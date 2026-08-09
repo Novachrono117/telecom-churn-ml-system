@@ -21,6 +21,17 @@ dev = [
     "pytest>=8.3",
     "ruff>=0.6",
 ]
+# Required from Phase 3 on to author and execute notebooks/01_eda.ipynb.
+# nbconvert is what validates the notebook runs end to end; nbformat is imported
+# directly by the validation step. Kept out of the runtime dependencies.
+notebooks = [
+    "ipykernel>=6.29",
+    "nbformat>=5.10",
+    "nbconvert>=7.16",
+]
+
+[tool.uv]
+default-groups = ["dev", "notebooks"]
 
 [build-system]
 requires = ["hatchling"]

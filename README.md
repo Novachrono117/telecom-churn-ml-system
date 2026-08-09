@@ -110,22 +110,40 @@ no empty placeholders):
 ├── data/
 │   ├── README.md          # acquisition + provenance (the only tracked file here)
 │   └── raw/               # untouched source CSV, never committed
+├── notebooks/
+│   └── 01_eda.ipynb       # Phase 3 narrative (committed without outputs)
 ├── reports/
 │   ├── data_understanding.md   # generated: findings, quality, leakage
-│   └── data_dictionary.md      # generated: one row per observed column
+│   ├── data_dictionary.md      # generated: one row per observed column
+│   ├── eda_report.md           # generated: Phase 3 analysis
+│   └── figures/eda/            # generated: 16 figures
 ├── scripts/
-│   └── inspect_raw_data.py     # regenerates the two reports above
+│   ├── inspect_raw_data.py     # regenerates the Phase 2 reports
+│   └── run_eda.py              # regenerates the Phase 3 report and figures
 ├── src/
 │   └── churn/
 │       ├── __init__.py
 │       ├── config.py
-│       └── data/          # loader, inspection, provenance, reporting
+│       ├── data/          # loader, inspection, provenance, reporting
+│       └── analysis/      # descriptive stats, association measures, plots
 └── tests/
 ```
 
-Planned as the project advances: `data/{interim,processed}/`, `notebooks/`,
+Planned as the project advances: `data/{interim,processed}/`,
 `src/churn/{features,modeling,explainability,monitoring}/` and `artifacts/`.
 Raw data and model artifacts are never committed.
+
+## Regenerating the analysis artifacts
+
+```powershell
+uv run python scripts/inspect_raw_data.py   # Phase 2: provenance, dictionary, validation
+uv run python scripts/run_eda.py            # Phase 3: EDA report and figures
+uv run jupyter lab notebooks/01_eda.ipynb   # the EDA narrative, interactively
+```
+
+The notebook is committed **without executed outputs** to keep the repository
+small and its diffs readable; it is validated by executing it end to end
+(`jupyter nbconvert --to notebook --execute`).
 
 ---
 
@@ -135,7 +153,7 @@ Raw data and model artifacts are never committed.
 | --- | --- | --- |
 | 1 | Foundation — repository, environment, configuration | ✅ Done |
 | 2 | Data understanding — acquisition, data dictionary, validation | ✅ Done — [report](reports/data_understanding.md), [dictionary](reports/data_dictionary.md) |
-| 3 | EDA — analysis and hypotheses | ⬜ Not started |
+| 3 | EDA — analysis and hypotheses | ✅ Done — [report](reports/eda_report.md), [notebook](notebooks/01_eda.ipynb) |
 | 4 | Preprocessing — split, imputation, encoding, scaling, pipeline | ⬜ Not started |
 | 5 | Baselines — `DummyClassifier` and Logistic Regression | ⬜ Not started |
 | 6 | Feature engineering — hypothesis-driven features | ⬜ Not started |
