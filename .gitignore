@@ -31,8 +31,11 @@ coverage.xml
 
 # --- Data ---
 # Data is never committed: it is acquired and rebuilt reproducibly by code.
-# Directories are created on demand, so no .gitkeep placeholder is needed.
-data/
+# `data/*` (not `data/`) so that the documentation below can be re-included:
+# git does not descend into an ignored directory, which would make the
+# negation unreachable.
+data/*
+!data/README.md
 *.csv
 *.tsv
 *.parquet
@@ -60,6 +63,9 @@ mlruns/
 *.key
 
 # --- Editors / OS ---
+# Machine-local Claude Code settings: must not rely on a global core.excludesfile
+# to stay out of the repository.
+.claude/settings.local.json
 .vscode/
 .idea/
 *.swp

@@ -18,8 +18,8 @@ interim_dir = "data/interim"
 processed_dir = "data/processed"
 
 [target]
-# ASSUMPTION (to be verified in Phase 2 against the real Telco Customer Churn file):
-# the target column is named "Churn" with "Yes"/"No" values, positive class = "Yes".
+# Verified in Phase 2 against the real file (SHA-256 88be4b93...61d61358a): the
+# column "Churn" holds exactly {"No", "Yes"}. Enforced by tests/test_raw_dataset_contract.py.
 column = "Churn"
 positive_label = "Yes"
 negative_label = "No"
