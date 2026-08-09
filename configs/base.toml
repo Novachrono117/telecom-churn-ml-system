@@ -1,0 +1,31 @@
+# Central configuration for the churn project.
+# Single source of truth for seed, data paths, target definition and split policy.
+# Loaded and validated by `churn.config`. Extend only when a phase needs it.
+
+[project]
+name = "churn-ml-engineering"
+
+[random]
+# Fixed seed for every stochastic step (splits, model init, resampling).
+seed = 42
+
+[data]
+# Dataset acquisition happens in Phase 2 (Data Understanding).
+# Paths are declared relative to the repository root and resolved by `churn.config`,
+# so no absolute path is ever hardcoded. Directories are created when first used.
+raw_dir = "data/raw"
+interim_dir = "data/interim"
+processed_dir = "data/processed"
+
+[target]
+# ASSUMPTION (to be verified in Phase 2 against the real Telco Customer Churn file):
+# the target column is named "Churn" with "Yes"/"No" values, positive class = "Yes".
+column = "Churn"
+positive_label = "Yes"
+negative_label = "No"
+
+[split]
+# Held-out test set, untouched until final evaluation (Phase 9).
+# Stratified because the target is imbalanced in this dataset family.
+test_size = 0.2
+stratify = true

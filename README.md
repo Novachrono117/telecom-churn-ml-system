@@ -1,0 +1,159 @@
+# Churn ML Engineering — Telecom Customer Churn
+
+End-to-end **machine learning engineering** solution for telecom customer churn
+prediction. The goal is not a trained classifier in a notebook, but a
+reproducible system: validated data understanding, leakage-free preprocessing,
+a controlled model comparison, an analyzed decision threshold, explainability,
+a packaged inference pipeline and a monitoring design.
+
+> ## ⚠️ Project status — Phase 1 (Foundation)
+>
+> **There are no results, metrics, models, figures or conclusions in this
+> repository yet.** No dataset has been acquired, no exploratory analysis has
+> been run and no model has been trained. Only the environment, the project
+> configuration and the package skeleton exist.
+>
+> Every number published here in the future will come from an experiment that
+> was actually executed by code in this repository.
+
+---
+
+## Problem
+
+| Item | Definition |
+| --- | --- |
+| Domain | Telecommunications |
+| Task | Supervised binary classification |
+| Planned dataset | Telco Customer Churn (to be acquired in Phase 2) |
+| Target | `Churn` |
+| Positive class | `Yes` |
+| Negative class | `No` |
+| Primary output | Churn probability |
+| Secondary output | Class label from a justified decision threshold |
+
+The project must answer *who is at risk*, *which factors are associated with the
+predictions*, *why an individual prediction was made*, *which threshold is
+appropriate* and *how the model would be monitored*. Accuracy alone is never a
+model-selection criterion.
+
+> The target column name and its labels are currently an **assumption** taken
+> from the project specification. They are validated against the real file in
+> Phase 2.
+
+---
+
+## Requirements
+
+- [uv](https://docs.astral.sh/uv/) (project and environment manager)
+- Python 3.12 — installed automatically by uv, pinned in `.python-version`
+
+Conda is not used. `pyproject.toml` is the single source of dependencies and
+`uv.lock` is versioned so the environment is byte-for-byte reproducible.
+
+## Environment reproduction
+
+```powershell
+# from the repository root
+uv sync                      # creates .venv from uv.lock and installs the project
+uv run pytest                # run the test suite
+uv run ruff check .          # lint
+uv run ruff format .         # format
+```
+
+`uv run <command>` uses the project environment without a manual `activate`.
+To open a Python session with the package importable:
+
+```powershell
+uv run python -c "from churn import get_config; print(get_config())"
+```
+
+---
+
+## Configuration
+
+All shared settings live in [`configs/base.toml`](configs/base.toml) — random
+seed, data-layer paths, target definition and the train/test split policy.
+They are read and validated by [`src/churn/config.py`](src/churn/config.py)
+using `tomllib` (standard library) plus `pydantic` models.
+
+```python
+from churn import get_config
+
+config = get_config()
+config.seed  # 42
+config.target.column  # "Churn"
+config.split.test_size  # 0.2
+config.data.raw_dir  # <repo>/data/raw  (absolute, resolved from the repo root)
+```
+
+Data paths are written relative to the repository root in the TOML file and
+resolved to absolute paths at load time, so no module depends on the current
+working directory and no absolute path is hardcoded.
+
+---
+
+## Repository structure
+
+Current state (directories are created only when a phase actually needs them —
+no empty placeholders):
+
+```text
+.
+├── CLAUDE.md              # project contract: rules, phases, quality bar
+├── README.md
+├── pyproject.toml         # dependencies and tooling (source of truth)
+├── uv.lock                # locked environment (versioned)
+├── .python-version        # 3.12
+├── configs/
+│   └── base.toml          # seed, paths, target, split
+├── src/
+│   └── churn/
+│       ├── __init__.py
+│       └── config.py
+└── tests/
+    └── test_config.py
+```
+
+Planned as the project advances: `data/{raw,interim,processed}/`, `notebooks/`,
+`src/churn/{data,features,modeling,explainability,monitoring}/`, `artifacts/`,
+`reports/` and `scripts/`. Raw data and model artifacts are never committed.
+
+---
+
+## Phases
+
+| # | Phase | Status |
+| --- | --- | --- |
+| 1 | Foundation — repository, environment, configuration | ✅ Done |
+| 2 | Data understanding — acquisition, data dictionary, validation | ⬜ Not started |
+| 3 | EDA — analysis and hypotheses | ⬜ Not started |
+| 4 | Preprocessing — split, imputation, encoding, scaling, pipeline | ⬜ Not started |
+| 5 | Baselines — `DummyClassifier` and Logistic Regression | ⬜ Not started |
+| 6 | Feature engineering — hypothesis-driven features | ⬜ Not started |
+| 7 | Modeling — controlled model comparison | ⬜ Not started |
+| 8 | Tuning — only promising candidates | ⬜ Not started |
+| 9 | Final evaluation — held-out test set, threshold, calibration, errors | ⬜ Not started |
+| 10 | Explainability — global and local | ⬜ Not started |
+| 11 | Persistence & inference — trained pipeline and prediction interface | ⬜ Not started |
+| 12 | Monitoring design — quality, drift, performance, retraining triggers | ⬜ Not started |
+| 13 | Portfolio product — optional API/UI | ⬜ Not started |
+| 14 | Academic delivery — notebook, report, figures, presentation | ⬜ Not started |
+| 15 | GitHub polish — documentation and reproduction instructions | ⬜ Not started |
+
+## Methodological commitments
+
+- The test set is separated before any transformation is fitted and stays
+  untouched until Phase 9.
+- Preprocessing is learned **only** on training data, through
+  `Pipeline` / `ColumnTransformer`.
+- Model selection uses cross-validation on training data only.
+- Evaluation reports precision, recall, F1, ROC-AUC, PR-AUC, the confusion
+  matrix, calibration and threshold sensitivity — never accuracy alone.
+- Any cost-based threshold discussion without real business figures is labeled
+  explicitly as a hypothetical scenario.
+- Feature importance and SHAP values are treated as associations, not causal
+  evidence.
+
+## License
+
+Not defined yet.

@@ -1,0 +1,10 @@
+# Normalize every text file to LF, both in the repository and in the working
+# tree, so Windows, Linux and Google Colab check out byte-identical content.
+# This overrides any local core.autocrlf setting.
+* text=auto eol=lf
+
+# Binary formats must never be line-ending normalized.
+# Data and model files are gitignored; figures for the report are not.
+*.png binary
+*.jpg binary
+*.pdf binary
