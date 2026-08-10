@@ -1,0 +1,20 @@
+{
+  "manifest_version": 1,
+  "raw_filename": "WA_Fn-UseC_-Telco-Customer-Churn.csv",
+  "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+  "id_column": "customerID",
+  "target_column": "Churn",
+  "positive_label": "Yes",
+  "negative_label": "No",
+  "test_size": 0.2,
+  "random_state": 42,
+  "stratified_by": "Churn",
+  "shuffle": true,
+  "split_function": "sklearn.model_selection.train_test_split",
+  "scikit_learn_version": "1.9.0",
+  "n_rows_total": 7043,
+  "n_rows_training": 5634,
+  "n_rows_holdout": 1409,
+  "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd",
+  "holdout_ids_sha256": "1ad8aefb7e34776a78d76765d2465c630a41b3813b1d7d96d0d1b03d049776f6"
+}
