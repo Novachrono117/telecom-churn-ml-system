@@ -6,17 +6,17 @@ reproducible system: validated data understanding, leakage-free preprocessing,
 a controlled model comparison, an analyzed decision threshold, explainability,
 a packaged inference pipeline and a monitoring design.
 
-> ## ⚠️ Project status — Phase 4 (Preprocessing)
+> ## ⚠️ Project status — Phase 5 (Baselines)
 >
-> **There are no metrics, models or predictive conclusions in this repository
-> yet.** The dataset has been acquired, inspected and explored; the train/holdout
-> split is frozen and the preprocessing pipeline is built and tested. No model
-> has been trained.
+> **There is no holdout estimate in this repository, and there will be none
+> before Phase 9.** The dataset has been acquired, inspected and explored; the
+> train/holdout split is frozen; the preprocessing pipeline is built and tested;
+> and three reference models have been cross-validated on the training pool.
 >
-> Every number published here comes from an analysis actually executed by code in
-> this repository — `scripts/inspect_raw_data.py`, `scripts/run_eda.py` and
-> `scripts/run_preprocessing.py`. The holdout partition is reserved for Phase 9
-> and no statistic of it is reported anywhere.
+> Every metric published here is **cross-validated out-of-fold performance on the
+> training pool** — not a test result. Every number comes from a run actually
+> executed by code in this repository. The holdout partition is reserved for the
+> final evaluation and no statistic of it is reported anywhere.
 
 ---
 
@@ -119,19 +119,23 @@ no empty placeholders):
 │   ├── eda_report.md           # generated: Phase 3 analysis
 │   ├── preprocessing_report.md # generated: Phase 4 protocol
 │   ├── split_manifest.json     # generated: frozen split + fingerprints
+│   ├── baseline_report.md      # generated: Phase 5 baselines
+│   ├── experiments/            # generated: machine-readable experiment records
 │   └── figures/eda/            # generated: 16 figures
 ├── scripts/
 │   ├── inspect_raw_data.py     # regenerates the Phase 2 reports
 │   ├── run_eda.py              # regenerates the Phase 3 report and figures
 │   ├── build_split.py          # freezes / verifies the train-holdout split
-│   └── run_preprocessing.py    # regenerates the Phase 4 report
+│   ├── run_preprocessing.py    # regenerates the Phase 4 report
+│   └── run_baselines.py        # regenerates the Phase 5 baselines
 ├── src/
 │   └── churn/
 │       ├── __init__.py
 │       ├── config.py
 │       ├── data/          # loader, inspection, provenance, reporting
 │       ├── analysis/      # descriptive stats, association measures, plots
-│       └── preprocessing/ # split, contract, transformers, pipeline, manifest
+│       ├── preprocessing/ # split, contract, transformers, pipeline, manifest
+│       └── modeling/      # baseline builders, paired CV, metrics, results
 └── tests/
 ```
 
@@ -147,6 +151,7 @@ uv run python scripts/run_eda.py              # Phase 3: EDA report and figures
 uv run python scripts/build_split.py          # Phase 4: freeze the split manifest
 uv run python scripts/build_split.py --verify # Phase 4: prove the split is reproducible
 uv run python scripts/run_preprocessing.py    # Phase 4: preprocessing report
+uv run python scripts/run_baselines.py        # Phase 5: baseline CV, figures, report
 uv run jupyter lab notebooks/01_eda.ipynb     # the EDA narrative, interactively
 ```
 
@@ -169,7 +174,7 @@ small and its diffs readable; it is validated by executing it end to end
 | 2 | Data understanding — acquisition, data dictionary, validation | ✅ Done — [report](reports/data_understanding.md), [dictionary](reports/data_dictionary.md) |
 | 3 | EDA — analysis and hypotheses | ✅ Done — [report](reports/eda_report.md), [notebook](notebooks/01_eda.ipynb) |
 | 4 | Preprocessing — split, contract, encoding, scaling, pipeline | ✅ Done — [report](reports/preprocessing_report.md), [split manifest](reports/split_manifest.json) |
-| 5 | Baselines — `DummyClassifier` and Logistic Regression | ⬜ Not started |
+| 5 | Baselines — `DummyClassifier` and Logistic Regression | ✅ Done — [report](reports/baseline_report.md), [results](reports/experiments/baseline_results.json) |
 | 6 | Feature engineering — hypothesis-driven features | ⬜ Not started |
 | 7 | Modeling — controlled model comparison | ⬜ Not started |
 | 8 | Tuning — only promising candidates | ⬜ Not started |

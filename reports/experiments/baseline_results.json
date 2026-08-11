@@ -1,0 +1,418 @@
+{
+  "schema_version": 2,
+  "experiment": "phase5-baselines",
+  "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+  "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd",
+  "n_training_rows": 5634,
+  "training_positive_prevalence": 0.265353,
+  "feature_set": {
+    "n_features": 19,
+    "numeric": [
+      "tenure",
+      "MonthlyCharges",
+      "TotalCharges"
+    ],
+    "categorical": [
+      "gender",
+      "SeniorCitizen",
+      "Partner",
+      "Dependents",
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies",
+      "Contract",
+      "PaperlessBilling",
+      "PaymentMethod"
+    ],
+    "engineered": []
+  },
+  "random_seed": 42,
+  "scikit_learn_version": "1.9.0",
+  "cross_validation": {
+    "strategy": "StratifiedKFold",
+    "n_splits": 5,
+    "shuffle": true,
+    "random_state": 42,
+    "shared_across_models": true
+  },
+  "decision_threshold": 0.5,
+  "metric_names": [
+    "roc_auc",
+    "average_precision",
+    "precision",
+    "recall",
+    "f1",
+    "accuracy"
+  ],
+  "metric_protocol": {
+    "primary_development_metric": "average_precision",
+    "secondary_ranking_metric": "roc_auc",
+    "diagnostic_metrics": [
+      "precision",
+      "recall",
+      "f1"
+    ],
+    "auxiliary_metrics": [
+      "accuracy"
+    ],
+    "threshold_optimised": false,
+    "comparison_method": "Paired per-fold differences on the identical StratifiedKFold partition: delta_metric_fold = metric_candidate_fold - metric_baseline_fold. Judge a candidate on the consistency and magnitude of those deltas. Do not compare a candidate's gain against a baseline's between-fold standard deviation: that figure describes how performance varies across partitions, not the uncertainty of a difference between two models measured on the same partitions.",
+    "rationale": "Average Precision leads because the positive class is the minority and the task is to discriminate churners: AP is computed entirely on positive-class retrieval and degrades visibly when a model finds fewer churners, whereas ROC-AUC is dominated by the abundant negatives and moves less. ROC-AUC stays as the secondary ranking view because it is prevalence-independent and comparable across samples. No single metric decides anything on its own: a candidate must also be weighed on trade-offs, added complexity and interpretability, and it need not improve every metric at once."
+  },
+  "models": [
+    {
+      "name": "majority",
+      "estimator": "DummyClassifier",
+      "hyperparameters": {
+        "constant": null,
+        "random_state": null,
+        "strategy": "most_frequent"
+      },
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.5,
+            "average_precision": 0.265306,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "accuracy": 0.734694
+          }
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.5,
+            "average_precision": 0.265306,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "accuracy": 0.734694
+          }
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.5,
+            "average_precision": 0.265306,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "accuracy": 0.734694
+          }
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.5,
+            "average_precision": 0.265306,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "accuracy": 0.734694
+          }
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "metrics": {
+            "roc_auc": 0.5,
+            "average_precision": 0.265542,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "accuracy": 0.734458
+          }
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.5,
+        "average_precision": 0.265353,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "accuracy": 0.734647
+      },
+      "std": {
+        "roc_auc": 0.0,
+        "average_precision": 0.000105,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "accuracy": 0.000105
+      },
+      "out_of_fold": {
+        "roc_auc": 0.5,
+        "average_precision": 0.265353,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "accuracy": 0.734647
+      },
+      "out_of_fold_confusion": {
+        "true_negative": 4139,
+        "false_positive": 0,
+        "false_negative": 1495,
+        "true_positive": 0
+      },
+      "converged": true,
+      "max_iterations_used": null
+    },
+    {
+      "name": "stratified_random",
+      "estimator": "DummyClassifier",
+      "hyperparameters": {
+        "constant": null,
+        "random_state": 42,
+        "strategy": "stratified"
+      },
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.531587,
+            "average_precision": 0.279753,
+            "precision": 0.311258,
+            "recall": 0.314381,
+            "f1": 0.312812,
+            "accuracy": 0.63354
+          }
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.513378,
+            "average_precision": 0.270904,
+            "precision": 0.284768,
+            "recall": 0.287625,
+            "f1": 0.28619,
+            "accuracy": 0.619343
+          }
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.511102,
+            "average_precision": 0.269897,
+            "precision": 0.281457,
+            "recall": 0.284281,
+            "f1": 0.282862,
+            "accuracy": 0.617569
+          }
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.481512,
+            "average_precision": 0.25883,
+            "precision": 0.238411,
+            "recall": 0.240803,
+            "f1": 0.239601,
+            "accuracy": 0.594499
+          }
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "metrics": {
+            "roc_auc": 0.495006,
+            "average_precision": 0.263647,
+            "precision": 0.258278,
+            "recall": 0.26087,
+            "f1": 0.259567,
+            "accuracy": 0.604796
+          }
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.506517,
+        "average_precision": 0.268606,
+        "precision": 0.274834,
+        "recall": 0.277592,
+        "f1": 0.276206,
+        "accuracy": 0.613949
+      },
+      "std": {
+        "roc_auc": 0.019068,
+        "average_precision": 0.007927,
+        "precision": 0.027704,
+        "recall": 0.027982,
+        "f1": 0.027842,
+        "accuracy": 0.014901
+      },
+      "out_of_fold": {
+        "roc_auc": 0.506518,
+        "average_precision": 0.267985,
+        "precision": 0.274834,
+        "recall": 0.277592,
+        "f1": 0.276206,
+        "accuracy": 0.613951
+      },
+      "out_of_fold_confusion": {
+        "true_negative": 3044,
+        "false_positive": 1095,
+        "false_negative": 1080,
+        "true_positive": 415
+      },
+      "converged": true,
+      "max_iterations_used": null
+    },
+    {
+      "name": "logistic_regression",
+      "estimator": "LogisticRegression",
+      "hyperparameters": {
+        "C": 1.0,
+        "class_weight": null,
+        "dual": false,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "l1_ratio": 0.0,
+        "max_iter": 100,
+        "n_jobs": null,
+        "penalty": "l2",
+        "random_state": null,
+        "solver": "lbfgs",
+        "tol": 0.0001,
+        "verbose": 0,
+        "warm_start": false
+      },
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.847891,
+            "average_precision": 0.64366,
+            "precision": 0.645161,
+            "recall": 0.535117,
+            "f1": 0.585009,
+            "accuracy": 0.79858
+          }
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.825128,
+            "average_precision": 0.635452,
+            "precision": 0.607287,
+            "recall": 0.501672,
+            "f1": 0.549451,
+            "accuracy": 0.781721
+          }
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.841901,
+            "average_precision": 0.685865,
+            "precision": 0.659751,
+            "recall": 0.531773,
+            "f1": 0.588889,
+            "accuracy": 0.803017
+          }
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.862874,
+            "average_precision": 0.678188,
+            "precision": 0.664286,
+            "recall": 0.622074,
+            "f1": 0.642487,
+            "accuracy": 0.816327
+          }
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "metrics": {
+            "roc_auc": 0.852952,
+            "average_precision": 0.6643,
+            "precision": 0.683983,
+            "recall": 0.528428,
+            "f1": 0.596226,
+            "accuracy": 0.809947
+          }
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.846149,
+        "average_precision": 0.661493,
+        "precision": 0.652094,
+        "recall": 0.543813,
+        "f1": 0.592412,
+        "accuracy": 0.801918
+      },
+      "std": {
+        "roc_auc": 0.014045,
+        "average_precision": 0.021661,
+        "precision": 0.028635,
+        "recall": 0.045711,
+        "f1": 0.033298,
+        "accuracy": 0.013156
+      },
+      "out_of_fold": {
+        "roc_auc": 0.845606,
+        "average_precision": 0.658425,
+        "precision": 0.651965,
+        "recall": 0.543813,
+        "f1": 0.592998,
+        "accuracy": 0.801917
+      },
+      "out_of_fold_confusion": {
+        "true_negative": 3705,
+        "false_positive": 434,
+        "false_negative": 682,
+        "true_positive": 813
+      },
+      "converged": true,
+      "max_iterations_used": 47
+    }
+  ],
+  "methodological_notes": [
+    "Every metric here is cross-validated on the frozen Phase 4 training pool. No metric was computed on the holdout, which stays untouched until Phase 9.",
+    "Preprocessing is refitted inside every fold: the scaler's statistics and the encoder's categories come from the training fold alone.",
+    "All models share the same StratifiedKFold partition, so the comparison is paired.",
+    "'average_precision' is sklearn.metrics.average_precision_score, not a trapezoidal PR-AUC. Interpret it against the training positive prevalence recorded here.",
+    "The 0.5 decision rule is an operational reference, not a tuned or business-chosen threshold. Threshold analysis belongs to Phase 9.",
+    "Logistic regression is untuned: C, penalty and class_weight are scikit-learn defaults. No hyperparameter search was run.",
+    "No feature engineering, resampling or class weighting was applied. The models see only the 19 original features.",
+    "'accuracy' is auxiliary. It was not used to rank or promote any model.",
+    "The per-fold standard deviations describe variability across partitions. They are NOT a margin of error for the difference between two models and must not be used as a threshold a future gain has to clear. See metric_protocol.comparison_method.",
+    "No paired comparison was performed in this phase; these are reference values only.",
+    "The analyst-exposure limitation recorded in the EDA still applies: exploratory hypotheses were formed with the full dataset in view."
+  ]
+}
