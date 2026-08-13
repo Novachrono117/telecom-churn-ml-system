@@ -32,6 +32,7 @@ fail through :class:`~churn.preprocessing.exceptions.DataQualityError` instead.
 from __future__ import annotations
 
 import logging
+from collections.abc import Sequence
 
 import numpy as np
 from sklearn.compose import ColumnTransformer
@@ -47,6 +48,38 @@ NUMERIC_STEP = "numeric"
 CATEGORICAL_STEP = "categorical"
 CLEANER_STEP = "total_charges"
 ENCODER_STEP = "encode"
+
+
+def build_column_encoder(
+    numeric: Sequence[str],
+    categorical: Sequence[str],
+) -> ColumnTransformer:
+    """Build the scaling/encoding block for a given set of columns.
+
+    Extracted so that later phases can encode a *wider* frame — the Phase 6
+    ablation appends derived columns — without duplicating the encoder's
+    configuration. The Phase 4 pipeline calls it with the contracted 19
+    features and is unaffected.
+
+    Args:
+        numeric: Columns to standardize.
+        categorical: Columns to one-hot encode.
+
+    Returns:
+        The unfitted :class:`~sklearn.compose.ColumnTransformer`.
+    """
+    return ColumnTransformer(
+        transformers=[
+            (NUMERIC_STEP, StandardScaler(), list(numeric)),
+            (
+                CATEGORICAL_STEP,
+                OneHotEncoder(handle_unknown="ignore", sparse_output=False, dtype=np.float64),
+                list(categorical),
+            ),
+        ],
+        remainder="drop",
+        verbose_feature_names_out=True,
+    )
 
 
 def build_preprocessor() -> Pipeline:
@@ -65,22 +98,10 @@ def build_preprocessor() -> Pipeline:
     Returns:
         The unfitted :class:`~sklearn.pipeline.Pipeline`.
     """
-    encoder = ColumnTransformer(
-        transformers=[
-            (NUMERIC_STEP, StandardScaler(), list(NUMERIC_FEATURES)),
-            (
-                CATEGORICAL_STEP,
-                OneHotEncoder(handle_unknown="ignore", sparse_output=False, dtype=np.float64),
-                list(CATEGORICAL_FEATURES),
-            ),
-        ],
-        remainder="drop",
-        verbose_feature_names_out=True,
-    )
     return Pipeline(
         steps=[
             (CLEANER_STEP, TotalChargesCleaner()),
-            (ENCODER_STEP, encoder),
+            (ENCODER_STEP, build_column_encoder(NUMERIC_FEATURES, CATEGORICAL_FEATURES)),
         ]
     )
 

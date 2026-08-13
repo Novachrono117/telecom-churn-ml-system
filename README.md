@@ -6,7 +6,7 @@ reproducible system: validated data understanding, leakage-free preprocessing,
 a controlled model comparison, an analyzed decision threshold, explainability,
 a packaged inference pipeline and a monitoring design.
 
-> ## ⚠️ Project status — Phase 5 (Baselines)
+> ## ⚠️ Project status — Phase 6 (Feature engineering)
 >
 > **There is no holdout estimate in this repository, and there will be none
 > before Phase 9.** The dataset has been acquired, inspected and explored; the
@@ -120,6 +120,7 @@ no empty placeholders):
 │   ├── preprocessing_report.md # generated: Phase 4 protocol
 │   ├── split_manifest.json     # generated: frozen split + fingerprints
 │   ├── baseline_report.md      # generated: Phase 5 baselines
+│   ├── feature_engineering_report.md  # generated: Phase 6 ablation study
 │   ├── experiments/            # generated: machine-readable experiment records
 │   └── figures/eda/            # generated: 16 figures
 ├── scripts/
@@ -127,7 +128,8 @@ no empty placeholders):
 │   ├── run_eda.py              # regenerates the Phase 3 report and figures
 │   ├── build_split.py          # freezes / verifies the train-holdout split
 │   ├── run_preprocessing.py    # regenerates the Phase 4 report
-│   └── run_baselines.py        # regenerates the Phase 5 baselines
+│   ├── run_baselines.py        # regenerates the Phase 5 baselines
+│   └── run_feature_engineering.py  # regenerates the Phase 6 ablation
 ├── src/
 │   └── churn/
 │       ├── __init__.py
@@ -135,7 +137,8 @@ no empty placeholders):
 │       ├── data/          # loader, inspection, provenance, reporting
 │       ├── analysis/      # descriptive stats, association measures, plots
 │       ├── preprocessing/ # split, contract, transformers, pipeline, manifest
-│       └── modeling/      # baseline builders, paired CV, metrics, results
+│       ├── modeling/      # baseline builders, paired CV, metrics, results
+│       └── features/      # candidate features, feature groups, ablation protocol
 └── tests/
 ```
 
@@ -152,6 +155,7 @@ uv run python scripts/build_split.py          # Phase 4: freeze the split manife
 uv run python scripts/build_split.py --verify # Phase 4: prove the split is reproducible
 uv run python scripts/run_preprocessing.py    # Phase 4: preprocessing report
 uv run python scripts/run_baselines.py        # Phase 5: baseline CV, figures, report
+uv run python scripts/run_feature_engineering.py  # Phase 6: feature ablation study
 uv run jupyter lab notebooks/01_eda.ipynb     # the EDA narrative, interactively
 ```
 
@@ -175,7 +179,7 @@ small and its diffs readable; it is validated by executing it end to end
 | 3 | EDA — analysis and hypotheses | ✅ Done — [report](reports/eda_report.md), [notebook](notebooks/01_eda.ipynb) |
 | 4 | Preprocessing — split, contract, encoding, scaling, pipeline | ✅ Done — [report](reports/preprocessing_report.md), [split manifest](reports/split_manifest.json) |
 | 5 | Baselines — `DummyClassifier` and Logistic Regression | ✅ Done — [report](reports/baseline_report.md), [results](reports/experiments/baseline_results.json) |
-| 6 | Feature engineering — hypothesis-driven features | ⬜ Not started |
+| 6 | Feature engineering — hypothesis-driven ablation study | ✅ Done — [report](reports/feature_engineering_report.md), [results](reports/experiments/feature_engineering_results.json) |
 | 7 | Modeling — controlled model comparison | ⬜ Not started |
 | 8 | Tuning — only promising candidates | ⬜ Not started |
 | 9 | Final evaluation — held-out test set, threshold, calibration, errors | ⬜ Not started |

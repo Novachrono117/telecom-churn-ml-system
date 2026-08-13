@@ -154,6 +154,19 @@ def evaluate_model(
             converged = False
             logger.warning("%s: fold %d did not converge", name, number)
 
+        # ``catch_warnings(record=True)`` intercepts *every* warning raised during
+        # the fit, not only the convergence one being inspected. Anything else is
+        # re-emitted so that a genuine warning is not silently swallowed by a
+        # context manager that exists for an unrelated purpose.
+        for entry in caught:
+            if not issubclass(entry.category, ConvergenceWarning):
+                warnings.warn_explicit(
+                    entry.message,
+                    entry.category,
+                    entry.filename,
+                    entry.lineno,
+                )
+
         probability = model.predict_proba(features.iloc[validation_index])[:, 1]
         oof[validation_index] = probability
 

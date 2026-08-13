@@ -1,0 +1,786 @@
+{
+  "schema_version": 1,
+  "experiment": "phase6-feature-engineering-ablation",
+  "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+  "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd",
+  "n_training_rows": 5634,
+  "training_positive_prevalence": 0.265353,
+  "random_seed": 42,
+  "scikit_learn_version": "1.9.0",
+  "cross_validation": {
+    "strategy": "StratifiedKFold",
+    "n_splits": 5,
+    "shuffle": true,
+    "random_state": 42,
+    "shared_across_experiments": true,
+    "identical_to_baseline": true
+  },
+  "metric_protocol": {
+    "primary_development_metric": "average_precision",
+    "secondary_ranking_metric": "roc_auc",
+    "diagnostic_metrics": [
+      "precision",
+      "recall",
+      "f1"
+    ],
+    "auxiliary_metrics": [
+      "accuracy"
+    ],
+    "threshold_optimised": false,
+    "comparison_method": "Paired per-fold differences on the identical StratifiedKFold partition: delta_metric_fold = metric_candidate_fold - metric_baseline_fold. Judge a candidate on the consistency and magnitude of those deltas. Do not compare a candidate's gain against a baseline's between-fold standard deviation: that figure describes how performance varies across partitions, not the uncertainty of a difference between two models measured on the same partitions.",
+    "rationale": "Average Precision leads because the positive class is the minority and the task is to discriminate churners: AP is computed entirely on positive-class retrieval and degrades visibly when a model finds fewer churners, whereas ROC-AUC is dominated by the abundant negatives and moves less. ROC-AUC stays as the secondary ranking view because it is prevalence-independent and comparable across samples. No single metric decides anything on its own: a candidate must also be weighed on trade-offs, added complexity and interpretability, and it need not improve every metric at once.",
+    "primary_metric_used_here": "average_precision",
+    "secondary_metric_used_here": "roc_auc"
+  },
+  "decision_threshold": 0.5,
+  "baseline_reproduction": {
+    "reference_artefact": "reports/experiments/baseline_results.json",
+    "reference_schema_version": 2,
+    "reference_model": "logistic_regression",
+    "tolerance": 1e-09,
+    "max_absolute_difference": 0.0,
+    "reproduced": true
+  },
+  "candidates": [
+    {
+      "group": "protective_services",
+      "hypothesis": "Churn falls monotonically as protective services accumulate, so the count carries signal the four independent dummies cannot express as one slope.",
+      "added_numeric": [
+        "protective_service_count"
+      ],
+      "added_categorical": [],
+      "stateful": false,
+      "notes": "Counts only explicit 'Yes'. 'No' and the sentinel 'No internet service' both count as zero. The four source columns are kept, so the count is a deterministic sum of indicators the baseline already receives one-hot: it adds no information, only a coarser parametrisation of information the model already had."
+    },
+    {
+      "group": "automatic_payment",
+      "hypothesis": "The manual/automatic split is the axis of the payment-method signal, and one pooled coefficient estimates it more stably than four separate dummies.",
+      "added_numeric": [
+        "automatic_payment"
+      ],
+      "added_categorical": [],
+      "stateful": false,
+      "notes": "Positive for 'Bank transfer (automatic)' and 'Credit card (automatic)'. PaymentMethod is kept, so the flag is a deterministic aggregation of two of the four categories the encoder already emits: it adds no information, only a coarser parametrisation of information the model already had."
+    },
+    {
+      "group": "contract_tenure",
+      "hypothesis": "The tenure gradient differs by contract type, which the purely additive baseline cannot express with a single shared tenure slope.",
+      "added_numeric": [
+        "tenure_x_month_to_month",
+        "tenure_x_one_year"
+      ],
+      "added_categorical": [],
+      "stateful": false,
+      "notes": "'Two year' is the implicit reference. A third interaction would sum with the other two to exactly 'tenure', which is already in the matrix."
+    },
+    {
+      "group": "historical_average_charge",
+      "hypothesis": "Accumulated charge per month of tenure exposes the price history that the current MonthlyCharges hides, and the model would otherwise have to recover it from three separate columns.",
+      "added_numeric": [
+        "historical_average_charge"
+      ],
+      "added_categorical": [],
+      "stateful": false,
+      "notes": "A descriptive ratio, not an exact average contractual price. Undefined at tenure 0 and represented there as 0.0, coherent with the structural zero of TotalCharges; the model still receives tenure and can tell those rows apart."
+    },
+    {
+      "group": "charge_intensity",
+      "hypothesis": "Paying above the going rate for one's own internet tier relates to churn, whereas the raw charge mostly encodes which tier was bought — the EDA showed the marginal charge gap reversing once the tier is held fixed.",
+      "added_numeric": [
+        "charge_intensity"
+      ],
+      "added_categorical": [],
+      "stateful": true,
+      "notes": "The only stateful candidate. Tier medians are learned in fit — inside each training fold — and an unseen tier falls back to the training fold's global median. No median from the full-dataset EDA is reused."
+    }
+  ],
+  "experiments": [
+    {
+      "experiment": "E0",
+      "label": "Original features (baseline reproduction)",
+      "feature_groups": [],
+      "n_input_features": 19,
+      "n_transformed_features": 46,
+      "folds": [
+        {
+          "fold": 1,
+          "metrics": {
+            "roc_auc": 0.847891,
+            "average_precision": 0.64366,
+            "precision": 0.645161,
+            "recall": 0.535117,
+            "f1": 0.585009,
+            "accuracy": 0.79858
+          }
+        },
+        {
+          "fold": 2,
+          "metrics": {
+            "roc_auc": 0.825128,
+            "average_precision": 0.635452,
+            "precision": 0.607287,
+            "recall": 0.501672,
+            "f1": 0.549451,
+            "accuracy": 0.781721
+          }
+        },
+        {
+          "fold": 3,
+          "metrics": {
+            "roc_auc": 0.841901,
+            "average_precision": 0.685865,
+            "precision": 0.659751,
+            "recall": 0.531773,
+            "f1": 0.588889,
+            "accuracy": 0.803017
+          }
+        },
+        {
+          "fold": 4,
+          "metrics": {
+            "roc_auc": 0.862874,
+            "average_precision": 0.678188,
+            "precision": 0.664286,
+            "recall": 0.622074,
+            "f1": 0.642487,
+            "accuracy": 0.816327
+          }
+        },
+        {
+          "fold": 5,
+          "metrics": {
+            "roc_auc": 0.852952,
+            "average_precision": 0.6643,
+            "precision": 0.683983,
+            "recall": 0.528428,
+            "f1": 0.596226,
+            "accuracy": 0.809947
+          }
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.846149,
+        "average_precision": 0.661493,
+        "precision": 0.652094,
+        "recall": 0.543813,
+        "f1": 0.592412,
+        "accuracy": 0.801918
+      },
+      "std": {
+        "roc_auc": 0.014045,
+        "average_precision": 0.021661,
+        "precision": 0.028635,
+        "recall": 0.045711,
+        "f1": 0.033298,
+        "accuracy": 0.013156
+      },
+      "paired_deltas": {},
+      "classification": null,
+      "rationale": "Baseline reproduction; nothing to compare against.",
+      "out_of_fold": {
+        "roc_auc": 0.845606,
+        "average_precision": 0.658425,
+        "precision": 0.651965,
+        "recall": 0.543813,
+        "f1": 0.592998,
+        "accuracy": 0.801917
+      }
+    },
+    {
+      "experiment": "E1",
+      "label": "Original + protective_services",
+      "feature_groups": [
+        "protective_services"
+      ],
+      "n_input_features": 20,
+      "n_transformed_features": 47,
+      "folds": [
+        {
+          "fold": 1,
+          "metrics": {
+            "roc_auc": 0.847895,
+            "average_precision": 0.643743,
+            "precision": 0.645161,
+            "recall": 0.535117,
+            "f1": 0.585009,
+            "accuracy": 0.79858
+          }
+        },
+        {
+          "fold": 2,
+          "metrics": {
+            "roc_auc": 0.825249,
+            "average_precision": 0.635426,
+            "precision": 0.609756,
+            "recall": 0.501672,
+            "f1": 0.550459,
+            "accuracy": 0.782609
+          }
+        },
+        {
+          "fold": 3,
+          "metrics": {
+            "roc_auc": 0.841884,
+            "average_precision": 0.685776,
+            "precision": 0.659751,
+            "recall": 0.531773,
+            "f1": 0.588889,
+            "accuracy": 0.803017
+          }
+        },
+        {
+          "fold": 4,
+          "metrics": {
+            "roc_auc": 0.862894,
+            "average_precision": 0.678207,
+            "precision": 0.664286,
+            "recall": 0.622074,
+            "f1": 0.642487,
+            "accuracy": 0.816327
+          }
+        },
+        {
+          "fold": 5,
+          "metrics": {
+            "roc_auc": 0.852932,
+            "average_precision": 0.664096,
+            "precision": 0.686957,
+            "recall": 0.528428,
+            "f1": 0.597353,
+            "accuracy": 0.810835
+          }
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.846171,
+        "average_precision": 0.66145,
+        "precision": 0.653182,
+        "recall": 0.543813,
+        "f1": 0.592839,
+        "accuracy": 0.802273
+      },
+      "std": {
+        "roc_auc": 0.014004,
+        "average_precision": 0.021624,
+        "precision": 0.028536,
+        "recall": 0.045711,
+        "f1": 0.033009,
+        "accuracy": 0.012958
+      },
+      "paired_deltas": {
+        "average_precision": {
+          "metric": "average_precision",
+          "per_fold": [
+            8.2e-05,
+            -2.6e-05,
+            -8.9e-05,
+            1.9e-05,
+            -0.000204
+          ],
+          "mean": -4.4e-05,
+          "std": 0.000109,
+          "folds_improved": 2,
+          "folds_worsened": 3
+        },
+        "roc_auc": {
+          "metric": "roc_auc",
+          "per_fold": [
+            4e-06,
+            0.000121,
+            -1.6e-05,
+            2e-05,
+            -2e-05
+          ],
+          "mean": 2.2e-05,
+          "std": 5.8e-05,
+          "folds_improved": 3,
+          "folds_worsened": 2
+        }
+      },
+      "classification": "NOT_SUPPORTED",
+      "rationale": "mean delta average_precision = -0.0000 with 2/5 folds improving: the hypothesis does not show up under the frozen protocol.",
+      "out_of_fold": null
+    },
+    {
+      "experiment": "E2",
+      "label": "Original + automatic_payment",
+      "feature_groups": [
+        "automatic_payment"
+      ],
+      "n_input_features": 20,
+      "n_transformed_features": 47,
+      "folds": [
+        {
+          "fold": 1,
+          "metrics": {
+            "roc_auc": 0.847895,
+            "average_precision": 0.643716,
+            "precision": 0.647773,
+            "recall": 0.535117,
+            "f1": 0.586081,
+            "accuracy": 0.799468
+          }
+        },
+        {
+          "fold": 2,
+          "metrics": {
+            "roc_auc": 0.825196,
+            "average_precision": 0.635431,
+            "precision": 0.609756,
+            "recall": 0.501672,
+            "f1": 0.550459,
+            "accuracy": 0.782609
+          }
+        },
+        {
+          "fold": 3,
+          "metrics": {
+            "roc_auc": 0.841945,
+            "average_precision": 0.686091,
+            "precision": 0.659751,
+            "recall": 0.531773,
+            "f1": 0.588889,
+            "accuracy": 0.803017
+          }
+        },
+        {
+          "fold": 4,
+          "metrics": {
+            "roc_auc": 0.862963,
+            "average_precision": 0.678561,
+            "precision": 0.664286,
+            "recall": 0.622074,
+            "f1": 0.642487,
+            "accuracy": 0.816327
+          }
+        },
+        {
+          "fold": 5,
+          "metrics": {
+            "roc_auc": 0.85298,
+            "average_precision": 0.664266,
+            "precision": 0.686957,
+            "recall": 0.528428,
+            "f1": 0.597353,
+            "accuracy": 0.810835
+          }
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.846196,
+        "average_precision": 0.661613,
+        "precision": 0.653705,
+        "recall": 0.543813,
+        "f1": 0.593054,
+        "accuracy": 0.802451
+      },
+      "std": {
+        "roc_auc": 0.014046,
+        "average_precision": 0.02179,
+        "precision": 0.028376,
+        "recall": 0.045711,
+        "f1": 0.032949,
+        "accuracy": 0.012901
+      },
+      "paired_deltas": {
+        "average_precision": {
+          "metric": "average_precision",
+          "per_fold": [
+            5.6e-05,
+            -2.1e-05,
+            0.000226,
+            0.000373,
+            -3.4e-05
+          ],
+          "mean": 0.00012,
+          "std": 0.000175,
+          "folds_improved": 3,
+          "folds_worsened": 2
+        },
+        "roc_auc": {
+          "metric": "roc_auc",
+          "per_fold": [
+            4e-06,
+            6.9e-05,
+            4.4e-05,
+            8.9e-05,
+            2.8e-05
+          ],
+          "mean": 4.7e-05,
+          "std": 3.3e-05,
+          "folds_improved": 5,
+          "folds_worsened": 0
+        }
+      },
+      "classification": "INCONCLUSIVE",
+      "rationale": "mean delta average_precision = +0.0001 but only 3/5 folds improve: the direction is not consistent enough to act on with five folds and no significance test.",
+      "out_of_fold": null
+    },
+    {
+      "experiment": "E3",
+      "label": "Original + contract_tenure",
+      "feature_groups": [
+        "contract_tenure"
+      ],
+      "n_input_features": 21,
+      "n_transformed_features": 48,
+      "folds": [
+        {
+          "fold": 1,
+          "metrics": {
+            "roc_auc": 0.846748,
+            "average_precision": 0.644466,
+            "precision": 0.643443,
+            "recall": 0.525084,
+            "f1": 0.578269,
+            "accuracy": 0.796806
+          }
+        },
+        {
+          "fold": 2,
+          "metrics": {
+            "roc_auc": 0.827167,
+            "average_precision": 0.640057,
+            "precision": 0.622951,
+            "recall": 0.508361,
+            "f1": 0.559853,
+            "accuracy": 0.787933
+          }
+        },
+        {
+          "fold": 3,
+          "metrics": {
+            "roc_auc": 0.842292,
+            "average_precision": 0.68654,
+            "precision": 0.668067,
+            "recall": 0.531773,
+            "f1": 0.592179,
+            "accuracy": 0.805679
+          }
+        },
+        {
+          "fold": 4,
+          "metrics": {
+            "roc_auc": 0.864029,
+            "average_precision": 0.678175,
+            "precision": 0.67509,
+            "recall": 0.625418,
+            "f1": 0.649306,
+            "accuracy": 0.820763
+          }
+        },
+        {
+          "fold": 5,
+          "metrics": {
+            "roc_auc": 0.85531,
+            "average_precision": 0.666648,
+            "precision": 0.681034,
+            "recall": 0.528428,
+            "f1": 0.595104,
+            "accuracy": 0.809059
+          }
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.847109,
+        "average_precision": 0.663177,
+        "precision": 0.658117,
+        "recall": 0.543813,
+        "f1": 0.594942,
+        "accuracy": 0.804048
+      },
+      "std": {
+        "roc_auc": 0.013915,
+        "average_precision": 0.020417,
+        "precision": 0.024312,
+        "recall": 0.046499,
+        "f1": 0.033438,
+        "accuracy": 0.012443
+      },
+      "paired_deltas": {
+        "average_precision": {
+          "metric": "average_precision",
+          "per_fold": [
+            0.000805,
+            0.004605,
+            0.000675,
+            -1.3e-05,
+            0.002348
+          ],
+          "mean": 0.001684,
+          "std": 0.001847,
+          "folds_improved": 4,
+          "folds_worsened": 1
+        },
+        "roc_auc": {
+          "metric": "roc_auc",
+          "per_fold": [
+            -0.001143,
+            0.00204,
+            0.000392,
+            0.001155,
+            0.002358
+          ],
+          "mean": 0.00096,
+          "std": 0.001406,
+          "folds_improved": 4,
+          "folds_worsened": 1
+        }
+      },
+      "classification": "PROMISING",
+      "rationale": "mean delta average_precision = +0.0017, improving in 4/5 folds, with roc_auc +0.0010: consistent in direction under the frozen protocol.",
+      "out_of_fold": {
+        "roc_auc": 0.846664,
+        "average_precision": 0.660533,
+        "precision": 0.6583,
+        "recall": 0.543813,
+        "f1": 0.595604,
+        "accuracy": 0.804047
+      }
+    },
+    {
+      "experiment": "E4",
+      "label": "Original + historical_average_charge",
+      "feature_groups": [
+        "historical_average_charge"
+      ],
+      "n_input_features": 20,
+      "n_transformed_features": 47,
+      "folds": [
+        {
+          "fold": 1,
+          "metrics": {
+            "roc_auc": 0.847943,
+            "average_precision": 0.644044,
+            "precision": 0.645161,
+            "recall": 0.535117,
+            "f1": 0.585009,
+            "accuracy": 0.79858
+          }
+        },
+        {
+          "fold": 2,
+          "metrics": {
+            "roc_auc": 0.824392,
+            "average_precision": 0.633406,
+            "precision": 0.609756,
+            "recall": 0.501672,
+            "f1": 0.550459,
+            "accuracy": 0.782609
+          }
+        },
+        {
+          "fold": 3,
+          "metrics": {
+            "roc_auc": 0.841642,
+            "average_precision": 0.684639,
+            "precision": 0.659751,
+            "recall": 0.531773,
+            "f1": 0.588889,
+            "accuracy": 0.803017
+          }
+        },
+        {
+          "fold": 4,
+          "metrics": {
+            "roc_auc": 0.861852,
+            "average_precision": 0.673632,
+            "precision": 0.661972,
+            "recall": 0.628763,
+            "f1": 0.64494,
+            "accuracy": 0.816327
+          }
+        },
+        {
+          "fold": 5,
+          "metrics": {
+            "roc_auc": 0.852879,
+            "average_precision": 0.664037,
+            "precision": 0.688312,
+            "recall": 0.531773,
+            "f1": 0.6,
+            "accuracy": 0.811723
+          }
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.845742,
+        "average_precision": 0.659952,
+        "precision": 0.65299,
+        "recall": 0.545819,
+        "f1": 0.593859,
+        "accuracy": 0.802451
+      },
+      "std": {
+        "roc_auc": 0.014035,
+        "average_precision": 0.021042,
+        "precision": 0.028742,
+        "recall": 0.048316,
+        "f1": 0.034035,
+        "accuracy": 0.01311
+      },
+      "paired_deltas": {
+        "average_precision": {
+          "metric": "average_precision",
+          "per_fold": [
+            0.000384,
+            -0.002046,
+            -0.001226,
+            -0.004557,
+            -0.000263
+          ],
+          "mean": -0.001541,
+          "std": 0.001923,
+          "folds_improved": 1,
+          "folds_worsened": 4
+        },
+        "roc_auc": {
+          "metric": "roc_auc",
+          "per_fold": [
+            5.3e-05,
+            -0.000735,
+            -0.000259,
+            -0.001022,
+            -7.3e-05
+          ],
+          "mean": -0.000407,
+          "std": 0.000456,
+          "folds_improved": 1,
+          "folds_worsened": 4
+        }
+      },
+      "classification": "NOT_SUPPORTED",
+      "rationale": "mean delta average_precision = -0.0015 with 1/5 folds improving: the hypothesis does not show up under the frozen protocol.",
+      "out_of_fold": null
+    },
+    {
+      "experiment": "E5",
+      "label": "Original + charge_intensity",
+      "feature_groups": [
+        "charge_intensity"
+      ],
+      "n_input_features": 20,
+      "n_transformed_features": 47,
+      "folds": [
+        {
+          "fold": 1,
+          "metrics": {
+            "roc_auc": 0.848682,
+            "average_precision": 0.642924,
+            "precision": 0.644898,
+            "recall": 0.528428,
+            "f1": 0.580882,
+            "accuracy": 0.797693
+          }
+        },
+        {
+          "fold": 2,
+          "metrics": {
+            "roc_auc": 0.824893,
+            "average_precision": 0.63367,
+            "precision": 0.609053,
+            "recall": 0.494983,
+            "f1": 0.546125,
+            "accuracy": 0.781721
+          }
+        },
+        {
+          "fold": 3,
+          "metrics": {
+            "roc_auc": 0.840656,
+            "average_precision": 0.683854,
+            "precision": 0.651639,
+            "recall": 0.531773,
+            "f1": 0.585635,
+            "accuracy": 0.800355
+          }
+        },
+        {
+          "fold": 4,
+          "metrics": {
+            "roc_auc": 0.863383,
+            "average_precision": 0.678752,
+            "precision": 0.661871,
+            "recall": 0.615385,
+            "f1": 0.637782,
+            "accuracy": 0.814552
+          }
+        },
+        {
+          "fold": 5,
+          "metrics": {
+            "roc_auc": 0.853437,
+            "average_precision": 0.665661,
+            "precision": 0.689362,
+            "recall": 0.541806,
+            "f1": 0.606742,
+            "accuracy": 0.813499
+          }
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.846211,
+        "average_precision": 0.660972,
+        "precision": 0.651365,
+        "recall": 0.542475,
+        "f1": 0.591433,
+        "accuracy": 0.801564
+      },
+      "std": {
+        "roc_auc": 0.014478,
+        "average_precision": 0.021982,
+        "precision": 0.029096,
+        "recall": 0.044395,
+        "f1": 0.033839,
+        "accuracy": 0.013429
+      },
+      "paired_deltas": {
+        "average_precision": {
+          "metric": "average_precision",
+          "per_fold": [
+            -0.000736,
+            -0.001781,
+            -0.002011,
+            0.000564,
+            0.00136
+          ],
+          "mean": -0.000521,
+          "std": 0.001464,
+          "folds_improved": 2,
+          "folds_worsened": 3
+        },
+        "roc_auc": {
+          "metric": "roc_auc",
+          "per_fold": [
+            0.000792,
+            -0.000234,
+            -0.001244,
+            0.000509,
+            0.000485
+          ],
+          "mean": 6.2e-05,
+          "std": 0.000822,
+          "folds_improved": 3,
+          "folds_worsened": 2
+        }
+      },
+      "classification": "NOT_SUPPORTED",
+      "rationale": "mean delta average_precision = -0.0005 with 2/5 folds improving: the hypothesis does not show up under the frozen protocol.",
+      "out_of_fold": null
+    }
+  ],
+  "combined_experiment": null,
+  "methodological_notes": [
+    "Every metric is cross-validated on the frozen Phase 4 training pool. No metric was computed on the holdout, which stays untouched until Phase 9.",
+    "All experiments use the identical StratifiedKFold partition as the Phase 5 baseline, so every delta is a paired per-fold difference.",
+    "Deltas are compared on direction and consistency across folds. The baseline's between-fold standard deviation is NOT used as a bar a gain must clear: it measures dispersion across partitions, not the uncertainty of a difference between two models.",
+    "No significance test was run. Five folds cannot support one, and the PROMISING/INCONCLUSIVE/NOT_SUPPORTED labels are engineering heuristics, not inference.",
+    "No minimum-gain cutoff is applied. Magnitude, interpretability and complexity are reported separately and weighed by a reader.",
+    "The classifier is frozen at the Phase 5 configuration for every experiment. No hyperparameter, threshold or fold assignment was changed to benefit a candidate.",
+    "No original feature was removed. This phase tests added representation; feature selection is a different question and is not mixed in here.",
+    "Only charge_intensity is stateful. Its tier medians are learned inside each training fold; no median from the full-dataset EDA is reused.",
+    "No candidate reads the target. Every derived column is a function of the features.",
+    "Threshold-dependent metrics at 0.5 are diagnostic and were not used to select any candidate.",
+    "Associations, not causes: a feature improving prediction says nothing about whether it causes churn."
+  ]
+}
