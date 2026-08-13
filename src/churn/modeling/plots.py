@@ -37,6 +37,11 @@ MODEL_COLORS: dict[str, str] = {
     "majority": "#8a8880",
     "stratified_random": COLOR_RETAINED,
     "logistic_regression": COLOR_CHURNED,
+    # Phase 7 families. Orange / deep blue / near-black separate under every
+    # common colour-vision deficiency and also in grayscale, which a
+    # blue-vs-violet or green-vs-orange pair would not.
+    "random_forest": "#3c3b38",
+    "hist_gradient_boosting": "#1b5fa8",
 }
 
 #: Human-readable names, used in legends and axis labels.
@@ -44,6 +49,8 @@ MODEL_LABELS: dict[str, str] = {
     "majority": "Majority (always 'no churn')",
     "stratified_random": "Stratified random",
     "logistic_regression": "Logistic regression",
+    "random_forest": "Random forest",
+    "hist_gradient_boosting": "Histogram gradient boosting",
 }
 
 OOF_CAPTION = "Cross-validated out-of-fold performance on the training pool"

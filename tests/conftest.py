@@ -114,3 +114,15 @@ def make_contract_frame(rows: int = CONTRACT_ROWS) -> pd.DataFrame:
 def contract_frame() -> pd.DataFrame:
     """A synthetic frame carrying the full Phase 4 schema."""
     return make_contract_frame()
+
+
+#: Rows of :func:`comparison_frame`. Twice :data:`CONTRACT_ROWS`, so a stratified
+#: 5-fold split still leaves several churners in every validation fold — a tree
+#: ensemble fitted on two positives says nothing about anything.
+COMPARISON_ROWS = 80
+
+
+@pytest.fixture(scope="module")
+def comparison_frame() -> pd.DataFrame:
+    """A larger synthetic frame, module-scoped for cross-validation tests."""
+    return make_contract_frame(COMPARISON_ROWS)
