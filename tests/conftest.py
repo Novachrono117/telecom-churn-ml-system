@@ -9,6 +9,7 @@ file live in ``test_raw_dataset_contract.py`` and skip when it is absent.
 from __future__ import annotations
 
 import itertools
+from collections.abc import Callable
 from pathlib import Path
 
 import pandas as pd
@@ -126,3 +127,9 @@ COMPARISON_ROWS = 80
 def comparison_frame() -> pd.DataFrame:
     """A larger synthetic frame, module-scoped for cross-validation tests."""
     return make_contract_frame(COMPARISON_ROWS)
+
+
+@pytest.fixture(scope="session")
+def contract_frame_factory() -> Callable[[int], pd.DataFrame]:
+    """The synthetic-frame builder, for tests that need a specific row count."""
+    return make_contract_frame

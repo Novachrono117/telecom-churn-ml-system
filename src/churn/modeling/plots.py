@@ -42,6 +42,9 @@ MODEL_COLORS: dict[str, str] = {
     # blue-vs-violet or green-vs-orange pair would not.
     "random_forest": "#3c3b38",
     "hist_gradient_boosting": "#1b5fa8",
+    # Phase 8A. The same family under a different representation, so a teal that
+    # reads as related to the boosted blue without being confusable with it.
+    "hgb_native": "#0f7a6e",
 }
 
 #: Human-readable names, used in legends and axis labels.
@@ -51,6 +54,7 @@ MODEL_LABELS: dict[str, str] = {
     "logistic_regression": "Logistic regression",
     "random_forest": "Random forest",
     "hist_gradient_boosting": "Histogram gradient boosting",
+    "hgb_native": "Hist gradient boosting (native categorical)",
 }
 
 OOF_CAPTION = "Cross-validated out-of-fold performance on the training pool"

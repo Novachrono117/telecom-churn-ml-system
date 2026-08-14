@@ -1,0 +1,679 @@
+{
+  "schema_version": 1,
+  "experiment": "phase8a-hgb-representation-gate",
+  "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+  "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd",
+  "n_training_rows": 5634,
+  "training_positive_prevalence": 0.265353,
+  "random_seed": 42,
+  "scikit_learn_version": "1.9.0",
+  "references": {
+    "model_comparison": {
+      "artefact": "reports/experiments/model_comparison_results.json",
+      "schema_version": 1,
+      "experiment": "phase7-model-family-comparison",
+      "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+      "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd"
+    }
+  },
+  "cross_validation": {
+    "strategy": "StratifiedKFold",
+    "n_splits": 5,
+    "shuffle": true,
+    "random_state": 42,
+    "shared_across_experiments": true,
+    "identical_to_model_comparison": true
+  },
+  "metric_protocol": {
+    "primary_development_metric": "average_precision",
+    "secondary_ranking_metric": "roc_auc",
+    "diagnostic_metrics": [
+      "precision",
+      "recall",
+      "f1"
+    ],
+    "auxiliary_metrics": [
+      "accuracy"
+    ],
+    "threshold_optimised": false,
+    "comparison_method": "Paired per-fold differences on the identical StratifiedKFold partition: delta_metric_fold = metric_candidate_fold - metric_baseline_fold. Judge a candidate on the consistency and magnitude of those deltas. Do not compare a candidate's gain against a baseline's between-fold standard deviation: that figure describes how performance varies across partitions, not the uncertainty of a difference between two models measured on the same partitions.",
+    "rationale": "Average Precision leads because the positive class is the minority and the task is to discriminate churners: AP is computed entirely on positive-class retrieval and degrades visibly when a model finds fewer churners, whereas ROC-AUC is dominated by the abundant negatives and moves less. ROC-AUC stays as the secondary ranking view because it is prevalence-independent and comparable across samples. No single metric decides anything on its own: a candidate must also be weighed on trade-offs, added complexity and interpretability, and it need not improve every metric at once.",
+    "primary_metric_used_here": "average_precision",
+    "secondary_metric_used_here": "roc_auc"
+  },
+  "decision_threshold": 0.5,
+  "tuning_performed": false,
+  "calibration_performed": false,
+  "engineered_features_used": [],
+  "reproduction": [
+    {
+      "experiment": "R0",
+      "reference_artefact": "reports/experiments/model_comparison_results.json",
+      "reference_schema_version": 1,
+      "reference_key": "main_comparison[M0]",
+      "tolerance": 1e-09,
+      "max_absolute_difference": 0.0,
+      "reproduced": true
+    },
+    {
+      "experiment": "R1",
+      "reference_artefact": "reports/experiments/model_comparison_results.json",
+      "reference_schema_version": 1,
+      "reference_key": "main_comparison[M2]",
+      "tolerance": 1e-09,
+      "max_absolute_difference": 0.0,
+      "reproduced": true
+    }
+  ],
+  "representations": {
+    "common_ohe": {
+      "name": "common_ohe",
+      "raw_features": 19,
+      "numeric_features": [
+        "tenure",
+        "MonthlyCharges",
+        "TotalCharges"
+      ],
+      "categorical_features": [
+        "gender",
+        "SeniorCitizen",
+        "Partner",
+        "Dependents",
+        "PhoneService",
+        "MultipleLines",
+        "InternetService",
+        "OnlineSecurity",
+        "OnlineBackup",
+        "DeviceProtection",
+        "TechSupport",
+        "StreamingTV",
+        "StreamingMovies",
+        "Contract",
+        "PaperlessBilling",
+        "PaymentMethod"
+      ],
+      "n_transformed_features": 46,
+      "categorical_mask": [],
+      "categorical_indices": [],
+      "n_categorical_columns": 43,
+      "n_numeric_columns": 3,
+      "categorical_features_declared_explicitly": false,
+      "max_categorical_cardinality": 255,
+      "observed_training_cardinality": {},
+      "engineered_features": []
+    },
+    "native_categorical": {
+      "name": "native_categorical",
+      "raw_features": 19,
+      "numeric_features": [
+        "tenure",
+        "MonthlyCharges",
+        "TotalCharges"
+      ],
+      "categorical_features": [
+        "gender",
+        "SeniorCitizen",
+        "Partner",
+        "Dependents",
+        "PhoneService",
+        "MultipleLines",
+        "InternetService",
+        "OnlineSecurity",
+        "OnlineBackup",
+        "DeviceProtection",
+        "TechSupport",
+        "StreamingTV",
+        "StreamingMovies",
+        "Contract",
+        "PaperlessBilling",
+        "PaymentMethod"
+      ],
+      "n_transformed_features": 19,
+      "categorical_mask": [
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "categorical_indices": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "n_categorical_columns": 16,
+      "n_numeric_columns": 3,
+      "categorical_features_declared_explicitly": true,
+      "max_categorical_cardinality": 255,
+      "observed_training_cardinality": {
+        "gender": 2,
+        "SeniorCitizen": 2,
+        "Partner": 2,
+        "Dependents": 2,
+        "PhoneService": 2,
+        "MultipleLines": 3,
+        "InternetService": 3,
+        "OnlineSecurity": 3,
+        "OnlineBackup": 3,
+        "DeviceProtection": 3,
+        "TechSupport": 3,
+        "StreamingTV": 3,
+        "StreamingMovies": 3,
+        "Contract": 3,
+        "PaperlessBilling": 2,
+        "PaymentMethod": 4
+      },
+      "engineered_features": []
+    }
+  },
+  "ordinal_encoder": {
+    "encoder": "OrdinalEncoder",
+    "parameters": {
+      "handle_unknown": "use_encoded_value",
+      "unknown_value": NaN,
+      "dtype": "<class 'numpy.float64'>"
+    },
+    "fitted_per_fold": true,
+    "unknown_category_behaviour": "A category absent from the training fold is encoded as NaN and routed to the estimator's native missing-value handling for categorical splits. This is serving behaviour for a new but valid category, not blank handling: blanks are rejected earlier by the Phase 4 feature contract.",
+    "ordinal_meaning": "None. The integer codes are an internal representation with no order. They stay nominal because the same 16 positions are declared through categorical_features, so the estimator partitions sets of categories rather than thresholding a number line."
+  },
+  "hgb_effective_hyperparameters": {
+    "R1": {
+      "categorical_features": null,
+      "class_weight": null,
+      "early_stopping": false,
+      "interaction_cst": null,
+      "l2_regularization": 0.0,
+      "learning_rate": 0.1,
+      "loss": "log_loss",
+      "max_bins": 255,
+      "max_depth": null,
+      "max_features": 1.0,
+      "max_iter": 100,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 20,
+      "monotonic_cst": null,
+      "n_iter_no_change": 10,
+      "random_state": 42,
+      "scoring": "loss",
+      "tol": 1e-07,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "R2": {
+      "categorical_features": [
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "class_weight": null,
+      "early_stopping": false,
+      "interaction_cst": null,
+      "l2_regularization": 0.0,
+      "learning_rate": 0.1,
+      "loss": "log_loss",
+      "max_bins": 255,
+      "max_depth": null,
+      "max_features": 1.0,
+      "max_iter": 100,
+      "max_leaf_nodes": 31,
+      "min_samples_leaf": 20,
+      "monotonic_cst": null,
+      "n_iter_no_change": 10,
+      "random_state": 42,
+      "scoring": "loss",
+      "tol": 1e-07,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    }
+  },
+  "experiments": [
+    {
+      "experiment": "R0",
+      "label": "Logistic regression, common representation",
+      "model": "logistic_regression",
+      "representation": "common_ohe",
+      "n_transformed_features": 46,
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.847891,
+            "average_precision": 0.64366,
+            "precision": 0.645161,
+            "recall": 0.535117,
+            "f1": 0.585009,
+            "accuracy": 0.79858
+          }
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.825128,
+            "average_precision": 0.635452,
+            "precision": 0.607287,
+            "recall": 0.501672,
+            "f1": 0.549451,
+            "accuracy": 0.781721
+          }
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.841901,
+            "average_precision": 0.685865,
+            "precision": 0.659751,
+            "recall": 0.531773,
+            "f1": 0.588889,
+            "accuracy": 0.803017
+          }
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.862874,
+            "average_precision": 0.678188,
+            "precision": 0.664286,
+            "recall": 0.622074,
+            "f1": 0.642487,
+            "accuracy": 0.816327
+          }
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "metrics": {
+            "roc_auc": 0.852952,
+            "average_precision": 0.6643,
+            "precision": 0.683983,
+            "recall": 0.528428,
+            "f1": 0.596226,
+            "accuracy": 0.809947
+          }
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.846149,
+        "average_precision": 0.661493,
+        "precision": 0.652094,
+        "recall": 0.543813,
+        "f1": 0.592412,
+        "accuracy": 0.801918
+      },
+      "std": {
+        "roc_auc": 0.014045,
+        "average_precision": 0.021661,
+        "precision": 0.028635,
+        "recall": 0.045711,
+        "f1": 0.033298,
+        "accuracy": 0.013156
+      },
+      "out_of_fold": {
+        "roc_auc": 0.845606,
+        "average_precision": 0.658425,
+        "precision": 0.651965,
+        "recall": 0.543813,
+        "f1": 0.592998,
+        "accuracy": 0.801917
+      },
+      "paired_deltas": {},
+      "converged": true,
+      "max_iterations_used": 47
+    },
+    {
+      "experiment": "R1",
+      "label": "HistGradientBoosting, common representation",
+      "model": "hist_gradient_boosting",
+      "representation": "common_ohe",
+      "n_transformed_features": 46,
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.836763,
+            "average_precision": 0.638618,
+            "precision": 0.649789,
+            "recall": 0.51505,
+            "f1": 0.574627,
+            "accuracy": 0.797693
+          }
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.826133,
+            "average_precision": 0.614896,
+            "precision": 0.607759,
+            "recall": 0.471572,
+            "f1": 0.531073,
+            "accuracy": 0.779059
+          }
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.837726,
+            "average_precision": 0.679682,
+            "precision": 0.644788,
+            "recall": 0.558528,
+            "f1": 0.598566,
+            "accuracy": 0.801242
+          }
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.841951,
+            "average_precision": 0.64859,
+            "precision": 0.637131,
+            "recall": 0.505017,
+            "f1": 0.563433,
+            "accuracy": 0.792369
+          }
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "metrics": {
+            "roc_auc": 0.839606,
+            "average_precision": 0.653897,
+            "precision": 0.68,
+            "recall": 0.511706,
+            "f1": 0.583969,
+            "accuracy": 0.806394
+          }
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.836436,
+        "average_precision": 0.647137,
+        "precision": 0.643893,
+        "recall": 0.512375,
+        "f1": 0.570334,
+        "accuracy": 0.795352
+      },
+      "std": {
+        "roc_auc": 0.006091,
+        "average_precision": 0.023553,
+        "precision": 0.025936,
+        "recall": 0.031051,
+        "f1": 0.025448,
+        "accuracy": 0.010446
+      },
+      "out_of_fold": {
+        "roc_auc": 0.836062,
+        "average_precision": 0.644391,
+        "precision": 0.643697,
+        "recall": 0.512375,
+        "f1": 0.570577,
+        "accuracy": 0.79535
+      },
+      "paired_deltas": {},
+      "converged": true,
+      "max_iterations_used": 100
+    },
+    {
+      "experiment": "R2",
+      "label": "HistGradientBoosting, native categorical representation",
+      "model": "hgb_native",
+      "representation": "native_categorical",
+      "n_transformed_features": 19,
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.830334,
+            "average_precision": 0.631151,
+            "precision": 0.648536,
+            "recall": 0.518395,
+            "f1": 0.576208,
+            "accuracy": 0.797693
+          }
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.822637,
+            "average_precision": 0.616507,
+            "precision": 0.590308,
+            "recall": 0.448161,
+            "f1": 0.509506,
+            "accuracy": 0.771074
+          }
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.837106,
+            "average_precision": 0.67826,
+            "precision": 0.660156,
+            "recall": 0.565217,
+            "f1": 0.609009,
+            "accuracy": 0.807453
+          }
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.847463,
+            "average_precision": 0.656299,
+            "precision": 0.629482,
+            "recall": 0.528428,
+            "f1": 0.574545,
+            "accuracy": 0.792369
+          }
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "metrics": {
+            "roc_auc": 0.846471,
+            "average_precision": 0.652365,
+            "precision": 0.672727,
+            "recall": 0.494983,
+            "f1": 0.570328,
+            "accuracy": 0.801954
+          }
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.836802,
+        "average_precision": 0.646916,
+        "precision": 0.640242,
+        "recall": 0.511037,
+        "f1": 0.567919,
+        "accuracy": 0.794109
+      },
+      "std": {
+        "roc_auc": 0.010603,
+        "average_precision": 0.02384,
+        "precision": 0.032132,
+        "recall": 0.043311,
+        "f1": 0.036121,
+        "accuracy": 0.014019
+      },
+      "out_of_fold": {
+        "roc_auc": 0.836219,
+        "average_precision": 0.64404,
+        "precision": 0.640402,
+        "recall": 0.511037,
+        "f1": 0.568452,
+        "accuracy": 0.794107
+      },
+      "paired_deltas": {
+        "R1": {
+          "average_precision": {
+            "metric": "average_precision",
+            "reference": "R1",
+            "per_fold": [
+              -0.007467,
+              0.001611,
+              -0.001421,
+              0.007709,
+              -0.001532
+            ],
+            "mean": -0.00022,
+            "std": 0.00552,
+            "folds_improved": 2,
+            "folds_worsened": 3
+          },
+          "roc_auc": {
+            "metric": "roc_auc",
+            "reference": "R1",
+            "per_fold": [
+              -0.006428,
+              -0.003496,
+              -0.00062,
+              0.005512,
+              0.006865
+            ],
+            "mean": 0.000366,
+            "std": 0.005718,
+            "folds_improved": 2,
+            "folds_worsened": 3
+          }
+        },
+        "R0": {
+          "average_precision": {
+            "metric": "average_precision",
+            "reference": "R0",
+            "per_fold": [
+              -0.012509,
+              -0.018944,
+              -0.007605,
+              -0.02189,
+              -0.011936
+            ],
+            "mean": -0.014577,
+            "std": 0.005754,
+            "folds_improved": 0,
+            "folds_worsened": 5
+          },
+          "roc_auc": {
+            "metric": "roc_auc",
+            "reference": "R0",
+            "per_fold": [
+              -0.017557,
+              -0.00249,
+              -0.004795,
+              -0.015412,
+              -0.006481
+            ],
+            "mean": -0.009347,
+            "std": 0.006711,
+            "folds_improved": 0,
+            "folds_worsened": 5
+          }
+        }
+      },
+      "converged": true,
+      "max_iterations_used": 100
+    }
+  ],
+  "verdict": {
+    "representation_classification": "REPRESENTATION_NOT_SUPPORTED",
+    "representation_rationale": "mean delta average_precision = -0.00022 with 2/5 folds improving: the native representation does not improve the family under the frozen protocol.",
+    "standing_against_logistic": "BELOW_LOGISTIC",
+    "standing_rationale": "mean delta average_precision = -0.01458 in 0/5 folds: still below the logistic regression, consistently across folds.",
+    "tuning_candidate_selected": false,
+    "decision_note": "No tuning candidate was selected. This gate measures one factor — the categorical representation — and the decision about which models, if any, are worth tuning is deferred to a human review of this evidence."
+  },
+  "warnings": [
+    {
+      "category": "FutureWarning",
+      "message": "'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', l1_ratio set to a float between 0 and 1 instead of penalty='elasticnet', and C=np.inf instead of penalty=None.",
+      "source": "linear_model/_logistic.py",
+      "count": 6
+    }
+  ],
+  "methodological_notes": [
+    "Every metric is cross-validated on the frozen Phase 4 training pool. No metric was computed on the holdout, which stays untouched until Phase 9.",
+    "All experiments use the identical StratifiedKFold partition as Phases 5, 6 and 7, so every delta is a paired per-fold difference.",
+    "R0 and R1 are rebuilt through the Phase 7 pipeline builder and checked fold by fold against model_comparison_results.json before R2 is interpreted.",
+    "R2 differs from R1 in exactly one respect: the 16 contracted categorical columns are ordinal-coded and declared categorical to the estimator instead of one-hot encoded. Every hyperparameter is the frozen Phase 7 M2 configuration, derived from the same dictionary rather than restated.",
+    "The ordinal codes carry no ordinal meaning. They stay nominal because the same 16 positions are declared through categorical_features, so the estimator partitions sets of categories instead of thresholding a number line.",
+    "categorical_features is an explicit positional mask. It is never 'from_dtype' and never inferred from a dtype produced upstream.",
+    "The ordinal encoder is fitted inside each training fold. A category seen only in a validation fold does not enter categories_ and is encoded as NaN, which the estimator's native missing-value handling routes at split time.",
+    "NaN for an unseen category is a serving behaviour for a new but valid category. It is not blank handling: blanks, None and empty strings are rejected earlier by the Phase 4 feature contract, and a new valid category must not be confused with invalid input.",
+    "Categorical cardinality is checked inside the training fold only, and no column is grouped, hashed or truncated to fit the estimator's limit.",
+    "No hyperparameter was tuned, searched or selected, and no threshold was moved. The 0.5 rule is a diagnostic reference and selected nothing.",
+    "No engineered feature was used. contract_tenure remains a retained candidate from Phase 6 and is deliberately absent: adding it would mix a representation effect with a feature effect in one number.",
+    "The two comparisons are kept apart. R2 vs R1 measures the representation inside one family; R2 vs R0 measures where the result stands against the reference model. They answer different questions and are never summed.",
+    "No calibration was performed and no calibration metric was used to rank anything.",
+    "Deltas are read on direction and consistency across folds. The between-fold standard deviation is NOT a bar a gain must clear, and no significance test was run: five folds cannot support one.",
+    "Out-of-fold predictions cover every training row exactly once, always produced by a model that never saw that row while fitting. They are not test metrics, and no per-customer prediction is persisted.",
+    "This phase selects no tuning candidate. It produces evidence for a human review that happens before any tuning phase begins."
+  ]
+}
