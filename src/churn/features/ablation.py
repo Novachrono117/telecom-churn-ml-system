@@ -77,6 +77,17 @@ class PairedComparison:
         """Folds in which the candidate lost to the baseline."""
         return int(sum(delta < 0 for delta in self.deltas))
 
+    @property
+    def n_zero(self) -> int:
+        """Folds in which the candidate and the baseline scored identically.
+
+        Reported separately because ``n_positive`` and ``n_negative`` do not
+        have to sum to the number of folds. A tie is not an improvement, and
+        collapsing it into either count would misstate how consistent a
+        difference was.
+        """
+        return int(sum(delta == 0 for delta in self.deltas))
+
 
 @dataclass(frozen=True)
 class ExperimentResult:

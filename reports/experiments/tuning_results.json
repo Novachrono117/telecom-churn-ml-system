@@ -1,0 +1,802 @@
+{
+  "schema_version": 1,
+  "experiment": "phase8b-nested-hyperparameter-tuning",
+  "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+  "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd",
+  "n_training_rows": 5634,
+  "training_positive_prevalence": 0.265353,
+  "random_seed": 42,
+  "scikit_learn_version": "1.9.0",
+  "references": {
+    "baseline": {
+      "artefact": "reports/experiments/baseline_results.json",
+      "schema_version": 2,
+      "experiment": "phase5-baselines",
+      "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+      "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd"
+    },
+    "feature_engineering": {
+      "artefact": "reports/experiments/feature_engineering_results.json",
+      "schema_version": 1,
+      "experiment": "phase6-feature-engineering-ablation",
+      "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+      "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd"
+    },
+    "model_comparison": {
+      "artefact": "reports/experiments/model_comparison_results.json",
+      "schema_version": 1,
+      "experiment": "phase7-model-family-comparison",
+      "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+      "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd"
+    },
+    "hgb_representation": {
+      "artefact": "reports/experiments/hgb_representation_results.json",
+      "schema_version": 1,
+      "experiment": "phase8a-hgb-representation-gate",
+      "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+      "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd"
+    }
+  },
+  "feature_set": {
+    "n_features": 19,
+    "numeric": [
+      "tenure",
+      "MonthlyCharges",
+      "TotalCharges"
+    ],
+    "categorical": [
+      "gender",
+      "SeniorCitizen",
+      "Partner",
+      "Dependents",
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies",
+      "Contract",
+      "PaperlessBilling",
+      "PaymentMethod"
+    ],
+    "engineered": [],
+    "representation": "common_ohe",
+    "n_transformed_features": 46
+  },
+  "outer_cross_validation": {
+    "strategy": "StratifiedKFold",
+    "n_splits": 5,
+    "shuffle": true,
+    "random_state": 42,
+    "shared_across_procedures": true,
+    "identical_to_previous_phases": true,
+    "role": "outer estimate of the tuning procedure; never used for selection"
+  },
+  "inner_cross_validation": {
+    "strategy": "StratifiedKFold",
+    "n_splits": 4,
+    "shuffle": true,
+    "random_state": 42,
+    "scope": "inside each outer training fold only",
+    "role": "hyperparameter selection"
+  },
+  "metric_protocol": {
+    "primary_development_metric": "average_precision",
+    "secondary_ranking_metric": "roc_auc",
+    "diagnostic_metrics": [
+      "precision",
+      "recall",
+      "f1"
+    ],
+    "auxiliary_metrics": [
+      "accuracy"
+    ],
+    "threshold_optimised": false,
+    "comparison_method": "Paired per-fold differences on the identical StratifiedKFold partition: delta_metric_fold = metric_candidate_fold - metric_baseline_fold. Judge a candidate on the consistency and magnitude of those deltas. Do not compare a candidate's gain against a baseline's between-fold standard deviation: that figure describes how performance varies across partitions, not the uncertainty of a difference between two models measured on the same partitions.",
+    "rationale": "Average Precision leads because the positive class is the minority and the task is to discriminate churners: AP is computed entirely on positive-class retrieval and degrades visibly when a model finds fewer churners, whereas ROC-AUC is dominated by the abundant negatives and moves less. ROC-AUC stays as the secondary ranking view because it is prevalence-independent and comparable across samples. No single metric decides anything on its own: a candidate must also be weighed on trade-offs, added complexity and interpretability, and it need not improve every metric at once.",
+    "primary_metric_used_here": "average_precision",
+    "secondary_metric_used_here": "roc_auc",
+    "search_selection_metric": "average_precision"
+  },
+  "decision_threshold": 0.5,
+  "threshold_optimised": false,
+  "class_weight": null,
+  "calibration_performed": false,
+  "engineered_features_used": [],
+  "compatibility_migration": {
+    "legacy_configuration": {
+      "C": 1.0,
+      "penalty": "l2",
+      "class_weight": null,
+      "solver": "lbfgs",
+      "max_iter": 100
+    },
+    "modern_configuration": {
+      "C": 1.0,
+      "class_weight": null,
+      "l1_ratio": 0.0,
+      "max_iter": 100,
+      "solver": "lbfgs"
+    },
+    "tolerance": 1e-09,
+    "max_metric_difference": 0.0,
+    "max_oof_probability_difference": 0.0,
+    "metrics_equivalent": true,
+    "probabilities_equivalent": true,
+    "legacy_emits_deprecation_warning": true,
+    "modern_emits_deprecation_warning": false,
+    "classification": "COMPATIBILITY_MIGRATION",
+    "note": "penalty='l2' and l1_ratio=0.0 describe the same L2 penalty. The legacy builder is preserved so the historical artefacts keep reproducing; the modern builder is used for the new experiments and no longer emits the removal warning."
+  },
+  "reproduction": [
+    {
+      "experiment": "T0",
+      "reference_artefact": "reports/experiments/baseline_results.json",
+      "reference_schema_version": 2,
+      "reference_key": "models[logistic_regression]",
+      "tolerance": 1e-09,
+      "max_absolute_difference": 0.0,
+      "reproduced": true
+    }
+  ],
+  "search_spaces": [
+    {
+      "experiment": "T1",
+      "estimator": "LogisticRegression",
+      "parameters": {
+        "classifier__C": [
+          0.01,
+          0.03,
+          0.1,
+          0.3,
+          1.0,
+          3.0,
+          10.0,
+          30.0,
+          100.0
+        ]
+      },
+      "n_candidates": 9,
+      "fixed_parameters": {
+        "l1_ratio": 0.0,
+        "solver": "lbfgs",
+        "class_weight": null,
+        "max_iter": 100
+      },
+      "scoring": "average_precision",
+      "contains_frozen_configuration": true
+    },
+    {
+      "experiment": "T2",
+      "estimator": "HistGradientBoostingClassifier",
+      "parameters": {
+        "classifier__learning_rate": [
+          0.05,
+          0.1
+        ],
+        "classifier__max_iter": [
+          100,
+          200
+        ],
+        "classifier__max_leaf_nodes": [
+          15,
+          31
+        ],
+        "classifier__min_samples_leaf": [
+          10,
+          20,
+          40
+        ],
+        "classifier__l2_regularization": [
+          0.0,
+          1.0
+        ]
+      },
+      "n_candidates": 48,
+      "fixed_parameters": {
+        "loss": "log_loss",
+        "max_depth": null,
+        "max_features": 1.0,
+        "early_stopping": false,
+        "class_weight": null,
+        "random_state": 42
+      },
+      "scoring": "average_precision",
+      "contains_frozen_configuration": true
+    }
+  ],
+  "procedures": [
+    {
+      "experiment": "T0",
+      "label": "Frozen logistic regression (C=1.0, untuned)",
+      "model": "logistic_frozen",
+      "tuned": false,
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.847891,
+            "average_precision": 0.64366,
+            "precision": 0.645161,
+            "recall": 0.535117,
+            "f1": 0.585009,
+            "accuracy": 0.79858
+          },
+          "best_params": null,
+          "best_inner_score": null
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.825128,
+            "average_precision": 0.635452,
+            "precision": 0.607287,
+            "recall": 0.501672,
+            "f1": 0.549451,
+            "accuracy": 0.781721
+          },
+          "best_params": null,
+          "best_inner_score": null
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.841901,
+            "average_precision": 0.685865,
+            "precision": 0.659751,
+            "recall": 0.531773,
+            "f1": 0.588889,
+            "accuracy": 0.803017
+          },
+          "best_params": null,
+          "best_inner_score": null
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.862874,
+            "average_precision": 0.678188,
+            "precision": 0.664286,
+            "recall": 0.622074,
+            "f1": 0.642487,
+            "accuracy": 0.816327
+          },
+          "best_params": null,
+          "best_inner_score": null
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "metrics": {
+            "roc_auc": 0.852952,
+            "average_precision": 0.6643,
+            "precision": 0.683983,
+            "recall": 0.528428,
+            "f1": 0.596226,
+            "accuracy": 0.809947
+          },
+          "best_params": null,
+          "best_inner_score": null
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.846149,
+        "average_precision": 0.661493,
+        "precision": 0.652094,
+        "recall": 0.543813,
+        "f1": 0.592412,
+        "accuracy": 0.801918
+      },
+      "std": {
+        "roc_auc": 0.014045,
+        "average_precision": 0.021661,
+        "precision": 0.028635,
+        "recall": 0.045711,
+        "f1": 0.033298,
+        "accuracy": 0.013156
+      },
+      "outer_out_of_fold": {
+        "roc_auc": 0.845606,
+        "average_precision": 0.658425,
+        "precision": 0.651965,
+        "recall": 0.543813,
+        "f1": 0.592998,
+        "accuracy": 0.801917
+      },
+      "paired_deltas": {},
+      "hyperparameter_selection_frequency": {},
+      "converged": true
+    },
+    {
+      "experiment": "T1",
+      "label": "Tuned logistic regression (C searched)",
+      "model": "logistic_tuned",
+      "tuned": true,
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.848577,
+            "average_precision": 0.645758,
+            "precision": 0.652,
+            "recall": 0.545151,
+            "f1": 0.593807,
+            "accuracy": 0.80213
+          },
+          "best_params": {
+            "C": 10.0
+          },
+          "best_inner_score": 0.661746
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.825212,
+            "average_precision": 0.635674,
+            "precision": 0.607287,
+            "recall": 0.501672,
+            "f1": 0.549451,
+            "accuracy": 0.781721
+          },
+          "best_params": {
+            "C": 3.0
+          },
+          "best_inner_score": 0.666875
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.841901,
+            "average_precision": 0.685865,
+            "precision": 0.659751,
+            "recall": 0.531773,
+            "f1": 0.588889,
+            "accuracy": 0.803017
+          },
+          "best_params": {
+            "C": 1.0
+          },
+          "best_inner_score": 0.65474
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.863274,
+            "average_precision": 0.677825,
+            "precision": 0.667857,
+            "recall": 0.625418,
+            "f1": 0.645941,
+            "accuracy": 0.818101
+          },
+          "best_params": {
+            "C": 3.0
+          },
+          "best_inner_score": 0.654578
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "metrics": {
+            "roc_auc": 0.853369,
+            "average_precision": 0.661368,
+            "precision": 0.688034,
+            "recall": 0.538462,
+            "f1": 0.604128,
+            "accuracy": 0.812611
+          },
+          "best_params": {
+            "C": 10.0
+          },
+          "best_inner_score": 0.664352
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.846467,
+        "average_precision": 0.661298,
+        "precision": 0.654986,
+        "recall": 0.548495,
+        "f1": 0.596443,
+        "accuracy": 0.803516
+      },
+      "std": {
+        "roc_auc": 0.014205,
+        "average_precision": 0.021064,
+        "precision": 0.029852,
+        "recall": 0.0461,
+        "f1": 0.034574,
+        "accuracy": 0.013898
+      },
+      "outer_out_of_fold": {
+        "roc_auc": 0.845967,
+        "average_precision": 0.658283,
+        "precision": 0.654952,
+        "recall": 0.548495,
+        "f1": 0.597015,
+        "accuracy": 0.803514
+      },
+      "paired_deltas": {
+        "T0": {
+          "average_precision": {
+            "metric": "average_precision",
+            "reference": "T0",
+            "per_fold": [
+              0.002098,
+              0.000223,
+              0.0,
+              -0.000363,
+              -0.002933
+            ],
+            "mean": -0.000195,
+            "std": 0.001802,
+            "folds_improved": 2,
+            "folds_worsened": 2,
+            "folds_unchanged": 1
+          },
+          "roc_auc": {
+            "metric": "roc_auc",
+            "reference": "T0",
+            "per_fold": [
+              0.000687,
+              8.5e-05,
+              0.0,
+              0.0004,
+              0.000417
+            ],
+            "mean": 0.000318,
+            "std": 0.000277,
+            "folds_improved": 4,
+            "folds_worsened": 0,
+            "folds_unchanged": 1
+          }
+        }
+      },
+      "hyperparameter_selection_frequency": {
+        "C": {
+          "10.0": 2,
+          "3.0": 2,
+          "1.0": 1
+        }
+      },
+      "converged": true
+    },
+    {
+      "experiment": "T2",
+      "label": "Tuned histogram gradient boosting",
+      "model": "hgb_tuned",
+      "tuned": true,
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.844108,
+            "average_precision": 0.648793,
+            "precision": 0.656522,
+            "recall": 0.505017,
+            "f1": 0.570888,
+            "accuracy": 0.79858
+          },
+          "best_params": {
+            "l2_regularization": 0.0,
+            "learning_rate": 0.05,
+            "max_iter": 100,
+            "max_leaf_nodes": 15,
+            "min_samples_leaf": 20
+          },
+          "best_inner_score": 0.662871
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.830292,
+            "average_precision": 0.627377,
+            "precision": 0.630252,
+            "recall": 0.501672,
+            "f1": 0.558659,
+            "accuracy": 0.789707
+          },
+          "best_params": {
+            "l2_regularization": 1.0,
+            "learning_rate": 0.05,
+            "max_iter": 100,
+            "max_leaf_nodes": 15,
+            "min_samples_leaf": 40
+          },
+          "best_inner_score": 0.662803
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.845724,
+            "average_precision": 0.695992,
+            "precision": 0.685714,
+            "recall": 0.561873,
+            "f1": 0.617647,
+            "accuracy": 0.815439
+          },
+          "best_params": {
+            "l2_regularization": 1.0,
+            "learning_rate": 0.05,
+            "max_iter": 100,
+            "max_leaf_nodes": 15,
+            "min_samples_leaf": 10
+          },
+          "best_inner_score": 0.649872
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "roc_auc": 0.859235,
+            "average_precision": 0.675199,
+            "precision": 0.654618,
+            "recall": 0.545151,
+            "f1": 0.594891,
+            "accuracy": 0.803017
+          },
+          "best_params": {
+            "l2_regularization": 1.0,
+            "learning_rate": 0.05,
+            "max_iter": 100,
+            "max_leaf_nodes": 15,
+            "min_samples_leaf": 40
+          },
+          "best_inner_score": 0.667041
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "metrics": {
+            "roc_auc": 0.860385,
+            "average_precision": 0.679313,
+            "precision": 0.718894,
+            "recall": 0.521739,
+            "f1": 0.604651,
+            "accuracy": 0.818828
+          },
+          "best_params": {
+            "l2_regularization": 0.0,
+            "learning_rate": 0.05,
+            "max_iter": 100,
+            "max_leaf_nodes": 15,
+            "min_samples_leaf": 40
+          },
+          "best_inner_score": 0.663549
+        }
+      ],
+      "mean": {
+        "roc_auc": 0.847949,
+        "average_precision": 0.665335,
+        "precision": 0.6692,
+        "recall": 0.52709,
+        "f1": 0.589347,
+        "accuracy": 0.805114
+      },
+      "std": {
+        "roc_auc": 0.012385,
+        "average_precision": 0.027143,
+        "precision": 0.034031,
+        "recall": 0.025971,
+        "f1": 0.02423,
+        "accuracy": 0.012033
+      },
+      "outer_out_of_fold": {
+        "roc_auc": 0.847299,
+        "average_precision": 0.660415,
+        "precision": 0.668363,
+        "recall": 0.52709,
+        "f1": 0.589379,
+        "accuracy": 0.805112
+      },
+      "paired_deltas": {
+        "T0": {
+          "average_precision": {
+            "metric": "average_precision",
+            "reference": "T0",
+            "per_fold": [
+              0.005132,
+              -0.008074,
+              0.010127,
+              -0.002989,
+              0.015012
+            ],
+            "mean": 0.003842,
+            "std": 0.009415,
+            "folds_improved": 3,
+            "folds_worsened": 2,
+            "folds_unchanged": 0
+          },
+          "roc_auc": {
+            "metric": "roc_auc",
+            "reference": "T0",
+            "per_fold": [
+              -0.003783,
+              0.005164,
+              0.003823,
+              -0.003639,
+              0.007433
+            ],
+            "mean": 0.0018,
+            "std": 0.005194,
+            "folds_improved": 3,
+            "folds_worsened": 2,
+            "folds_unchanged": 0
+          }
+        },
+        "T1": {
+          "average_precision": {
+            "metric": "average_precision",
+            "reference": "T1",
+            "per_fold": [
+              0.003035,
+              -0.008297,
+              0.010127,
+              -0.002626,
+              0.017945
+            ],
+            "mean": 0.004037,
+            "std": 0.010345,
+            "folds_improved": 3,
+            "folds_worsened": 2,
+            "folds_unchanged": 0
+          },
+          "roc_auc": {
+            "metric": "roc_auc",
+            "reference": "T1",
+            "per_fold": [
+              -0.004469,
+              0.005079,
+              0.003823,
+              -0.004039,
+              0.007017
+            ],
+            "mean": 0.001482,
+            "std": 0.005361,
+            "folds_improved": 3,
+            "folds_worsened": 2,
+            "folds_unchanged": 0
+          }
+        }
+      },
+      "hyperparameter_selection_frequency": {
+        "l2_regularization": {
+          "0.0": 2,
+          "1.0": 3
+        },
+        "learning_rate": {
+          "0.05": 5
+        },
+        "max_iter": {
+          "100": 5
+        },
+        "max_leaf_nodes": {
+          "15": 5
+        },
+        "min_samples_leaf": {
+          "20": 1,
+          "40": 3,
+          "10": 1
+        }
+      },
+      "converged": true
+    }
+  ],
+  "eligibility": [
+    {
+      "experiment": "T1",
+      "status": "NOT_ELIGIBLE_TO_REPLACE_BASELINE",
+      "rationale": "mean paired delta AP = -0.00020 with 2 of 5 outer folds improving (1 tied, 2 worse): it does not clear the pre-registered eligibility rule.",
+      "mean_paired_delta_ap": -0.000195,
+      "outer_folds_improved": 2,
+      "outer_folds_unchanged": 1,
+      "outer_folds_worsened": 2
+    },
+    {
+      "experiment": "T2",
+      "status": "NOT_ELIGIBLE_TO_REPLACE_BASELINE",
+      "rationale": "mean paired delta AP = +0.00384 with 3 of 5 outer folds improving (0 tied, 2 worse): it does not clear the pre-registered eligibility rule.",
+      "mean_paired_delta_ap": 0.003842,
+      "outer_folds_improved": 3,
+      "outer_folds_unchanged": 0,
+      "outer_folds_worsened": 2
+    }
+  ],
+  "selection": {
+    "rule": [
+      "A tuned procedure is ELIGIBLE_TO_REPLACE_BASELINE when its mean paired delta AP against T0 is > 0 and AP improves in at least 4 of the 5 outer folds, where 'improves' means a strictly positive delta and a tied fold counts as neither.",
+      "If neither is eligible, the frozen baseline T0 is kept.",
+      "If exactly one is eligible, it is selected.",
+      "If both are eligible, compare T2 against T1 directly: a procedure with mean delta AP > 0 winning at least 4 of 5 outer folds is selected.",
+      "Otherwise prefer the logistic regression, for lower complexity and higher interpretability."
+    ],
+    "rule_fixed_before_results": true,
+    "eligibility_min_positive_folds": 4,
+    "minimum_gain_cutoff": null,
+    "selected_experiment": "T0",
+    "selected_label": "Frozen logistic regression (C=1.0, untuned)",
+    "rationale": "Neither tuned procedure cleared the eligibility rule, so the frozen baseline stands. Tuning has to justify replacing it; the default when it does not is to keep the simpler model, not to adopt the best-scoring one.",
+    "frozen_hyperparameters": {
+      "C": 1.0,
+      "l1_ratio": 0.0,
+      "solver": "lbfgs",
+      "class_weight": null,
+      "max_iter": 100
+    },
+    "estimator_implementation": "churn.modeling.tuning.build_modern_logistic — LogisticRegression(C=1.0, l1_ratio=0.0, solver='lbfgs', class_weight=None, max_iter=100). This is the implementation Phase 9 must instantiate. The compatibility gate proved it reproduces the legacy penalty='l2' configuration exactly: maximum per-fold metric difference 0.0 and maximum out-of-fold probability difference 0.0.",
+    "legacy_builder_status": "PRESERVED FOR HISTORICAL REPRODUCTION ONLY. churn.modeling.models.build_logistic_baseline still passes penalty='l2' so the Phase 5 to 8A artefacts keep reproducing byte for byte. It must not be used for any new experiment.",
+    "threshold_status": "not optimised; 0.5 is a diagnostic reference and is decided in Phase 9",
+    "calibration_status": "not performed; calibration is a separate question for a later phase",
+    "class_weight_status": "FROZEN at None and DEFERRED. class_weight modifies the fit itself, so reopening it would reopen model selection and tuning rather than extend them. The threshold modifies only the decision rule applied after training and can therefore be settled on its own. Cost-sensitive training is explicitly out of scope for the main line of this project.",
+    "phase9_sequence": [
+      "A. Analyse and select the decision threshold using the training pool only, through cross-validation and outer out-of-fold predictions. The holdout takes no part in it.",
+      "B. Decide whether calibration is needed using the training pool only, under a leakage-safe protocol.",
+      "C. Freeze the estimator, the preprocessing, the calibration if any, and the threshold.",
+      "D. Only then run the first and only final evaluation on the holdout.",
+      "E. Error analysis on the holdout may follow the final evaluation as DESCRIPTIVE analysis only. It must not feed back into the model, the features, the hyperparameters, the calibration or the threshold."
+    ]
+  },
+  "final_full_training_searches": [],
+  "excluded_from_scope": [
+    {
+      "family": "random_forest",
+      "reason": "Phase 7 measured a mean paired delta of about -0.0553 AP against the logistic regression with 0/5 folds positive, and no later experiment produced evidence to reopen it. A scoping decision, not a claim that the family is universally inferior."
+    },
+    {
+      "family": "hist_gradient_boosting_native_categorical",
+      "reason": "Phase 8A classified the native categorical representation REPRESENTATION_NOT_SUPPORTED (mean delta about -0.00022 AP, 2/5 folds) and it stayed below the logistic regression in 5/5 folds. Including it would multiply experimental factors inside a tuning study."
+    },
+    {
+      "family": "contract_tenure",
+      "reason": "Retained candidate from Phase 6, deliberately unused here so that a feature effect is not mixed into a hyperparameter effect."
+    }
+  ],
+  "warnings": [],
+  "methodological_notes": [
+    "Every metric is cross-validated on the frozen Phase 4 training pool. No metric was computed on the holdout, which stays untouched until Phase 9.",
+    "The outer folds are the identical StratifiedKFold partition used by Phases 5 to 8A, so every paired delta is a per-fold difference on the same partition.",
+    "Nested cross-validation estimates the TUNING PROCEDURE, not a single configuration. The search runs entirely inside each outer training fold; the outer validation fold is predicted once, by the estimator the search had already committed to.",
+    "The inner cross-validation never sees an outer validation row. Preprocessing is refitted inside every inner fold, because the estimator handed to GridSearchCV is the complete pipeline and nothing is pre-fitted before the search.",
+    "GridSearchCV selects on average_precision alone. No multi-metric objective was built: ROC-AUC and the 0.5 diagnostics accompany the evaluation and select nothing.",
+    "The logistic migration from penalty='l2' to l1_ratio=0.0 is a COMPATIBILITY MIGRATION, not a model change. It is gated on reproducing the legacy per-fold metrics and the legacy out-of-fold probabilities within tolerance before any tuning runs.",
+    "The legacy builder is preserved and still reproduces the historical artefacts. The modern builder is used only for the new Phase 8B experiments.",
+    "class_weight is None for every candidate and stays frozen there. Cost-sensitive learning through class weights is DEFERRED and out of scope for the main line of this project: it changes the fit, so reopening it would reopen model selection rather than extend it. The threshold changes only the post-training decision rule and is therefore separable. Recall was not compensated through class weights.",
+    "Paired fold counts are reported as improved / tied / worsened. A tie is not an improvement and never counts towards the eligibility rule, which requires strictly positive deltas; folds_improved and folds_worsened do not have to sum to the number of folds.",
+    "No wall-clock metadata is written into this artefact or into the Phase 8B report. Both are a pure function of their inputs, so re-running the generator on an unchanged repository reproduces them byte for byte and any diff is a real change. Git already records when something was produced.",
+    "The decision threshold was not optimised. 0.5 is a diagnostic reference only, and no threshold search, F1-max, Youden rule or TunedThresholdClassifierCV was used.",
+    "No probability was calibrated and no calibration metric ranked anything.",
+    "No engineered feature was used, and the categorical representation is the common one-hot block. The native categorical representation was closed in Phase 8A and is not reopened.",
+    "Random forest is out of scope for this phase by decision, recorded in excluded_from_scope. That is a scoping decision, not a claim that the family is universally inferior.",
+    "The eligibility rule and the selection rule were fixed before any Phase 8B result was read, carry no minimum-gain cutoff, and every branch of the selection rule is exercised by tests on synthetic inputs.",
+    "The final full-training search is NOT a generalisation estimate. Its cross-validated score is computed on the same rows the selection used and is optimistically biased by construction; the honest estimate of the procedure is the nested outer result.",
+    "Outer out-of-fold predictions cover every training row exactly once, always produced by a procedure whose entire selection ran without that row. They are nested cross-validated outer-OOF results on the training pool, never test performance.",
+    "No fitted estimator was persisted. This phase persists the protocol, the metrics, the selected hyperparameters and the decision."
+  ]
+}

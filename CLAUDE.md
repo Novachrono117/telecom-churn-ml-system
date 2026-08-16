@@ -106,6 +106,14 @@ Use:
 - documented executable commands.
 Never invent metrics, plots, experiments or conclusions.
 
+**Deterministic artefacts.** New generated artefacts — reports, machine-readable
+records, figures — must be pure functions of their inputs, so that re-running a
+generator on an unchanged repository reproduces them byte for byte and any diff
+is a real change. Do not write wall-clock metadata (generation dates, timestamps,
+run durations, hostnames) into them: Git already records when a file was
+produced, and a clock inside the file guarantees a spurious diff on every rerun.
+Reports committed before this convention are not retrofitted.
+
 ## Preferred stack
 Core: pandas, numpy, scikit-learn, matplotlib, seaborn, scipy, joblib, shap, pydantic, pytest.
 Use `pyproject.toml` as the primary project configuration/dependency source.

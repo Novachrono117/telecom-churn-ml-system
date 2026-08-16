@@ -133,6 +133,10 @@ class PairedDelta(BaseModel):
     std: float
     folds_improved: int = Field(ge=0)
     folds_worsened: int = Field(ge=0)
+    #: Folds in which the two scored identically. Optional because artefacts
+    #: written before this field existed do not carry it, and back-filling a 0
+    #: into them would assert something that was never measured.
+    folds_unchanged: int | None = Field(default=None, ge=0)
 
 
 class ExperimentRecord(BaseModel):

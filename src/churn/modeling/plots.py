@@ -45,6 +45,12 @@ MODEL_COLORS: dict[str, str] = {
     # Phase 8A. The same family under a different representation, so a teal that
     # reads as related to the boosted blue without being confusable with it.
     "hgb_native": "#0f7a6e",
+    # Phase 8B. The frozen baseline keeps the logistic hue; its tuned sibling
+    # takes a darker shade of the same family, and tuned boosting keeps the
+    # Phase 7 blue so a family is recognisable across reports.
+    "logistic_frozen": COLOR_CHURNED,
+    "logistic_tuned": "#a33d12",
+    "hgb_tuned": "#1b5fa8",
 }
 
 #: Human-readable names, used in legends and axis labels.
@@ -55,6 +61,9 @@ MODEL_LABELS: dict[str, str] = {
     "random_forest": "Random forest",
     "hist_gradient_boosting": "Histogram gradient boosting",
     "hgb_native": "Hist gradient boosting (native categorical)",
+    "logistic_frozen": "Logistic (frozen baseline)",
+    "logistic_tuned": "Logistic (tuned)",
+    "hgb_tuned": "Hist gradient boosting (tuned)",
 }
 
 OOF_CAPTION = "Cross-validated out-of-fold performance on the training pool"
