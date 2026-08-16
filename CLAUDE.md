@@ -153,7 +153,7 @@ Reusable logic belongs under `src/`.
 6. Feature engineering — hypothesis-driven features.
 7. Modeling — controlled model comparison.
 8. Tuning — optimize only promising candidates.
-9. Final evaluation — untouched test set, threshold, calibration, error analysis.
+9. Final evaluation — calibration decision, then threshold, then freeze, then the untouched test set, then post-hoc error analysis. **Calibration is decided before the threshold**: it rewrites the probabilities a threshold would act on, so a threshold chosen first would belong to a score that no longer exists. Both decisions are made on the training pool alone.
 10. Explainability — global and local.
 11. Persistence & inference — trained pipeline and prediction interface.
 12. Monitoring design — quality, drift, performance, retraining criteria.

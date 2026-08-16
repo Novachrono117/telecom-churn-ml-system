@@ -758,18 +758,29 @@ for any new experiment.
 
 ### The order Phase 9 has to run in
 
-The holdout stays untouched until **every** development decision is frozen. That
-is not a formality. A threshold chosen while looking at holdout performance, or a
-calibration adopted because it improved a holdout number, turns the final
-evaluation into a selection score — and this project would then have no unbiased
-estimate anywhere.
+Two constraints fix this order, and neither is a formality.
+
+**Calibration comes before the threshold.** Calibration, if adopted, rewrites the
+probabilities the classifier emits. A threshold selected before that decision is
+attached to a score that will no longer exist afterwards: 0.42 on raw scores and
+0.42 on calibrated scores are different operating points, with different recall
+and different precision. The threshold has to be chosen on exactly the score that
+will be used in production and later on the holdout, which means the calibration
+policy must be frozen first.
+
+**The holdout stays untouched until every development decision is frozen.** A
+threshold chosen while looking at holdout performance, or a calibration adopted
+because it improved a holdout number, turns the final evaluation into a selection
+score — and this project would then have no unbiased estimate anywhere.
 
 {(chr(10) * 2).join(f"**{step[:2]}** {step[2:].strip()}" for step in selection.phase9_sequence)}
 
 Step E is the one that is easiest to violate by accident. Reading the holdout
-errors and then adjusting a threshold, a feature, a hyperparameter or the
-calibration would mean the reported holdout number no longer describes the model
-that produced it.
+errors and then adjusting a feature, the preprocessing, a hyperparameter, the
+calibration, `class_weight` or the threshold would mean the reported holdout
+number no longer describes the model that produced it. A hypothesis raised there
+is future work on future data, and it must not trigger a second evaluation on the
+same holdout — the second one would no longer be a first look.
 
 ## 21. Warnings
 

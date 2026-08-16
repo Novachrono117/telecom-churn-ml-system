@@ -728,11 +728,42 @@ def test_the_frozen_candidate_is_the_modern_implementation() -> None:
     assert "DEFERRED" in selection["class_weight_status"]
     assert len(selection["phase9_sequence"]) == 5
     assert selection["phase9_sequence"][3].startswith("D.")
-    # The holdout is evaluated only in step D, after the threshold and the
-    # calibration decision have been made and everything has been frozen.
-    evaluation_step = next(
-        index
-        for index, step in enumerate(selection["phase9_sequence"])
-        if "final evaluation on the holdout" in step
+
+
+def test_calibration_is_decided_before_the_threshold() -> None:
+    """Calibration rewrites the probabilities a threshold acts on, so it comes first."""
+    results = PROJECT_ROOT / "reports" / "experiments" / "tuning_results.json"
+    if not results.is_file():
+        pytest.skip("the artefact has not been generated yet")
+
+    sequence = json.loads(results.read_text(encoding="utf-8"))["selection"]["phase9_sequence"]
+
+    assert [text[:2] for text in sequence] == ["A.", "B.", "C.", "D.", "E."]
+
+    calibration = next(index for index, text in enumerate(sequence) if "CALIBRATION GATE" in text)
+    threshold = next(index for index, text in enumerate(sequence) if "THRESHOLD POLICY" in text)
+    freeze = next(index for index, text in enumerate(sequence) if "FREEZE" in text)
+    holdout = next(
+        index for index, text in enumerate(sequence) if "FINAL HOLDOUT EVALUATION" in text
     )
-    assert evaluation_step == 3
+    post_hoc = next(
+        index for index, text in enumerate(sequence) if "POST-HOC ERROR ANALYSIS" in text
+    )
+
+    assert calibration < threshold < freeze < holdout < post_hoc
+    assert (calibration, holdout) == (0, 3)
+
+
+def test_the_holdout_is_evaluated_only_after_everything_is_frozen() -> None:
+    results = PROJECT_ROOT / "reports" / "experiments" / "tuning_results.json"
+    if not results.is_file():
+        pytest.skip("the artefact has not been generated yet")
+
+    sequence = json.loads(results.read_text(encoding="utf-8"))["selection"]["phase9_sequence"]
+
+    # No step before D may evaluate the holdout, and the post-hoc step must
+    # forbid a second one rather than merely discourage it.
+    for text in sequence[:3]:
+        assert "FINAL HOLDOUT EVALUATION" not in text
+    assert "must not trigger" in sequence[4]
+    assert "class_weight" in sequence[4], "the feedback ban has to name class_weight too"

@@ -387,8 +387,8 @@ higher mean — which is what the eligibility rule encodes.
 | Hyperparameters | `C=1.0`, `l1_ratio=0.0`, `solver=lbfgs`, `class_weight=None`, `max_iter=100` |
 | Feature set | 19 original features, `common_ohe` |
 | `class_weight` | `None` — frozen and deferred |
-| Threshold | not optimised; 0.5 is a diagnostic reference and is decided in Phase 9 |
-| Calibration | not performed; calibration is a separate question for a later phase |
+| Threshold | not optimised; 0.5 is a diagnostic reference only. Phase 9 selects it on the training pool, and only after the calibration policy is frozen |
+| Calibration | not performed; Phase 9 decides it on the training pool BEFORE any threshold is selected, because calibration changes the probabilities a threshold would act on |
 | Outer-OOF Average Precision | 0.6584 |
 | Outer-OOF ROC-AUC | 0.8456 |
 
@@ -416,26 +416,37 @@ for any new experiment.
 
 ### The order Phase 9 has to run in
 
-The holdout stays untouched until **every** development decision is frozen. That
-is not a formality. A threshold chosen while looking at holdout performance, or a
-calibration adopted because it improved a holdout number, turns the final
-evaluation into a selection score — and this project would then have no unbiased
-estimate anywhere.
+Two constraints fix this order, and neither is a formality.
 
-**A.** Analyse and select the decision threshold using the training pool only, through cross-validation and outer out-of-fold predictions. The holdout takes no part in it.
+**Calibration comes before the threshold.** Calibration, if adopted, rewrites the
+probabilities the classifier emits. A threshold selected before that decision is
+attached to a score that will no longer exist afterwards: 0.42 on raw scores and
+0.42 on calibrated scores are different operating points, with different recall
+and different precision. The threshold has to be chosen on exactly the score that
+will be used in production and later on the holdout, which means the calibration
+policy must be frozen first.
 
-**B.** Decide whether calibration is needed using the training pool only, under a leakage-safe protocol.
+**The holdout stays untouched until every development decision is frozen.** A
+threshold chosen while looking at holdout performance, or a calibration adopted
+because it improved a holdout number, turns the final evaluation into a selection
+score — and this project would then have no unbiased estimate anywhere.
 
-**C.** Freeze the estimator, the preprocessing, the calibration if any, and the threshold.
+**A.** CALIBRATION GATE. Decide on the training pool alone, under a leakage-safe protocol, whether the frozen candidate needs calibration. No calibration decision may use the holdout.
 
-**D.** Only then run the first and only final evaluation on the holdout.
+**B.** THRESHOLD POLICY. Only once the estimator, the preprocessing and the calibration policy are frozen, analyse and select the decision threshold on the training pool alone. The threshold must act on exactly the score that will be used in production and later on the holdout, which is why it cannot be chosen before the calibration policy exists.
 
-**E.** Error analysis on the holdout may follow the final evaluation as DESCRIPTIVE analysis only. It must not feed back into the model, the features, the hyperparameters, the calibration or the threshold.
+**C.** FREEZE. Freeze definitively: the preprocessing, the modern logistic regression, C=1.0, l1_ratio=0.0, solver='lbfgs', class_weight=None, max_iter=100, the calibration policy and the decision threshold.
+
+**D.** FINAL HOLDOUT EVALUATION. Only after A to C, run the first and only final evaluation on the 1409 protected holdout rows.
+
+**E.** POST-HOC ERROR ANALYSIS. Once the final metrics are recorded, a DESCRIPTIVE analysis of the holdout errors is allowed. It must not feed back into the features, the preprocessing, the model, the hyperparameters, the calibration, class_weight or the threshold. Any hypothesis it raises belongs to future work and must not trigger a second evaluation on the same holdout.
 
 Step E is the one that is easiest to violate by accident. Reading the holdout
-errors and then adjusting a threshold, a feature, a hyperparameter or the
-calibration would mean the reported holdout number no longer describes the model
-that produced it.
+errors and then adjusting a feature, the preprocessing, a hyperparameter, the
+calibration, `class_weight` or the threshold would mean the reported holdout
+number no longer describes the model that produced it. A hypothesis raised there
+is future work on future data, and it must not trigger a second evaluation on the
+same holdout — the second one would no longer be a first look.
 
 ## 21. Warnings
 

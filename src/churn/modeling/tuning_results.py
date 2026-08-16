@@ -624,8 +624,14 @@ def build_selection_record(
             "build_logistic_baseline still passes penalty='l2' so the Phase 5 to 8A artefacts "
             "keep reproducing byte for byte. It must not be used for any new experiment."
         ),
-        threshold_status="not optimised; 0.5 is a diagnostic reference and is decided in Phase 9",
-        calibration_status="not performed; calibration is a separate question for a later phase",
+        threshold_status=(
+            "not optimised; 0.5 is a diagnostic reference only. Phase 9 selects it on the "
+            "training pool, and only after the calibration policy is frozen"
+        ),
+        calibration_status=(
+            "not performed; Phase 9 decides it on the training pool BEFORE any threshold is "
+            "selected, because calibration changes the probabilities a threshold would act on"
+        ),
         class_weight_status=(
             "FROZEN at None and DEFERRED. class_weight modifies the fit itself, so reopening it "
             "would reopen model selection and tuning rather than extend them. The threshold "
@@ -634,16 +640,24 @@ def build_selection_record(
             "this project."
         ),
         phase9_sequence=[
-            "A. Analyse and select the decision threshold using the training pool only, through "
-            "cross-validation and outer out-of-fold predictions. The holdout takes no part in it.",
-            "B. Decide whether calibration is needed using the training pool only, under a "
-            "leakage-safe protocol.",
-            "C. Freeze the estimator, the preprocessing, the calibration if any, and the "
-            "threshold.",
-            "D. Only then run the first and only final evaluation on the holdout.",
-            "E. Error analysis on the holdout may follow the final evaluation as DESCRIPTIVE "
-            "analysis only. It must not feed back into the model, the features, the "
-            "hyperparameters, the calibration or the threshold.",
+            "A. CALIBRATION GATE. Decide on the training pool alone, under a leakage-safe "
+            "protocol, whether the frozen candidate needs calibration. No calibration decision "
+            "may use the holdout.",
+            "B. THRESHOLD POLICY. Only once the estimator, the preprocessing and the calibration "
+            "policy are frozen, analyse and select the decision threshold on the training pool "
+            "alone. The threshold must act on exactly the score that will be used in production "
+            "and later on the holdout, which is why it cannot be chosen before the calibration "
+            "policy exists.",
+            "C. FREEZE. Freeze definitively: the preprocessing, the modern logistic regression, "
+            "C=1.0, l1_ratio=0.0, solver='lbfgs', class_weight=None, max_iter=100, the "
+            "calibration policy and the decision threshold.",
+            "D. FINAL HOLDOUT EVALUATION. Only after A to C, run the first and only final "
+            "evaluation on the 1409 protected holdout rows.",
+            "E. POST-HOC ERROR ANALYSIS. Once the final metrics are recorded, a DESCRIPTIVE "
+            "analysis of the holdout errors is allowed. It must not feed back into the features, "
+            "the preprocessing, the model, the hyperparameters, the calibration, class_weight or "
+            "the threshold. Any hypothesis it raises belongs to future work and must not trigger "
+            "a second evaluation on the same holdout.",
         ],
     )
 
