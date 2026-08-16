@@ -51,6 +51,12 @@ MODEL_COLORS: dict[str, str] = {
     "logistic_frozen": COLOR_CHURNED,
     "logistic_tuned": "#a33d12",
     "hgb_tuned": "#1b5fa8",
+    # Phase 9A. The uncalibrated policy IS the frozen logistic, so it keeps that
+    # hue; the two calibrators take the blue and teal slots, a triple that stays
+    # separable under every common colour-vision deficiency and in grayscale.
+    "logistic_uncalibrated": COLOR_CHURNED,
+    "logistic_sigmoid": "#2a78d6",
+    "logistic_isotonic": "#0f7a6e",
 }
 
 #: Human-readable names, used in legends and axis labels.
@@ -64,6 +70,9 @@ MODEL_LABELS: dict[str, str] = {
     "logistic_frozen": "Logistic (frozen baseline)",
     "logistic_tuned": "Logistic (tuned)",
     "hgb_tuned": "Hist gradient boosting (tuned)",
+    "logistic_uncalibrated": "C0 — uncalibrated",
+    "logistic_sigmoid": "C1 — sigmoid calibration",
+    "logistic_isotonic": "C2 — isotonic calibration",
 }
 
 OOF_CAPTION = "Cross-validated out-of-fold performance on the training pool"

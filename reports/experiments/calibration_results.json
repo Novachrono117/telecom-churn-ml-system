@@ -1,0 +1,813 @@
+{
+  "schema_version": 1,
+  "experiment": "phase9a-calibration-gate",
+  "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+  "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd",
+  "n_training_rows": 5634,
+  "training_positive_prevalence": 0.265353,
+  "random_seed": 42,
+  "scikit_learn_version": "1.9.0",
+  "references": {
+    "tuning": {
+      "artefact": "reports/experiments/tuning_results.json",
+      "schema_version": 1,
+      "experiment": "phase8b-nested-hyperparameter-tuning",
+      "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+      "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd"
+    },
+    "baseline": {
+      "artefact": "reports/experiments/baseline_results.json",
+      "schema_version": 2,
+      "experiment": "phase5-baselines",
+      "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+      "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd"
+    },
+    "model_comparison": {
+      "artefact": "reports/experiments/model_comparison_results.json",
+      "schema_version": 1,
+      "experiment": "phase7-model-family-comparison",
+      "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+      "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd"
+    },
+    "hgb_representation": {
+      "artefact": "reports/experiments/hgb_representation_results.json",
+      "schema_version": 1,
+      "experiment": "phase8a-hgb-representation-gate",
+      "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+      "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd"
+    }
+  },
+  "upstream_artefact_digests": {
+    "reports/split_manifest.json": "834eb1313536c49e1e0f82976f4455138d89be65bd9d0e3e9ff50c4e8d36242c",
+    "reports/experiments/baseline_results.json": "2bd6eb992a4ed235e5a0b70f7c9b8d5f45929c076f6a440c16ab68e28a907f95",
+    "reports/experiments/feature_engineering_results.json": "bd8a3f03df405f7b0ca0b5f67de53f8a7106cd4b27feeb6ac40f952c589d57b3",
+    "reports/experiments/model_comparison_results.json": "648aca646146e6bcee42d8a6727e66f08f32798eff51866147a486e64077082e",
+    "reports/experiments/hgb_representation_results.json": "794bd1bde4a78240f63130c04985239a3cf8588a2d79a5a9cd25d13e2ece5ea3",
+    "reports/experiments/tuning_results.json": "d9d245e22fc893208673322ea39bb73ea02efca8bd1410908c27f6921468ef74"
+  },
+  "reproduction": [
+    {
+      "experiment": "C0",
+      "reference_artefact": "reports/experiments/tuning_results.json",
+      "reference_schema_version": 1,
+      "reference_key": "procedures[T0]",
+      "tolerance": 1e-09,
+      "max_absolute_difference": 0.0,
+      "reproduced": true
+    }
+  ],
+  "ranking_expectations": {
+    "C1_sigmoid": "Sigmoid calibration applied to the score of a single estimator is a strictly monotone transformation, so barring numerical or pathological effects it should not materially change the ranking. Average Precision and ROC-AUC for C1 against C0 are therefore checked as an implementation guardrail: a material change would indicate something other than calibration happened and would have to be investigated before the run is accepted. Small numerical differences are legitimate and are reported rather than asserted away.",
+    "C2_isotonic": "Isotonic calibration is monotone but NOT strictly increasing: it can map several distinct scores onto one plateau, introducing tied probabilities and reducing ranking resolution. Average Precision and ROC-AUC may therefore differ from the uncalibrated reference. Any such difference is reported as a trade-off of the probabilistic representation, not as a calibration error, and the count of distinct out-of-fold probabilities is recorded so the magnitude of the collapse is visible."
+  },
+  "frozen_estimator": {
+    "builder": "churn.modeling.tuning.build_modern_logistic",
+    "estimator": "LogisticRegression",
+    "selected_in": "phase8b-nested-hyperparameter-tuning",
+    "hyperparameters": {
+      "C": 1.0,
+      "class_weight": null,
+      "l1_ratio": 0.0,
+      "max_iter": 100,
+      "solver": "lbfgs"
+    },
+    "reopened_here": false
+  },
+  "frozen_preprocessing": {
+    "builder": "churn.features.pipeline.build_feature_preprocessor",
+    "steps": [
+      "prepare_features (contract validation and canonical column order)",
+      "TotalChargesCleaner",
+      "StandardScaler on the 3 numeric features",
+      "OneHotEncoder(handle_unknown='ignore') on the 16 categorical features"
+    ],
+    "n_transformed_features": 46,
+    "refitted_inside_every_inner_calibration_fold": true
+  },
+  "feature_set": {
+    "n_features": 19,
+    "numeric": [
+      "tenure",
+      "MonthlyCharges",
+      "TotalCharges"
+    ],
+    "categorical": [
+      "gender",
+      "SeniorCitizen",
+      "Partner",
+      "Dependents",
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies",
+      "Contract",
+      "PaperlessBilling",
+      "PaymentMethod"
+    ],
+    "engineered": []
+  },
+  "outer_cross_validation": {
+    "strategy": "StratifiedKFold",
+    "n_splits": 5,
+    "shuffle": true,
+    "random_state": 42,
+    "shared_across_policies": true,
+    "identical_to_previous_phases": true,
+    "role": "evaluation of the calibration policy; never used to fit a calibrator"
+  },
+  "calibration_inner_cross_validation": {
+    "strategy": "StratifiedKFold",
+    "n_splits": 4,
+    "shuffle": true,
+    "random_state": 42,
+    "ensemble": false,
+    "scope": "inside each outer training fold only",
+    "role": "produce out-of-sample scores for the calibrator; the base estimator is then refitted on the whole outer training fold",
+    "ensemble_rationale": "False isolates the calibration layer: the estimator that predicts is fitted on the same rows C0 is fitted on. True would average four estimators fitted on three quarters each, mixing variance reduction into the measured effect"
+  },
+  "calibration_methods": [
+    {
+      "experiment": "C0",
+      "method": "none",
+      "ensemble": null,
+      "description": "the frozen pipeline, its own probabilities, no transformation"
+    },
+    {
+      "experiment": "C1",
+      "method": "sigmoid",
+      "ensemble": false,
+      "description": "Platt scaling: a two-parameter logistic fit mapping score to probability. Strictly monotone, and rigid by construction — a limitation and a protection"
+    },
+    {
+      "experiment": "C2",
+      "method": "isotonic",
+      "ensemble": false,
+      "description": "a free monotone step function. More flexible, and therefore more able to track the particular calibration split it was fitted on. Monotone but not strictly increasing, so it can create ties"
+    }
+  ],
+  "metric_protocol": {
+    "probability_metrics": [
+      "brier_score",
+      "log_loss",
+      "expected_calibration_error"
+    ],
+    "ranking_guardrail_metrics": [
+      "average_precision",
+      "roc_auc"
+    ],
+    "decision_metrics": [
+      "brier_score",
+      "log_loss"
+    ],
+    "lower_is_better": [
+      "brier_score",
+      "expected_calibration_error",
+      "log_loss"
+    ],
+    "threshold_dependent_metrics_computed": [],
+    "note": "Brier score and log loss decide. Average Precision and ROC-AUC watch. A calibrator improving a ranking metric is not evidence for adopting it: both methods here are monotone and cannot reorder customers, so these metrics are read as a check that the ranking survived, never as a gain"
+  },
+  "ece_definition": {
+    "formula": "ECE = sum over non-empty bins b of (n_b / N) * |mean(predicted probability in b) - mean(observed label in b)|",
+    "n_bins": 10,
+    "strategy": "quantile",
+    "empty_bin_behaviour": "excluded; an empty bin carries weight 0 and contributes nothing",
+    "duplicate_edge_behaviour": "duplicate quantile edges are collapsed, so the effective number of bins can be smaller than n_bins when the score distribution has ties",
+    "caveat": "There is no canonical ECE. Implementations differ in binning, weighting and empty-bin handling, so this number is comparable within this report and must not be compared to an ECE from elsewhere without checking its definition. It is a supporting diagnostic and decided nothing on its own"
+  },
+  "reliability_diagram": {
+    "n_bins": 10,
+    "strategy": "quantile",
+    "shared_bins_across_policies": true,
+    "source": "outer out-of-fold probabilities on the training pool",
+    "note": "The bin configuration was declared before any diagram was drawn. Bins chosen after seeing which curve looks best would be a presentation decision"
+  },
+  "threshold_selected": false,
+  "class_weight": null,
+  "engineered_features_used": [],
+  "policies": [
+    {
+      "experiment": "C0",
+      "label": "Uncalibrated logistic regression",
+      "model": "logistic_uncalibrated",
+      "method": null,
+      "calibrated": false,
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "brier_score": 0.134613,
+            "log_loss": 0.415596,
+            "expected_calibration_error": 0.024643,
+            "average_precision": 0.64366,
+            "roc_auc": 0.847891
+          }
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "brier_score": 0.144283,
+            "log_loss": 0.436745,
+            "expected_calibration_error": 0.042406,
+            "average_precision": 0.635452,
+            "roc_auc": 0.825128
+          }
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "brier_score": 0.135326,
+            "log_loss": 0.421497,
+            "expected_calibration_error": 0.031883,
+            "average_precision": 0.685865,
+            "roc_auc": 0.841901
+          }
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "brier_score": 0.128692,
+            "log_loss": 0.399016,
+            "expected_calibration_error": 0.024501,
+            "average_precision": 0.678188,
+            "roc_auc": 0.862874
+          }
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "metrics": {
+            "brier_score": 0.132405,
+            "log_loss": 0.410548,
+            "expected_calibration_error": 0.034069,
+            "average_precision": 0.6643,
+            "roc_auc": 0.852952
+          }
+        }
+      ],
+      "mean": {
+        "brier_score": 0.135064,
+        "log_loss": 0.41668,
+        "expected_calibration_error": 0.0315,
+        "average_precision": 0.661493,
+        "roc_auc": 0.846149
+      },
+      "std": {
+        "brier_score": 0.005765,
+        "log_loss": 0.013934,
+        "expected_calibration_error": 0.007445,
+        "average_precision": 0.021661,
+        "roc_auc": 0.014045
+      },
+      "outer_out_of_fold": {
+        "brier_score": 0.135064,
+        "log_loss": 0.416681,
+        "expected_calibration_error": 0.010403,
+        "average_precision": 0.658425,
+        "roc_auc": 0.845606
+      },
+      "n_distinct_oof_probabilities": 5625,
+      "paired_deltas": {},
+      "converged": true
+    },
+    {
+      "experiment": "C1",
+      "label": "Sigmoid-calibrated logistic regression",
+      "model": "logistic_sigmoid",
+      "method": "sigmoid",
+      "calibrated": true,
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "brier_score": 0.134667,
+            "log_loss": 0.415467,
+            "expected_calibration_error": 0.023659,
+            "average_precision": 0.64366,
+            "roc_auc": 0.847891
+          }
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "brier_score": 0.143966,
+            "log_loss": 0.435815,
+            "expected_calibration_error": 0.040107,
+            "average_precision": 0.635452,
+            "roc_auc": 0.825128
+          }
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "brier_score": 0.135405,
+            "log_loss": 0.421341,
+            "expected_calibration_error": 0.030757,
+            "average_precision": 0.685865,
+            "roc_auc": 0.841901
+          }
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "brier_score": 0.128832,
+            "log_loss": 0.399565,
+            "expected_calibration_error": 0.026946,
+            "average_precision": 0.678188,
+            "roc_auc": 0.862874
+          }
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "metrics": {
+            "brier_score": 0.132537,
+            "log_loss": 0.410795,
+            "expected_calibration_error": 0.035209,
+            "average_precision": 0.6643,
+            "roc_auc": 0.852952
+          }
+        }
+      ],
+      "mean": {
+        "brier_score": 0.135081,
+        "log_loss": 0.416597,
+        "expected_calibration_error": 0.031336,
+        "average_precision": 0.661493,
+        "roc_auc": 0.846149
+      },
+      "std": {
+        "brier_score": 0.005584,
+        "log_loss": 0.013387,
+        "expected_calibration_error": 0.006528,
+        "average_precision": 0.021661,
+        "roc_auc": 0.014045
+      },
+      "outer_out_of_fold": {
+        "brier_score": 0.135082,
+        "log_loss": 0.416598,
+        "expected_calibration_error": 0.011398,
+        "average_precision": 0.658454,
+        "roc_auc": 0.845663
+      },
+      "n_distinct_oof_probabilities": 5625,
+      "paired_deltas": {
+        "C0": {
+          "brier_score": {
+            "metric": "brier_score",
+            "reference": "C0",
+            "lower_is_better": true,
+            "per_fold": [
+              5.5e-05,
+              -0.000317,
+              7.8e-05,
+              0.00014,
+              0.000132
+            ],
+            "mean": 1.8e-05,
+            "std": 0.00019,
+            "folds_improved": 1,
+            "folds_tied": 0,
+            "folds_worsened": 4
+          },
+          "log_loss": {
+            "metric": "log_loss",
+            "reference": "C0",
+            "lower_is_better": true,
+            "per_fold": [
+              -0.000129,
+              -0.000929,
+              -0.000155,
+              0.000549,
+              0.000247
+            ],
+            "mean": -8.3e-05,
+            "std": 0.000555,
+            "folds_improved": 3,
+            "folds_tied": 0,
+            "folds_worsened": 2
+          },
+          "expected_calibration_error": {
+            "metric": "expected_calibration_error",
+            "reference": "C0",
+            "lower_is_better": true,
+            "per_fold": [
+              -0.000983,
+              -0.002299,
+              -0.001126,
+              0.002446,
+              0.00114
+            ],
+            "mean": -0.000164,
+            "std": 0.001915,
+            "folds_improved": 3,
+            "folds_tied": 0,
+            "folds_worsened": 2
+          },
+          "average_precision": {
+            "metric": "average_precision",
+            "reference": "C0",
+            "lower_is_better": false,
+            "per_fold": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std": 0.0,
+            "folds_improved": 0,
+            "folds_tied": 5,
+            "folds_worsened": 0
+          },
+          "roc_auc": {
+            "metric": "roc_auc",
+            "reference": "C0",
+            "lower_is_better": false,
+            "per_fold": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ],
+            "mean": 0.0,
+            "std": 0.0,
+            "folds_improved": 0,
+            "folds_tied": 5,
+            "folds_worsened": 0
+          }
+        }
+      },
+      "converged": true
+    },
+    {
+      "experiment": "C2",
+      "label": "Isotonic-calibrated logistic regression",
+      "model": "logistic_isotonic",
+      "method": "isotonic",
+      "calibrated": true,
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "brier_score": 0.135946,
+            "log_loss": 0.418972,
+            "expected_calibration_error": 0.035341,
+            "average_precision": 0.628758,
+            "roc_auc": 0.844974
+          }
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "brier_score": 0.143445,
+            "log_loss": 0.435394,
+            "expected_calibration_error": 0.036657,
+            "average_precision": 0.620546,
+            "roc_auc": 0.825425
+          }
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "brier_score": 0.135241,
+            "log_loss": 0.419913,
+            "expected_calibration_error": 0.031561,
+            "average_precision": 0.664274,
+            "roc_auc": 0.841371
+          }
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "metrics": {
+            "brier_score": 0.1294,
+            "log_loss": 0.457311,
+            "expected_calibration_error": 0.023265,
+            "average_precision": 0.667732,
+            "roc_auc": 0.863163
+          }
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "metrics": {
+            "brier_score": 0.132909,
+            "log_loss": 0.411471,
+            "expected_calibration_error": 0.026772,
+            "average_precision": 0.650482,
+            "roc_auc": 0.852267
+          }
+        }
+      ],
+      "mean": {
+        "brier_score": 0.135388,
+        "log_loss": 0.428612,
+        "expected_calibration_error": 0.030719,
+        "average_precision": 0.646358,
+        "roc_auc": 0.84544
+      },
+      "std": {
+        "brier_score": 0.005178,
+        "log_loss": 0.018249,
+        "expected_calibration_error": 0.005667,
+        "average_precision": 0.021041,
+        "roc_auc": 0.013947
+      },
+      "outer_out_of_fold": {
+        "brier_score": 0.135389,
+        "log_loss": 0.428615,
+        "expected_calibration_error": 0.008447,
+        "average_precision": 0.652094,
+        "roc_auc": 0.843376
+      },
+      "n_distinct_oof_probabilities": 218,
+      "paired_deltas": {
+        "C0": {
+          "brier_score": {
+            "metric": "brier_score",
+            "reference": "C0",
+            "lower_is_better": true,
+            "per_fold": [
+              0.001334,
+              -0.000838,
+              -8.5e-05,
+              0.000708,
+              0.000503
+            ],
+            "mean": 0.000324,
+            "std": 0.000824,
+            "folds_improved": 2,
+            "folds_tied": 0,
+            "folds_worsened": 3
+          },
+          "log_loss": {
+            "metric": "log_loss",
+            "reference": "C0",
+            "lower_is_better": true,
+            "per_fold": [
+              0.003377,
+              -0.001351,
+              -0.001584,
+              0.058295,
+              0.000923
+            ],
+            "mean": 0.011932,
+            "std": 0.025995,
+            "folds_improved": 2,
+            "folds_tied": 0,
+            "folds_worsened": 3
+          },
+          "expected_calibration_error": {
+            "metric": "expected_calibration_error",
+            "reference": "C0",
+            "lower_is_better": true,
+            "per_fold": [
+              0.010698,
+              -0.005749,
+              -0.000322,
+              -0.001236,
+              -0.007296
+            ],
+            "mean": -0.000781,
+            "std": 0.007059,
+            "folds_improved": 4,
+            "folds_tied": 0,
+            "folds_worsened": 1
+          },
+          "average_precision": {
+            "metric": "average_precision",
+            "reference": "C0",
+            "lower_is_better": false,
+            "per_fold": [
+              -0.014903,
+              -0.014905,
+              -0.021591,
+              -0.010457,
+              -0.013819
+            ],
+            "mean": -0.015135,
+            "std": 0.004044,
+            "folds_improved": 0,
+            "folds_tied": 0,
+            "folds_worsened": 5
+          },
+          "roc_auc": {
+            "metric": "roc_auc",
+            "reference": "C0",
+            "lower_is_better": false,
+            "per_fold": [
+              -0.002916,
+              0.000297,
+              -0.000529,
+              0.000289,
+              -0.000685
+            ],
+            "mean": -0.000709,
+            "std": 0.001315,
+            "folds_improved": 2,
+            "folds_tied": 0,
+            "folds_worsened": 3
+          }
+        },
+        "C1": {
+          "brier_score": {
+            "metric": "brier_score",
+            "reference": "C1",
+            "lower_is_better": true,
+            "per_fold": [
+              0.001279,
+              -0.000521,
+              -0.000164,
+              0.000568,
+              0.000372
+            ],
+            "mean": 0.000307,
+            "std": 0.000694,
+            "folds_improved": 2,
+            "folds_tied": 0,
+            "folds_worsened": 3
+          },
+          "log_loss": {
+            "metric": "log_loss",
+            "reference": "C1",
+            "lower_is_better": true,
+            "per_fold": [
+              0.003506,
+              -0.000421,
+              -0.001428,
+              0.057746,
+              0.000676
+            ],
+            "mean": 0.012015,
+            "std": 0.02563,
+            "folds_improved": 2,
+            "folds_tied": 0,
+            "folds_worsened": 3
+          },
+          "expected_calibration_error": {
+            "metric": "expected_calibration_error",
+            "reference": "C1",
+            "lower_is_better": true,
+            "per_fold": [
+              0.011681,
+              -0.00345,
+              0.000804,
+              -0.003681,
+              -0.008436
+            ],
+            "mean": -0.000616,
+            "std": 0.007613,
+            "folds_improved": 3,
+            "folds_tied": 0,
+            "folds_worsened": 2
+          },
+          "average_precision": {
+            "metric": "average_precision",
+            "reference": "C1",
+            "lower_is_better": false,
+            "per_fold": [
+              -0.014903,
+              -0.014905,
+              -0.021591,
+              -0.010457,
+              -0.013819
+            ],
+            "mean": -0.015135,
+            "std": 0.004044,
+            "folds_improved": 0,
+            "folds_tied": 0,
+            "folds_worsened": 5
+          },
+          "roc_auc": {
+            "metric": "roc_auc",
+            "reference": "C1",
+            "lower_is_better": false,
+            "per_fold": [
+              -0.002916,
+              0.000297,
+              -0.000529,
+              0.000289,
+              -0.000685
+            ],
+            "mean": -0.000709,
+            "std": 0.001315,
+            "folds_improved": 2,
+            "folds_tied": 0,
+            "folds_worsened": 3
+          }
+        }
+      },
+      "converged": true
+    }
+  ],
+  "eligibility": [
+    {
+      "experiment": "C1",
+      "method": "sigmoid",
+      "status": "NOT_ELIGIBLE_CALIBRATION",
+      "rationale": "mean delta Brier +0.00002 improving in 1/5 folds; mean delta log loss -0.00008 improving in 3/5; mean delta AP +0.00000 worsening in 0/5. The Brier score does not improve consistently, which is the primary condition, so calibration is not adopted.",
+      "mean_delta_brier": 1.8e-05,
+      "folds_brier_improved": 1,
+      "mean_delta_log_loss": -8.3e-05,
+      "folds_log_loss_improved": 3,
+      "mean_delta_average_precision": 0.0,
+      "folds_average_precision_worsened": 0
+    },
+    {
+      "experiment": "C2",
+      "method": "isotonic",
+      "status": "NOT_ELIGIBLE_CALIBRATION",
+      "rationale": "mean delta Brier +0.00032 improving in 2/5 folds; mean delta log loss +0.01193 improving in 2/5; mean delta AP -0.01513 worsening in 5/5. The Brier score does not improve consistently, which is the primary condition, so calibration is not adopted.",
+      "mean_delta_brier": 0.000324,
+      "folds_brier_improved": 2,
+      "mean_delta_log_loss": 0.011932,
+      "folds_log_loss_improved": 2,
+      "mean_delta_average_precision": -0.015135,
+      "folds_average_precision_worsened": 5
+    }
+  ],
+  "selection": {
+    "rule": [
+      "A calibration method is ELIGIBLE_CALIBRATION when: (1) its mean paired delta Brier is < 0; (2) Brier improves in at least 4 of the 5 outer folds; (3) its mean paired delta log loss is <= 0; and (4) Average Precision does not deteriorate relevantly and consistently.",
+      "Condition 4 uses the project's standard consistency test and no magnitude cutoff: AP counts as deteriorated when its mean delta is negative AND it worsens in at least 4 of the 5 outer folds.",
+      "If conditions 1 and 2 hold but 3 fails, the two probability losses disagree materially and the method is INCONCLUSIVE_CALIBRATION, not adopted.",
+      "If no method is eligible, the calibration policy is NONE and the uncalibrated logistic regression is carried forward.",
+      "If exactly one method is eligible, it is selected.",
+      "If both are eligible, compare them directly on the same folds: first Brier, then log loss; a method with a mean delta in its favour winning at least 4 of the 5 outer folds is selected.",
+      "Otherwise the pre-registered default applies: sigmoid, for lower flexibility and lower overfitting risk. Stability and complexity are reported but are not turned into a numeric cutoff."
+    ],
+    "rule_fixed_before_results": true,
+    "min_improved_folds": 4,
+    "minimum_gain_cutoff": null,
+    "decision_metrics": [
+      "brier_score",
+      "log_loss"
+    ],
+    "guardrail_metrics": [
+      "average_precision",
+      "roc_auc"
+    ],
+    "selected_policy": "NONE",
+    "selected_label": "no calibration layer",
+    "rationale": "No calibration method cleared the eligibility rule, so no calibration layer is adopted and the frozen logistic regression keeps emitting its own probabilities. Adding a transformation has to be justified; the default when it is not is to keep the simpler object.",
+    "brier_stability": {
+      "C1": 0.005584,
+      "C2": 0.005178
+    },
+    "threshold_status": "not selected here. Phase 9B selects the threshold on the training pool, acting on the probability this phase froze",
+    "phase9b_input": "Phase 9B receives the frozen estimator plus this calibration policy, and selects a threshold on exactly the probability the policy produces"
+  },
+  "warnings": [],
+  "methodological_notes": [
+    "Every metric is cross-validated on the frozen Phase 4 training pool. No metric, distribution, plot or probability involves the holdout, which stays untouched.",
+    "The outer folds are the identical StratifiedKFold partition used by Phases 5 to 8B, so every paired delta is a per-fold difference on the same partition.",
+    "Calibration is CROSS-FITTED. Inside each outer training fold the inner 4-fold produces an out-of-sample score for every outer-train row, the calibrator is fitted on those scores, and the base pipeline is then refitted on the whole outer training fold. No row is ever used to fit the estimator that scores it and the calibrator that transforms that score. A calibrator fitted on in-sample scores would learn to correct a distortion that does not exist out of sample.",
+    "The whole pipeline sits inside the calibrator, not just the classifier, so the cleaner, the scaler and the encoder are refitted inside every inner calibration fold.",
+    "ensemble=False is pinned rather than left at the 'auto' default. This is what isolates the question: the base estimator is refitted on the entire outer training fold, exactly as C0 is, so the arms differ by the calibration layer alone. ensemble=True would instead average four estimators each fitted on three quarters of the fold, adding a variance-reduction effect on top of calibration and leaving the comparison unable to attribute the result.",
+    "Brier score and log loss are PROPER SCORING RULES of probabilistic quality. They are not measures of calibration alone: each decomposes into a calibration term and a refinement/discrimination term, so a movement can come from sharper probabilities rather than better-aligned ones. The decision reads them together with the reliability diagram, the ranking guardrails and fold-to-fold consistency.",
+    "Average Precision and ROC-AUC are GUARDRAILS only. No calibrator is adopted because a ranking metric improved.",
+    "No threshold-dependent metric was computed at all. Precision, recall, F1 and accuracy need a decision rule, this phase does not choose one, and a metric that is never computed cannot accidentally influence the decision.",
+    "No threshold was selected. Phase 9B selects it, on the training pool, acting on whatever probability this phase froze.",
+    "The estimator, its hyperparameters, class_weight=None, the 19 original features and the preprocessing are all frozen inputs. Nothing here reopens model selection.",
+    "Expected Calibration Error is reported under an explicitly stated definition because there is no canonical one: implementations differ in binning, weighting and empty-bin handling. It is a supporting diagnostic and decided nothing on its own.",
+    "Isotonic regression is more flexible than a sigmoid fit and was not assumed to be better. It is monotone but not strictly increasing, so it can map distinct scores onto one plateau and introduce tied probabilities, reducing ranking RESOLUTION. Where a lower Average Precision or ROC-AUC accompanies that reduction, it is reported as a trade-off of the probabilistic representation and must not be read as a calibration error. The count of distinct out-of-fold probabilities records how far the collapse went.",
+    "Whether a logistic regression needs calibration is an EMPIRICAL question here, not a property assumed from the family. Its probabilistic structure and log-loss objective often yield adequately calibrated probabilities, but regularisation, model misspecification and the characteristics of a dataset can still produce miscalibration. The conclusion recorded in this artefact is scoped to this dataset and this protocol: additional calibration was, or was not, supported by the measurements.",
+    "The eligibility and selection rules were fixed before any Phase 9A number was read, carry no minimum-gain cutoff, and every branch is exercised by tests on synthetic inputs.",
+    "Outer out-of-fold probabilities cover every training row exactly once, always produced by a policy whose entire fitting and calibration ran without that row. They are cross-validated training-pool results, never test performance.",
+    "No fitted estimator and no calibrator was persisted. This phase persists the protocol, the metrics and the decision."
+  ]
+}
