@@ -1,0 +1,1548 @@
+{
+  "schema_version": 1,
+  "experiment": "phase9b-decision-threshold-policy",
+  "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+  "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd",
+  "n_training_rows": 5634,
+  "training_positive_prevalence": 0.265353,
+  "random_seed": 42,
+  "scikit_learn_version": "1.9.0",
+  "references": {
+    "calibration": {
+      "artefact": "reports/experiments/calibration_results.json",
+      "schema_version": 1,
+      "experiment": "phase9a-calibration-gate",
+      "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+      "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd"
+    },
+    "tuning": {
+      "artefact": "reports/experiments/tuning_results.json",
+      "schema_version": 1,
+      "experiment": "phase8b-nested-hyperparameter-tuning",
+      "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+      "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd"
+    }
+  },
+  "upstream_artefact_digests": {
+    "reports/split_manifest.json": "834eb1313536c49e1e0f82976f4455138d89be65bd9d0e3e9ff50c4e8d36242c",
+    "reports/experiments/baseline_results.json": "2bd6eb992a4ed235e5a0b70f7c9b8d5f45929c076f6a440c16ab68e28a907f95",
+    "reports/experiments/feature_engineering_results.json": "bd8a3f03df405f7b0ca0b5f67de53f8a7106cd4b27feeb6ac40f952c589d57b3",
+    "reports/experiments/model_comparison_results.json": "648aca646146e6bcee42d8a6727e66f08f32798eff51866147a486e64077082e",
+    "reports/experiments/hgb_representation_results.json": "794bd1bde4a78240f63130c04985239a3cf8588a2d79a5a9cd25d13e2ece5ea3",
+    "reports/experiments/tuning_results.json": "d9d245e22fc893208673322ea39bb73ea02efca8bd1410908c27f6921468ef74",
+    "reports/experiments/calibration_results.json": "0119ca11c5c471906f82845482897d2e8a13ffd6598ccb58f77370e40cbbe778"
+  },
+  "reproduction": [
+    {
+      "experiment": "D0",
+      "reference_artefact": "reports/experiments/calibration_results.json",
+      "reference_schema_version": 1,
+      "reference_key": "policies[C0]",
+      "tolerance": 1e-09,
+      "max_absolute_difference": 0.0,
+      "reproduced": true
+    },
+    {
+      "experiment": "full_training_out_of_fold",
+      "reference_artefact": "in-run: nested outer out-of-fold probabilities",
+      "reference_schema_version": 1,
+      "reference_key": "policies[D0].outer_out_of_fold_probability",
+      "tolerance": 1e-12,
+      "max_absolute_difference": 0.0,
+      "reproduced": true
+    }
+  ],
+  "frozen_estimator": {
+    "builder": "churn.modeling.tuning.build_modern_logistic",
+    "estimator": "LogisticRegression",
+    "selected_in": "phase8b-nested-hyperparameter-tuning",
+    "hyperparameters": {
+      "C": 1.0,
+      "class_weight": null,
+      "l1_ratio": 0.0,
+      "max_iter": 100,
+      "solver": "lbfgs"
+    },
+    "reopened_here": false
+  },
+  "frozen_preprocessing": {
+    "builder": "churn.features.pipeline.build_feature_preprocessor",
+    "steps": [
+      "prepare_features (contract validation and canonical column order)",
+      "TotalChargesCleaner",
+      "StandardScaler on the 3 numeric features",
+      "OneHotEncoder(handle_unknown='ignore') on the 16 categorical features"
+    ],
+    "n_transformed_features": 46,
+    "refitted_inside_every_fold": true
+  },
+  "feature_set": {
+    "n_features": 19,
+    "numeric": [
+      "tenure",
+      "MonthlyCharges",
+      "TotalCharges"
+    ],
+    "categorical": [
+      "gender",
+      "SeniorCitizen",
+      "Partner",
+      "Dependents",
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies",
+      "Contract",
+      "PaperlessBilling",
+      "PaymentMethod"
+    ],
+    "engineered": []
+  },
+  "calibration_policy": "NONE",
+  "probability_source": {
+    "expression": "build_modern_logistic_pipeline().predict_proba(X)[:, 1]",
+    "calibrated": false,
+    "decided_in": "phase9a-calibration-gate",
+    "reference_experiment": "C0",
+    "note": "The threshold cuts the raw probability of the frozen logistic regression. A calibrator would have rewritten that score, and a threshold chosen on one is not the same operating point on the other, which is why Phase 9A ran first"
+  },
+  "outer_cross_validation": {
+    "strategy": "StratifiedKFold",
+    "n_splits": 5,
+    "shuffle": true,
+    "random_state": 42,
+    "shared_across_policies": true,
+    "identical_to_previous_phases": true,
+    "role": "evaluates the threshold-selection procedure; never takes part in choosing a threshold"
+  },
+  "inner_threshold_cross_validation": {
+    "strategy": "StratifiedKFold",
+    "n_splits": 4,
+    "shuffle": true,
+    "random_state": 42,
+    "scope": "inside each outer training fold only",
+    "role": "produces out-of-sample probabilities for every outer-train row; POLICY_F1 reads those and nothing else"
+  },
+  "threshold_policy": {
+    "name": "POLICY_F1",
+    "objective": "f1",
+    "objective_class": "positive class (Churn = Yes)",
+    "pre_registered": true,
+    "rule": [
+      "Candidates are every distinct predicted probability in the vector being searched, plus the default 0.5, which is added unconditionally so the procedure can return 'the default was already best'.",
+      "The decision rule is: predict the positive class when probability >= threshold.",
+      "Each candidate is scored by the F1 score of the positive class, and by nothing else.",
+      "The candidate with the maximum F1 is selected.",
+      "Ties are resolved by the tie-breaking rule, not by argmax over an array order.",
+      "Probabilities are never rounded before the search: rounding would merge cuts that separate different customers."
+    ],
+    "rationale": "Precision and recall are both relevant and F1 weighs them symmetrically, which is a defensible default when no cost ratio is available. It requires no invented business number",
+    "scope_statement": "F1-max is a research operating point, not a business-optimal threshold",
+    "changed_after_seeing_results": false
+  },
+  "tie_breaking_rule": [
+    "Two candidates count as tied when their F1 values are within 1e-12 of the maximum. 'Equal' is not a well-defined operation on floats, so the tolerance is explicit.",
+    "Among the tied candidates, the threshold closest to 0.5 is selected. This is a PARSIMONY rule: when the evidence does not distinguish two operating points, the one that moves less from the default is taken. It is not a claim that 0.5 is correct and it is not a business conclusion.",
+    "If two tied candidates are exactly equidistant from 0.5, the larger threshold is selected. This second tie-break exists only to make the answer unique and deterministic."
+  ],
+  "default_threshold": 0.5,
+  "numeric_precision": {
+    "metrics_rounded_to": 6,
+    "thresholds_rounded": false,
+    "probabilities_rounded_before_search": false,
+    "note": "A metric rounded in the seventh decimal is the same measurement; a threshold rounded in the sixth can move customers across the decision boundary"
+  },
+  "outer_thresholds": [
+    {
+      "fold": 1,
+      "n_outer_train": 4507,
+      "n_inner_splits": 4,
+      "n_candidates": 4503,
+      "n_tied_within_tolerance": 1,
+      "default_in_candidates": true,
+      "threshold": 0.3292440995513046,
+      "inner_out_of_fold_selection_metrics": {
+        "threshold": 0.3292440995513046,
+        "precision": 0.557471,
+        "recall": 0.729933,
+        "f1": 0.632151,
+        "accuracy": 0.774573,
+        "predicted_positive_rate": 0.34746,
+        "true_negatives": 2618,
+        "false_positives": 693,
+        "false_negatives": 323,
+        "true_positives": 873
+      }
+    },
+    {
+      "fold": 2,
+      "n_outer_train": 4507,
+      "n_inner_splits": 4,
+      "n_candidates": 4504,
+      "n_tied_within_tolerance": 1,
+      "default_in_candidates": true,
+      "threshold": 0.2844589228100722,
+      "inner_out_of_fold_selection_metrics": {
+        "threshold": 0.2844589228100722,
+        "precision": 0.544776,
+        "recall": 0.793478,
+        "f1": 0.646018,
+        "accuracy": 0.769248,
+        "predicted_positive_rate": 0.38651,
+        "true_negatives": 2518,
+        "false_positives": 793,
+        "false_negatives": 247,
+        "true_positives": 949
+      }
+    },
+    {
+      "fold": 3,
+      "n_outer_train": 4507,
+      "n_inner_splits": 4,
+      "n_candidates": 4507,
+      "n_tied_within_tolerance": 1,
+      "default_in_candidates": true,
+      "threshold": 0.3004869971491383,
+      "inner_out_of_fold_selection_metrics": {
+        "threshold": 0.3004869971491383,
+        "precision": 0.543808,
+        "recall": 0.778428,
+        "f1": 0.640303,
+        "accuracy": 0.767917,
+        "predicted_positive_rate": 0.379854,
+        "true_negatives": 2530,
+        "false_positives": 781,
+        "false_negatives": 265,
+        "true_positives": 931
+      }
+    },
+    {
+      "fold": 4,
+      "n_outer_train": 4507,
+      "n_inner_splits": 4,
+      "n_candidates": 4505,
+      "n_tied_within_tolerance": 1,
+      "default_in_candidates": true,
+      "threshold": 0.2904220063661291,
+      "inner_out_of_fold_selection_metrics": {
+        "threshold": 0.2904220063661291,
+        "precision": 0.532453,
+        "recall": 0.775084,
+        "f1": 0.631256,
+        "accuracy": 0.759707,
+        "predicted_positive_rate": 0.386288,
+        "true_negatives": 2497,
+        "false_positives": 814,
+        "false_negatives": 269,
+        "true_positives": 927
+      }
+    },
+    {
+      "fold": 5,
+      "n_outer_train": 4508,
+      "n_inner_splits": 4,
+      "n_candidates": 4505,
+      "n_tied_within_tolerance": 1,
+      "default_in_candidates": true,
+      "threshold": 0.2974008539869448,
+      "inner_out_of_fold_selection_metrics": {
+        "threshold": 0.2974008539869448,
+        "precision": 0.539359,
+        "recall": 0.773411,
+        "f1": 0.63552,
+        "accuracy": 0.764641,
+        "predicted_positive_rate": 0.380435,
+        "true_negatives": 2522,
+        "false_positives": 790,
+        "false_negatives": 271,
+        "true_positives": 925
+      }
+    }
+  ],
+  "policies": [
+    {
+      "experiment": "D0",
+      "label": "Default threshold 0.5",
+      "model": "threshold_default",
+      "policy": "DEFAULT_0_5",
+      "threshold_source": "fixed at 0.5; not optimised",
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "threshold": 0.5,
+          "metrics": {
+            "precision": 0.645161,
+            "recall": 0.535117,
+            "f1": 0.585009,
+            "accuracy": 0.79858,
+            "predicted_positive_rate": 0.220053,
+            "average_precision": 0.64366,
+            "roc_auc": 0.847891
+          },
+          "confusion": {
+            "true_negatives": 740,
+            "false_positives": 88,
+            "false_negatives": 139,
+            "true_positives": 160
+          }
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "threshold": 0.5,
+          "metrics": {
+            "precision": 0.607287,
+            "recall": 0.501672,
+            "f1": 0.549451,
+            "accuracy": 0.781721,
+            "predicted_positive_rate": 0.219166,
+            "average_precision": 0.635452,
+            "roc_auc": 0.825128
+          },
+          "confusion": {
+            "true_negatives": 731,
+            "false_positives": 97,
+            "false_negatives": 149,
+            "true_positives": 150
+          }
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "threshold": 0.5,
+          "metrics": {
+            "precision": 0.659751,
+            "recall": 0.531773,
+            "f1": 0.588889,
+            "accuracy": 0.803017,
+            "predicted_positive_rate": 0.213842,
+            "average_precision": 0.685865,
+            "roc_auc": 0.841901
+          },
+          "confusion": {
+            "true_negatives": 746,
+            "false_positives": 82,
+            "false_negatives": 140,
+            "true_positives": 159
+          }
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "threshold": 0.5,
+          "metrics": {
+            "precision": 0.664286,
+            "recall": 0.622074,
+            "f1": 0.642487,
+            "accuracy": 0.816327,
+            "predicted_positive_rate": 0.248447,
+            "average_precision": 0.678188,
+            "roc_auc": 0.862874
+          },
+          "confusion": {
+            "true_negatives": 734,
+            "false_positives": 94,
+            "false_negatives": 113,
+            "true_positives": 186
+          }
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "threshold": 0.5,
+          "metrics": {
+            "precision": 0.683983,
+            "recall": 0.528428,
+            "f1": 0.596226,
+            "accuracy": 0.809947,
+            "predicted_positive_rate": 0.205151,
+            "average_precision": 0.6643,
+            "roc_auc": 0.852952
+          },
+          "confusion": {
+            "true_negatives": 754,
+            "false_positives": 73,
+            "false_negatives": 141,
+            "true_positives": 158
+          }
+        }
+      ],
+      "mean": {
+        "precision": 0.652094,
+        "recall": 0.543813,
+        "f1": 0.592412,
+        "accuracy": 0.801918,
+        "predicted_positive_rate": 0.221332,
+        "average_precision": 0.661493,
+        "roc_auc": 0.846149
+      },
+      "std": {
+        "precision": 0.028635,
+        "recall": 0.045711,
+        "f1": 0.033298,
+        "accuracy": 0.013156,
+        "predicted_positive_rate": 0.016275,
+        "average_precision": 0.021661,
+        "roc_auc": 0.014045
+      },
+      "paired_deltas": {}
+    },
+    {
+      "experiment": "D1",
+      "label": "Nested F1-max threshold",
+      "model": "threshold_nested_f1",
+      "policy": "F1_MAXIMIZATION",
+      "threshold_source": "POLICY_F1 on the inner out-of-fold probabilities of the outer training fold",
+      "folds": [
+        {
+          "fold": 1,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "threshold": 0.3292440995513046,
+          "metrics": {
+            "precision": 0.567901,
+            "recall": 0.769231,
+            "f1": 0.653409,
+            "accuracy": 0.783496,
+            "predicted_positive_rate": 0.359361,
+            "average_precision": 0.64366,
+            "roc_auc": 0.847891
+          },
+          "confusion": {
+            "true_negatives": 653,
+            "false_positives": 175,
+            "false_negatives": 69,
+            "true_positives": 230
+          }
+        },
+        {
+          "fold": 2,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "threshold": 0.2844589228100722,
+          "metrics": {
+            "precision": 0.508083,
+            "recall": 0.735786,
+            "f1": 0.601093,
+            "accuracy": 0.740905,
+            "predicted_positive_rate": 0.384206,
+            "average_precision": 0.635452,
+            "roc_auc": 0.825128
+          },
+          "confusion": {
+            "true_negatives": 615,
+            "false_positives": 213,
+            "false_negatives": 79,
+            "true_positives": 220
+          }
+        },
+        {
+          "fold": 3,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "threshold": 0.3004869971491383,
+          "metrics": {
+            "precision": 0.526807,
+            "recall": 0.755853,
+            "f1": 0.620879,
+            "accuracy": 0.755102,
+            "predicted_positive_rate": 0.380657,
+            "average_precision": 0.685865,
+            "roc_auc": 0.841901
+          },
+          "confusion": {
+            "true_negatives": 625,
+            "false_positives": 203,
+            "false_negatives": 73,
+            "true_positives": 226
+          }
+        },
+        {
+          "fold": 4,
+          "n_train": 4507,
+          "n_validation": 1127,
+          "threshold": 0.2904220063661291,
+          "metrics": {
+            "precision": 0.537611,
+            "recall": 0.812709,
+            "f1": 0.647137,
+            "accuracy": 0.764862,
+            "predicted_positive_rate": 0.401065,
+            "average_precision": 0.678188,
+            "roc_auc": 0.862874
+          },
+          "confusion": {
+            "true_negatives": 619,
+            "false_positives": 209,
+            "false_negatives": 56,
+            "true_positives": 243
+          }
+        },
+        {
+          "fold": 5,
+          "n_train": 4508,
+          "n_validation": 1126,
+          "threshold": 0.2974008539869448,
+          "metrics": {
+            "precision": 0.557457,
+            "recall": 0.762542,
+            "f1": 0.644068,
+            "accuracy": 0.776199,
+            "predicted_positive_rate": 0.363233,
+            "average_precision": 0.6643,
+            "roc_auc": 0.852952
+          },
+          "confusion": {
+            "true_negatives": 646,
+            "false_positives": 181,
+            "false_negatives": 71,
+            "true_positives": 228
+          }
+        }
+      ],
+      "mean": {
+        "precision": 0.539572,
+        "recall": 0.767224,
+        "f1": 0.633317,
+        "accuracy": 0.764113,
+        "predicted_positive_rate": 0.377704,
+        "average_precision": 0.661493,
+        "roc_auc": 0.846149
+      },
+      "std": {
+        "precision": 0.023879,
+        "recall": 0.028339,
+        "f1": 0.021814,
+        "accuracy": 0.016898,
+        "predicted_positive_rate": 0.016901,
+        "average_precision": 0.021661,
+        "roc_auc": 0.014045
+      },
+      "paired_deltas": {
+        "D0": {
+          "precision": {
+            "metric": "precision",
+            "reference": "D0",
+            "per_fold": [
+              -0.07726,
+              -0.099204,
+              -0.132945,
+              -0.126675,
+              -0.126525
+            ],
+            "mean": -0.112522,
+            "std": 0.023634,
+            "folds_higher": 0,
+            "folds_tied": 0,
+            "folds_lower": 5
+          },
+          "recall": {
+            "metric": "recall",
+            "reference": "D0",
+            "per_fold": [
+              0.234114,
+              0.234114,
+              0.22408,
+              0.190635,
+              0.234114
+            ],
+            "mean": 0.223411,
+            "std": 0.01883,
+            "folds_higher": 5,
+            "folds_tied": 0,
+            "folds_lower": 0
+          },
+          "f1": {
+            "metric": "f1",
+            "reference": "D0",
+            "per_fold": [
+              0.0684,
+              0.051642,
+              0.03199,
+              0.00465,
+              0.047841
+            ],
+            "mean": 0.040905,
+            "std": 0.024048,
+            "folds_higher": 5,
+            "folds_tied": 0,
+            "folds_lower": 0
+          },
+          "accuracy": {
+            "metric": "accuracy",
+            "reference": "D0",
+            "per_fold": [
+              -0.015084,
+              -0.040816,
+              -0.047915,
+              -0.051464,
+              -0.033748
+            ],
+            "mean": -0.037805,
+            "std": 0.01441,
+            "folds_higher": 0,
+            "folds_tied": 0,
+            "folds_lower": 5
+          },
+          "predicted_positive_rate": {
+            "metric": "predicted_positive_rate",
+            "reference": "D0",
+            "per_fold": [
+              0.139308,
+              0.16504,
+              0.166815,
+              0.152618,
+              0.158082
+            ],
+            "mean": 0.156372,
+            "std": 0.011095,
+            "folds_higher": 5,
+            "folds_tied": 0,
+            "folds_lower": 0
+          }
+        }
+      }
+    }
+  ],
+  "ranking_invariance": {
+    "metrics": [
+      "average_precision",
+      "roc_auc"
+    ],
+    "expectation": "identical between D0 and D1: both arms read the same outer probability vector and neither metric depends on a threshold",
+    "max_absolute_difference": 0.0,
+    "holds": true,
+    "gate": "the run aborts if any outer fold disagrees"
+  },
+  "eligibility": {
+    "rule": [
+      "The F1-maximisation procedure (D1) is ELIGIBLE_THRESHOLD_POLICY to replace the default threshold when: (1) its mean paired delta F1 against D0 across the outer folds is > 0; and (2) F1 improves STRICTLY in at least 4 of the 5 outer folds.",
+      "A fold in which both arms scored identically is a TIE, never an improvement. A tie is exactly what happens when the search returns the default, and counting it as a win would let a procedure that changed nothing look like one that helped.",
+      "There is no minimum-gain cutoff. Magnitude is reported separately and weighed by a reader.",
+      "This is an engineering heuristic about direction and consistency, not a significance test. Five folds cannot support one and none was run.",
+      "If D1 is not eligible, the selected policy is DEFAULT_0_5 and the final threshold is 0.5.",
+      "If D1 is eligible, the selected policy is F1_MAXIMIZATION and the final threshold comes from applying the same POLICY_F1 once to the out-of-fold probabilities of the whole training pool. That application is a FREEZE, not a new performance estimate."
+    ],
+    "rule_fixed_before_results": true,
+    "min_improved_folds": 4,
+    "minimum_gain_cutoff": null,
+    "decision_metric": "f1",
+    "status": "ELIGIBLE_THRESHOLD_POLICY",
+    "rationale": "mean paired delta F1 = +0.04090 with 5 of 5 outer folds improving strictly (0 tied, 0 worse): the selection procedure beats the default consistently, on folds whose rows took no part in choosing their own threshold.",
+    "mean_delta_f1": 0.040905,
+    "folds_f1_improved": 5,
+    "folds_f1_tied": 0,
+    "folds_f1_worsened": 0
+  },
+  "selection": {
+    "selected_threshold_policy": "F1_MAXIMIZATION",
+    "final_threshold": 0.3272694566222328,
+    "rationale": "The nested comparison shows the F1-maximisation procedure beating the default consistently on rows that took no part in selecting their own threshold, so the procedure is applied once more to the whole training pool to fix the threshold that goes to the holdout.",
+    "decision_rule": "predict churn when predict_proba(X)[:, 1] >= final_threshold",
+    "optimised": true,
+    "full_training_out_of_fold_operating_point": {
+      "threshold": 0.3272694566222328,
+      "precision": 0.559134,
+      "recall": 0.743144,
+      "f1": 0.638139,
+      "accuracy": 0.776358,
+      "predicted_positive_rate": 0.35268,
+      "true_negatives": 3263,
+      "false_positives": 876,
+      "false_negatives": 384,
+      "true_positives": 1111
+    },
+    "operating_point_label": "full-training out-of-fold operating-point selection metrics. Computed on the training pool, on the same rows any threshold search read, and therefore optimistically biased. NOT final performance: no performance figure exists in this repository until the holdout is evaluated",
+    "f1_max_on_full_training_out_of_fold": {
+      "threshold": 0.3272694566222328,
+      "precision": 0.559134,
+      "recall": 0.743144,
+      "f1": 0.638139,
+      "accuracy": 0.776358,
+      "predicted_positive_rate": 0.35268,
+      "true_negatives": 3263,
+      "false_positives": 876,
+      "false_negatives": 384,
+      "true_positives": 1111
+    },
+    "f1_max_adopted": true,
+    "phase9c_input": "Phase 9C freezes the estimator, the calibration policy NONE and this threshold into one decision policy; Phase 9D then evaluates the untouched holdout exactly once"
+  },
+  "threshold_stability": {
+    "per_fold": [
+      0.3292440995513046,
+      0.2844589228100722,
+      0.3004869971491383,
+      0.2904220063661291,
+      0.2974008539869448
+    ],
+    "mean": 0.3004025759727178,
+    "median": 0.2974008539869448,
+    "std": 0.017281947155860237,
+    "minimum": 0.2844589228100722,
+    "maximum": 0.3292440995513046,
+    "spread": 0.044785176741232446,
+    "n_distinct": 5,
+    "role": "descriptive. Dispersion is reported and, where wide, documented as a limitation. It is NOT a post-hoc criterion: the eligibility rule was fixed before these thresholds existed and is not modified by them"
+  },
+  "hypothetical_recall_scenarios": {
+    "status": "hypothetical operating scenarios",
+    "decisional": false,
+    "targets": [
+      0.6,
+      0.7,
+      0.8
+    ],
+    "rule": "recall is non-increasing in the threshold, so the LARGEST threshold reaching the target is also the most precise one that does; that is the threshold reported",
+    "source": "out-of-fold probabilities of the whole training pool",
+    "note": "No stakeholder in this project has stated a recall target. These rows describe what the trade-off looks like elsewhere on the curve and cannot select the frozen threshold",
+    "scenarios": [
+      {
+        "target_recall": 0.6,
+        "attainable": true,
+        "threshold": 0.45105848434905965,
+        "precision": 0.623783,
+        "recall": 0.6,
+        "f1": 0.61166,
+        "predicted_positive_rate": 0.255236
+      },
+      {
+        "target_recall": 0.7,
+        "attainable": true,
+        "threshold": 0.3635843268946995,
+        "precision": 0.577178,
+        "recall": 0.700334,
+        "f1": 0.63282,
+        "predicted_positive_rate": 0.321974
+      },
+      {
+        "target_recall": 0.8,
+        "attainable": true,
+        "threshold": 0.26721312141246767,
+        "precision": 0.522956,
+        "recall": 0.8,
+        "f1": 0.63247,
+        "predicted_positive_rate": 0.405928
+      }
+    ]
+  },
+  "top_k_capacity_analysis": {
+    "status": "hypothetical capacity analysis",
+    "decisional": false,
+    "fractions": [
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.25
+    ],
+    "ordering": "descending probability; ties broken by ascending row position",
+    "n_contacted_rule": "floor(fraction * n_training_rows), so a budget is never overspent",
+    "lift_baseline": "training-pool positive prevalence",
+    "source": "out-of-fold probabilities of the whole training pool",
+    "note": "No evidence exists that a real retention team has any of these capacities. The probability at the cut is reported so the ranking view and the threshold view can be compared, never so one can be substituted for the other",
+    "levels": [
+      {
+        "fraction": 0.05,
+        "n_contacted": 281,
+        "churners_captured": 228,
+        "recall": 0.152508,
+        "precision": 0.811388,
+        "lift": 3.057766,
+        "probability_at_cut": 0.7286540098239577
+      },
+      {
+        "fraction": 0.1,
+        "n_contacted": 563,
+        "churners_captured": 424,
+        "recall": 0.283612,
+        "precision": 0.753108,
+        "lift": 2.838135,
+        "probability_at_cut": 0.6607535383181496
+      },
+      {
+        "fraction": 0.15,
+        "n_contacted": 845,
+        "churners_captured": 603,
+        "recall": 0.403344,
+        "precision": 0.713609,
+        "lift": 2.689281,
+        "probability_at_cut": 0.5985776633839822
+      },
+      {
+        "fraction": 0.2,
+        "n_contacted": 1126,
+        "churners_captured": 759,
+        "recall": 0.507692,
+        "precision": 0.674067,
+        "lift": 2.540265,
+        "probability_at_cut": 0.5338885000594801
+      },
+      {
+        "fraction": 0.25,
+        "n_contacted": 1408,
+        "churners_captured": 888,
+        "recall": 0.59398,
+        "precision": 0.630682,
+        "lift": 2.376763,
+        "probability_at_cut": 0.45770528730265675
+      }
+    ]
+  },
+  "operating_curve": {
+    "source": "out-of-fold probabilities of the whole training pool",
+    "grid": "uniform, reporting only",
+    "n_points": 101,
+    "note": "The search read every distinct probability, not this grid. The grid exists so the curve can be tabulated at a fixed size",
+    "points": [
+      {
+        "threshold": 0.0,
+        "precision": 0.265353,
+        "recall": 1.0,
+        "f1": 0.419414,
+        "predicted_positive_rate": 1.0
+      },
+      {
+        "threshold": 0.01,
+        "precision": 0.289264,
+        "recall": 0.996656,
+        "f1": 0.44839,
+        "predicted_positive_rate": 0.914271
+      },
+      {
+        "threshold": 0.02,
+        "precision": 0.311186,
+        "recall": 0.989967,
+        "f1": 0.473524,
+        "predicted_positive_rate": 0.84416
+      },
+      {
+        "threshold": 0.03,
+        "precision": 0.327043,
+        "recall": 0.985284,
+        "f1": 0.491082,
+        "predicted_positive_rate": 0.799432
+      },
+      {
+        "threshold": 0.04,
+        "precision": 0.34047,
+        "recall": 0.978595,
+        "f1": 0.50518,
+        "predicted_positive_rate": 0.762691
+      },
+      {
+        "threshold": 0.05,
+        "precision": 0.354258,
+        "recall": 0.973913,
+        "f1": 0.519536,
+        "predicted_positive_rate": 0.729499
+      },
+      {
+        "threshold": 0.06,
+        "precision": 0.364895,
+        "recall": 0.969231,
+        "f1": 0.530187,
+        "predicted_positive_rate": 0.704828
+      },
+      {
+        "threshold": 0.07,
+        "precision": 0.375,
+        "recall": 0.963211,
+        "f1": 0.539831,
+        "predicted_positive_rate": 0.681576
+      },
+      {
+        "threshold": 0.08,
+        "precision": 0.384864,
+        "recall": 0.955853,
+        "f1": 0.548771,
+        "predicted_positive_rate": 0.659034
+      },
+      {
+        "threshold": 0.09,
+        "precision": 0.392135,
+        "recall": 0.947157,
+        "f1": 0.554642,
+        "predicted_positive_rate": 0.64093
+      },
+      {
+        "threshold": 0.1,
+        "precision": 0.400569,
+        "recall": 0.941806,
+        "f1": 0.562076,
+        "predicted_positive_rate": 0.623891
+      },
+      {
+        "threshold": 0.11,
+        "precision": 0.40717,
+        "recall": 0.934448,
+        "f1": 0.567194,
+        "predicted_positive_rate": 0.608981
+      },
+      {
+        "threshold": 0.12,
+        "precision": 0.414213,
+        "recall": 0.931773,
+        "f1": 0.573487,
+        "predicted_positive_rate": 0.596912
+      },
+      {
+        "threshold": 0.13,
+        "precision": 0.423817,
+        "recall": 0.928428,
+        "f1": 0.581971,
+        "predicted_positive_rate": 0.581292
+      },
+      {
+        "threshold": 0.14,
+        "precision": 0.430131,
+        "recall": 0.922408,
+        "f1": 0.586684,
+        "predicted_positive_rate": 0.569045
+      },
+      {
+        "threshold": 0.15,
+        "precision": 0.438062,
+        "recall": 0.913043,
+        "f1": 0.592062,
+        "predicted_positive_rate": 0.553071
+      },
+      {
+        "threshold": 0.16,
+        "precision": 0.445212,
+        "recall": 0.905017,
+        "f1": 0.596824,
+        "predicted_positive_rate": 0.539404
+      },
+      {
+        "threshold": 0.17,
+        "precision": 0.452977,
+        "recall": 0.895652,
+        "f1": 0.601663,
+        "predicted_positive_rate": 0.524672
+      },
+      {
+        "threshold": 0.18,
+        "precision": 0.459694,
+        "recall": 0.88495,
+        "f1": 0.605077,
+        "predicted_positive_rate": 0.510827
+      },
+      {
+        "threshold": 0.19,
+        "precision": 0.466954,
+        "recall": 0.869565,
+        "f1": 0.607619,
+        "predicted_positive_rate": 0.494143
+      },
+      {
+        "threshold": 0.2,
+        "precision": 0.474898,
+        "recall": 0.854181,
+        "f1": 0.610421,
+        "predicted_positive_rate": 0.477281
+      },
+      {
+        "threshold": 0.21,
+        "precision": 0.481017,
+        "recall": 0.847492,
+        "f1": 0.613708,
+        "predicted_positive_rate": 0.467519
+      },
+      {
+        "threshold": 0.22,
+        "precision": 0.488137,
+        "recall": 0.839465,
+        "f1": 0.617314,
+        "predicted_positive_rate": 0.456337
+      },
+      {
+        "threshold": 0.23,
+        "precision": 0.494422,
+        "recall": 0.8301,
+        "f1": 0.619725,
+        "predicted_positive_rate": 0.445509
+      },
+      {
+        "threshold": 0.24,
+        "precision": 0.501221,
+        "recall": 0.823411,
+        "f1": 0.623133,
+        "predicted_positive_rate": 0.435925
+      },
+      {
+        "threshold": 0.25,
+        "precision": 0.50875,
+        "recall": 0.816722,
+        "f1": 0.626958,
+        "predicted_positive_rate": 0.425985
+      },
+      {
+        "threshold": 0.26,
+        "precision": 0.516239,
+        "recall": 0.808027,
+        "f1": 0.629987,
+        "predicted_positive_rate": 0.415335
+      },
+      {
+        "threshold": 0.27,
+        "precision": 0.523977,
+        "recall": 0.796656,
+        "f1": 0.632166,
+        "predicted_positive_rate": 0.403443
+      },
+      {
+        "threshold": 0.28,
+        "precision": 0.532462,
+        "recall": 0.789967,
+        "f1": 0.636143,
+        "predicted_positive_rate": 0.393681
+      },
+      {
+        "threshold": 0.29,
+        "precision": 0.536011,
+        "recall": 0.776589,
+        "f1": 0.634253,
+        "predicted_positive_rate": 0.384452
+      },
+      {
+        "threshold": 0.3,
+        "precision": 0.541076,
+        "recall": 0.766555,
+        "f1": 0.634376,
+        "predicted_positive_rate": 0.375932
+      },
+      {
+        "threshold": 0.31,
+        "precision": 0.54677,
+        "recall": 0.758528,
+        "f1": 0.635472,
+        "predicted_positive_rate": 0.368122
+      },
+      {
+        "threshold": 0.32,
+        "precision": 0.554402,
+        "recall": 0.749833,
+        "f1": 0.637475,
+        "predicted_positive_rate": 0.358892
+      },
+      {
+        "threshold": 0.33,
+        "precision": 0.559777,
+        "recall": 0.73913,
+        "f1": 0.637071,
+        "predicted_positive_rate": 0.350373
+      },
+      {
+        "threshold": 0.34,
+        "precision": 0.563542,
+        "recall": 0.723746,
+        "f1": 0.633675,
+        "predicted_positive_rate": 0.340788
+      },
+      {
+        "threshold": 0.35,
+        "precision": 0.570516,
+        "recall": 0.717057,
+        "f1": 0.635448,
+        "predicted_positive_rate": 0.333511
+      },
+      {
+        "threshold": 0.36,
+        "precision": 0.57361,
+        "recall": 0.703679,
+        "f1": 0.632022,
+        "predicted_positive_rate": 0.325524
+      },
+      {
+        "threshold": 0.37,
+        "precision": 0.578212,
+        "recall": 0.692308,
+        "f1": 0.630137,
+        "predicted_positive_rate": 0.317714
+      },
+      {
+        "threshold": 0.38,
+        "precision": 0.580941,
+        "recall": 0.676923,
+        "f1": 0.62527,
+        "predicted_positive_rate": 0.309194
+      },
+      {
+        "threshold": 0.39,
+        "precision": 0.586791,
+        "recall": 0.671572,
+        "f1": 0.626326,
+        "predicted_positive_rate": 0.303692
+      },
+      {
+        "threshold": 0.4,
+        "precision": 0.593656,
+        "recall": 0.663545,
+        "f1": 0.626658,
+        "predicted_positive_rate": 0.296592
+      },
+      {
+        "threshold": 0.41,
+        "precision": 0.603077,
+        "recall": 0.655518,
+        "f1": 0.628205,
+        "predicted_positive_rate": 0.288427
+      },
+      {
+        "threshold": 0.42,
+        "precision": 0.608168,
+        "recall": 0.637458,
+        "f1": 0.622469,
+        "predicted_positive_rate": 0.278133
+      },
+      {
+        "threshold": 0.43,
+        "precision": 0.612648,
+        "recall": 0.622074,
+        "f1": 0.617325,
+        "predicted_positive_rate": 0.269436
+      },
+      {
+        "threshold": 0.44,
+        "precision": 0.618983,
+        "recall": 0.610702,
+        "f1": 0.614815,
+        "predicted_positive_rate": 0.261803
+      },
+      {
+        "threshold": 0.45,
+        "precision": 0.623872,
+        "recall": 0.601338,
+        "f1": 0.612398,
+        "predicted_positive_rate": 0.255769
+      },
+      {
+        "threshold": 0.46,
+        "precision": 0.633763,
+        "recall": 0.592642,
+        "f1": 0.612513,
+        "predicted_positive_rate": 0.248136
+      },
+      {
+        "threshold": 0.47,
+        "precision": 0.637564,
+        "recall": 0.581271,
+        "f1": 0.608118,
+        "predicted_positive_rate": 0.241924
+      },
+      {
+        "threshold": 0.48,
+        "precision": 0.645627,
+        "recall": 0.567893,
+        "f1": 0.60427,
+        "predicted_positive_rate": 0.233404
+      },
+      {
+        "threshold": 0.49,
+        "precision": 0.648903,
+        "recall": 0.553846,
+        "f1": 0.597618,
+        "predicted_positive_rate": 0.226482
+      },
+      {
+        "threshold": 0.5,
+        "precision": 0.651965,
+        "recall": 0.543813,
+        "f1": 0.592998,
+        "predicted_positive_rate": 0.221335
+      },
+      {
+        "threshold": 0.51,
+        "precision": 0.657096,
+        "recall": 0.535786,
+        "f1": 0.590273,
+        "predicted_positive_rate": 0.216365
+      },
+      {
+        "threshold": 0.52,
+        "precision": 0.665541,
+        "recall": 0.52709,
+        "f1": 0.588279,
+        "predicted_positive_rate": 0.210153
+      },
+      {
+        "threshold": 0.53,
+        "precision": 0.669869,
+        "recall": 0.513043,
+        "f1": 0.581061,
+        "predicted_positive_rate": 0.20323
+      },
+      {
+        "threshold": 0.54,
+        "precision": 0.678506,
+        "recall": 0.498328,
+        "f1": 0.574624,
+        "predicted_positive_rate": 0.194888
+      },
+      {
+        "threshold": 0.55,
+        "precision": 0.685203,
+        "recall": 0.486288,
+        "f1": 0.568858,
+        "predicted_positive_rate": 0.188321
+      },
+      {
+        "threshold": 0.56,
+        "precision": 0.695953,
+        "recall": 0.471572,
+        "f1": 0.562201,
+        "predicted_positive_rate": 0.179801
+      },
+      {
+        "threshold": 0.57,
+        "precision": 0.699897,
+        "recall": 0.455518,
+        "f1": 0.551864,
+        "predicted_positive_rate": 0.172701
+      },
+      {
+        "threshold": 0.58,
+        "precision": 0.706392,
+        "recall": 0.43612,
+        "f1": 0.539289,
+        "predicted_positive_rate": 0.163827
+      },
+      {
+        "threshold": 0.59,
+        "precision": 0.7125,
+        "recall": 0.419398,
+        "f1": 0.528,
+        "predicted_positive_rate": 0.156195
+      },
+      {
+        "threshold": 0.6,
+        "precision": 0.71018,
+        "recall": 0.396656,
+        "f1": 0.509013,
+        "predicted_positive_rate": 0.148207
+      },
+      {
+        "threshold": 0.61,
+        "precision": 0.719231,
+        "recall": 0.375251,
+        "f1": 0.493187,
+        "predicted_positive_rate": 0.138445
+      },
+      {
+        "threshold": 0.62,
+        "precision": 0.72381,
+        "recall": 0.355853,
+        "f1": 0.47713,
+        "predicted_positive_rate": 0.130458
+      },
+      {
+        "threshold": 0.63,
+        "precision": 0.738304,
+        "recall": 0.337793,
+        "f1": 0.463515,
+        "predicted_positive_rate": 0.121406
+      },
+      {
+        "threshold": 0.64,
+        "precision": 0.750388,
+        "recall": 0.323746,
+        "f1": 0.452336,
+        "predicted_positive_rate": 0.114483
+      },
+      {
+        "threshold": 0.65,
+        "precision": 0.75453,
+        "recall": 0.306355,
+        "f1": 0.435775,
+        "predicted_positive_rate": 0.107739
+      },
+      {
+        "threshold": 0.66,
+        "precision": 0.753546,
+        "recall": 0.284281,
+        "f1": 0.412822,
+        "predicted_positive_rate": 0.100106
+      },
+      {
+        "threshold": 0.67,
+        "precision": 0.756604,
+        "recall": 0.268227,
+        "f1": 0.396049,
+        "predicted_positive_rate": 0.094072
+      },
+      {
+        "threshold": 0.68,
+        "precision": 0.768267,
+        "recall": 0.246154,
+        "f1": 0.372847,
+        "predicted_positive_rate": 0.08502
+      },
+      {
+        "threshold": 0.69,
+        "precision": 0.780045,
+        "recall": 0.2301,
+        "f1": 0.355372,
+        "predicted_positive_rate": 0.078275
+      },
+      {
+        "threshold": 0.7,
+        "precision": 0.779156,
+        "recall": 0.210033,
+        "f1": 0.330875,
+        "predicted_positive_rate": 0.07153
+      },
+      {
+        "threshold": 0.71,
+        "precision": 0.785714,
+        "recall": 0.191304,
+        "f1": 0.307692,
+        "predicted_positive_rate": 0.064608
+      },
+      {
+        "threshold": 0.72,
+        "precision": 0.797428,
+        "recall": 0.165886,
+        "f1": 0.27464,
+        "predicted_positive_rate": 0.055201
+      },
+      {
+        "threshold": 0.73,
+        "precision": 0.8125,
+        "recall": 0.147826,
+        "f1": 0.250141,
+        "predicted_positive_rate": 0.048278
+      },
+      {
+        "threshold": 0.74,
+        "precision": 0.824885,
+        "recall": 0.119732,
+        "f1": 0.209112,
+        "predicted_positive_rate": 0.038516
+      },
+      {
+        "threshold": 0.75,
+        "precision": 0.848315,
+        "recall": 0.101003,
+        "f1": 0.180514,
+        "predicted_positive_rate": 0.031594
+      },
+      {
+        "threshold": 0.76,
+        "precision": 0.854167,
+        "recall": 0.082274,
+        "f1": 0.150092,
+        "predicted_positive_rate": 0.025559
+      },
+      {
+        "threshold": 0.77,
+        "precision": 0.883333,
+        "recall": 0.070903,
+        "f1": 0.131269,
+        "predicted_positive_rate": 0.021299
+      },
+      {
+        "threshold": 0.78,
+        "precision": 0.892473,
+        "recall": 0.055518,
+        "f1": 0.104534,
+        "predicted_positive_rate": 0.016507
+      },
+      {
+        "threshold": 0.79,
+        "precision": 0.882353,
+        "recall": 0.040134,
+        "f1": 0.076775,
+        "predicted_positive_rate": 0.01207
+      },
+      {
+        "threshold": 0.8,
+        "precision": 0.918367,
+        "recall": 0.0301,
+        "f1": 0.05829,
+        "predicted_positive_rate": 0.008697
+      },
+      {
+        "threshold": 0.81,
+        "precision": 0.969697,
+        "recall": 0.021405,
+        "f1": 0.041885,
+        "predicted_positive_rate": 0.005857
+      },
+      {
+        "threshold": 0.82,
+        "precision": 0.958333,
+        "recall": 0.015385,
+        "f1": 0.030283,
+        "predicted_positive_rate": 0.00426
+      },
+      {
+        "threshold": 0.83,
+        "precision": 0.9375,
+        "recall": 0.010033,
+        "f1": 0.019854,
+        "predicted_positive_rate": 0.00284
+      },
+      {
+        "threshold": 0.84,
+        "precision": 0.888889,
+        "recall": 0.005351,
+        "f1": 0.010638,
+        "predicted_positive_rate": 0.001597
+      },
+      {
+        "threshold": 0.85,
+        "precision": 1.0,
+        "recall": 0.001338,
+        "f1": 0.002672,
+        "predicted_positive_rate": 0.000355
+      },
+      {
+        "threshold": 0.86,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.87,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.88,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.89,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.9,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.91,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.92,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.93,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.94,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.95,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.96,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.97,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.98,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 0.99,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      },
+      {
+        "threshold": 1.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "predicted_positive_rate": 0.0
+      }
+    ]
+  },
+  "cost_framework": {
+    "formula": "ExpectedCost(t) = cost_FN * FN(t) + cost_FP * FP(t)",
+    "cost_false_negative": null,
+    "cost_false_positive": null,
+    "optimal_threshold_computed": false,
+    "note": "Recorded to make the limitation precise, not to be evaluated. Choosing values for the two costs would produce a number that looks like an economic optimum and whose entire content is the assumption. No cost-optimal threshold is computed or claimed anywhere in this phase"
+  },
+  "class_weight": null,
+  "engineered_features_used": [],
+  "holdout_touched": false,
+  "warnings": [],
+  "methodological_notes": [
+    "Every number in this artefact is cross-validated on the frozen Phase 4 training pool. No metric, threshold, curve, scenario or count involves the holdout, which stays untouched.",
+    "F1-max is a RESEARCH OPERATING POINT, not a business-optimal threshold. This dataset carries no cost of losing a customer and no cost of a retention contact, so no economically optimal threshold can be computed and none is claimed.",
+    "The selection metric was pre-registered as F1 of the positive class before any Phase 9B number was read, and was not changed after the results were seen.",
+    "The threshold-selection PROCEDURE is what the nested design evaluates, not one threshold. Inside each outer training fold an inner 4-fold produces an out-of-sample probability for every outer-train row, POLICY_F1 reads only those probabilities, and the resulting threshold is applied to the outer validation fold without any further adjustment. No outer-validation row takes part in a fit, in the probabilities the search reads, or in the F1 it maximises.",
+    "A per-fold threshold that moves across folds is not a defect of the estimate. It is part of what the nested design measures, and its dispersion is reported as such.",
+    "D0 and D1 read the SAME outer probability vector and differ only by where it is cut. Average Precision and ROC-AUC are invariant to the threshold, so they must be identical between the arms; the run gates on that identity rather than asserting it.",
+    "The final threshold is fixed by applying POLICY_F1 to the out-of-fold probabilities of the whole training pool. Its metrics are OPERATING-POINT SELECTION METRICS, computed on the same rows the threshold was chosen from, and are optimistically biased by construction. They are not performance and must never be relabelled as such.",
+    "The recall scenarios are hypothetical and descriptive. No stakeholder in this project has stated a recall target, and no scenario can select the frozen threshold.",
+    "The top-k table is a hypothetical capacity analysis. It uses only the descending order of the probabilities, no evidence exists that a real retention team has any of these capacities, and it does not select the frozen threshold.",
+    "Lift is precision divided by the training-pool prevalence, the only base rate available here. No external or historical base rate was used.",
+    "A threshold is applied AFTER the fit. Moving it changes decisions, not coefficients, which is why it can be chosen at this stage without reopening model selection. class_weight would not be: it changes the objective the model is fitted on, so it stays None and stays closed.",
+    "The calibration policy remains NONE. The threshold acts directly on predict_proba(X)[:, 1] of the frozen, uncalibrated logistic regression.",
+    "The estimator, its hyperparameters, the 19 original features and the preprocessing are frozen inputs. Nothing here reopens model selection, tuning or calibration.",
+    "Threshold selection is an explicit, auditable implementation. TunedThresholdClassifierCV was deliberately not used: the candidate set, the decision rule, the objective and the tie-breaking all had to be visible and testable rather than delegated to a default.",
+    "Thresholds are recorded unrounded; metrics are rounded to six decimals. A metric rounded in the seventh decimal is the same measurement, but a threshold rounded in the sixth can move customers across the boundary.",
+    "The operating curve in this artefact is tabulated on a uniform reporting grid. The search itself never used that grid: it read every distinct probability.",
+    "No fitted estimator was persisted. This phase persists the protocol, the metrics and the decision."
+  ]
+}

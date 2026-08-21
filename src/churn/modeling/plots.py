@@ -57,6 +57,11 @@ MODEL_COLORS: dict[str, str] = {
     "logistic_uncalibrated": COLOR_CHURNED,
     "logistic_sigmoid": "#2a78d6",
     "logistic_isotonic": "#0f7a6e",
+    # Phase 9B. The same probabilities under two decision rules, so the two keep
+    # the logistic hue family: muted grey for the unoptimised default, teal for
+    # the selected policy, matching the decision line drawn in the figures.
+    "threshold_default": "#8a8880",
+    "threshold_nested_f1": "#0f7a6e",
 }
 
 #: Human-readable names, used in legends and axis labels.
@@ -73,6 +78,8 @@ MODEL_LABELS: dict[str, str] = {
     "logistic_uncalibrated": "C0 — uncalibrated",
     "logistic_sigmoid": "C1 — sigmoid calibration",
     "logistic_isotonic": "C2 — isotonic calibration",
+    "threshold_default": "D0 — default threshold 0.5",
+    "threshold_nested_f1": "D1 — nested F1-max threshold",
 }
 
 OOF_CAPTION = "Cross-validated out-of-fold performance on the training pool"
