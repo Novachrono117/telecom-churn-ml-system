@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "policy": "phase9c-decision-policy-freeze",
+  "frozen_at_phase": "9C",
+  "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+  "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd",
+  "random_seed": 42,
+  "model": {
+    "builder": "churn.modeling.tuning.build_modern_logistic",
+    "pipeline_builder": "churn.modeling.tuning.build_modern_logistic_pipeline",
+    "estimator": "LogisticRegression",
+    "selected_in": "phase8b-nested-hyperparameter-tuning",
+    "hyperparameters": {
+      "C": 1.0,
+      "class_weight": null,
+      "l1_ratio": 0.0,
+      "max_iter": 100,
+      "solver": "lbfgs"
+    },
+    "preprocessing": {
+      "builder": "churn.features.pipeline.build_feature_preprocessor",
+      "steps": [
+        "TotalChargesCleaner",
+        "StandardScaler on the 3 numeric features",
+        "OneHotEncoder(handle_unknown='ignore') on the 16 categorical features"
+      ],
+      "n_transformed_features": 46,
+      "fitted_on_the_training_pool_only": true
+    },
+    "fitted_on": {
+      "partition": "training pool",
+      "loader": "churn.preprocessing.splitting.load_training_pool",
+      "n_rows": 5634,
+      "positive_prevalence": 0.265353,
+      "fraction_of_pool_used": 1.0,
+      "note": "the whole pool, not a fold: this fit materialises a frozen configuration and produces no estimate, so no validation split is withheld"
+    },
+    "convergence": {
+      "converged": true,
+      "n_iter": 42,
+      "max_iter": 100
+    },
+    "reopened_here": false
+  },
+  "feature_contract": {
+    "entry_point": "churn.preprocessing.contracts.prepare_features",
+    "boundary": "the persisted pipeline is applied to the OUTPUT of prepare_features(). It expects a validated feature matrix in canonical column order and does not validate one itself",
+    "n_features": 19,
+    "numeric": [
+      "tenure",
+      "MonthlyCharges",
+      "TotalCharges"
+    ],
+    "categorical": [
+      "gender",
+      "SeniorCitizen",
+      "Partner",
+      "Dependents",
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies",
+      "Contract",
+      "PaperlessBilling",
+      "PaymentMethod"
+    ],
+    "engineered": [],
+    "feature_names_sha256": "91e97520e82541ac146d3ebe4538d281428f4e55754a7b544379792385e6212f",
+    "n_transformed_features": 46,
+    "transformed_feature_names_sha256": "1e4fd4db82671312d785ad5950b535f8ecf3b6be7d8427ebc574fe46c6a2b483"
+  },
+  "inference_contract": {
+    "chain": [
+      "raw input",
+      "churn.preprocessing.contracts.prepare_features(...)",
+      "frozen sklearn pipeline (preprocessor -> classifier)",
+      "predict_proba(...)",
+      "positive-class probability (column resolved from classes_)",
+      "probability >= 0.3272694566222328"
+    ],
+    "entry_point": "churn.preprocessing.contracts.prepare_features",
+    "prepare_features_module": "churn.preprocessing.contracts",
+    "prepare_features_source_sha256": "94ca586de7235df5ada0a5dedf857eb93e05b3351fc6f47f239f783ec5b42a2e",
+    "feature_names_sha256": "91e97520e82541ac146d3ebe4538d281428f4e55754a7b544379792385e6212f",
+    "note": "prepare_features runs BEFORE the persisted pipeline and is therefore outside everything the model's own fingerprints can see. A change to it would alter the values handed to the model while pipeline_sha256, model_fingerprint_sha256, the feature names, the threshold and the hyperparameters all stayed identical. Its source is fingerprinted here so that cannot happen silently"
+  },
+  "code_provenance": {
+    "strategy": "whole-file SHA-256 of every source file that materially determines the frozen inference function, plus the configuration and the dependency pins. No source parsing, no AST normalisation, no comment stripping",
+    "digest_definition": "SHA-256 of the file's UTF-8 text with newlines normalised to \\n. Not a raw byte hash: a byte hash changes when the checkout's line endings change, which would fail the freeze for a reason unrelated to the code. .gitattributes already pins this repository to LF, so the two agree today; normalising keeps the digest valid in a checkout that ignores it, such as a zip download or a Colab upload",
+    "caveat": "WHOLE-FILE hashing means an UNRELATED edit in one of these files — a docstring, a new helper, a reordered import — also invalidates the freeze. That is deliberate and fail-closed: the alternative, hashing only the functions believed to matter, would silently miss a changed constant, a changed helper or a changed default. A freeze that survives an edit it should have caught is worse than one that fails on an edit it need not have caught",
+    "source_digests": {
+      "src/churn/preprocessing/contracts.py": "eb450e53b9098e3b7746c1f97fe462b7ead859ac0b37f8eb8c1d03cfcb76e4cd",
+      "src/churn/preprocessing/transformers.py": "5b081e8bf8b6c471312d36a4c1dc0c02a1024aa59bc79f008660e5c09567fec7",
+      "src/churn/preprocessing/pipeline.py": "2a77e9d24674cea0282a3b6241cfecd0ebbc3a73485be7e92d0d9706ff51f5f8",
+      "src/churn/features/pipeline.py": "9eaebd389af13ea94f0ac0d5c6fc9ee482e7a2e66188888584c3ec624f883533",
+      "src/churn/modeling/tuning.py": "1827c4a1e0bf937ebd5ed6855ee41f6488a88bbd7c89bcdb7682567264406eba",
+      "src/churn/modeling/models.py": "b93d9399a86adb58a4756f75b750aa0b62ba43b64257aecd0875948bdc3ccbce",
+      "src/churn/preprocessing/target.py": "fb038d9e2603d0a3a3531b55b088598ce0e48f0a7fa11d061300ebcd5fbe6507",
+      "src/churn/modeling/freeze.py": "8bc31ca057c7f4e3e33f4f4cb6c64ae4d852c5bb6047562ee32bc547f994f1f6"
+    },
+    "configuration_digests": {
+      "configs/base.toml": "c69ccbcb84c4f6b3197e7749e384146c2ccbee7afe8d67555cf3e3ccce88faa5",
+      "pyproject.toml": "d6eaa68766005bc601792a7dc75aa02091d836ecf8af1aac8797f00bf0b72155",
+      "uv.lock": "a262860cfc50bf7eddf05d5e2592c75cadf1f5993ea561ec40dcc121b146c59c"
+    },
+    "why_each_file": {
+      "src/churn/preprocessing/contracts.py": "defines prepare_features, the feature contract and the canonical column order — the entire input side of the inference function",
+      "src/churn/preprocessing/transformers.py": "defines TotalChargesCleaner, which is pickled BY REFERENCE inside the persisted pipeline: the stream carries the module path and unpickling imports whatever the module currently defines, so editing its transform changes what the loaded pipeline computes while both model fingerprints stay identical",
+      "src/churn/preprocessing/pipeline.py": "configures the ColumnTransformer — which columns are scaled, which are one-hot encoded, handle_unknown, the step names other code reads it by",
+      "src/churn/features/pipeline.py": "assembles the preprocessing pipeline and fixes its step order",
+      "src/churn/modeling/tuning.py": "defines build_modern_logistic and build_modern_logistic_pipeline, the builders that produce the frozen estimator",
+      "src/churn/modeling/models.py": "holds the solver, max_iter and step-name constants those builders read",
+      "src/churn/preprocessing/target.py": "defines encode_target, which fixes which label is the positive class and therefore what classes_ and the probability column mean",
+      "src/churn/modeling/freeze.py": "implements the decision rule itself: the >= comparison, the resolution of the positive-class column and the serialisation settings. Changing >= to > here would change every decision at the boundary",
+      "configs/base.toml": "fixes the seed, the target column and the positive label",
+      "pyproject.toml": "declares the dependency constraints",
+      "uv.lock": "pins the exact resolved versions whose behaviour the fitted object and the transformations depend on"
+    },
+    "not_covered": [
+      "The train/holdout partition is not covered here: it is gated separately and more strongly by reports/split_manifest.json, whose digest is in provenance.upstream_artefact_digests and whose reproducibility is proven by `scripts/build_split.py --verify`.",
+      "churn/modeling/freeze_results.py is deliberately excluded. It records the freeze; it does not participate in producing a prediction, so an edit to it cannot change one.",
+      "Third-party library source is not hashed file by file. uv.lock pins the exact resolved versions, which is the auditable equivalent.",
+      "The Python interpreter build is recorded in `environment` but not fingerprinted."
+    ]
+  },
+  "calibration": {
+    "calibration_policy": "NONE",
+    "calibrated": false,
+    "decided_in": "phase9a-calibration-gate",
+    "probability_expression": "pipeline.predict_proba(X)[:, positive_class_column]",
+    "note": "NONE was the outcome of the Phase 9A gate, not an omission: neither sigmoid nor isotonic calibration cleared the pre-registered eligibility rule, so no calibration layer was adopted and the frozen logistic regression keeps emitting its own probabilities. See reports/calibration_report.md; the result is not reinterpreted here"
+  },
+  "threshold": {
+    "threshold_policy": "F1_MAXIMIZATION",
+    "final_threshold": 0.3272694566222328,
+    "decided_in": "phase9b-decision-threshold-policy",
+    "rounded": false,
+    "note": "selected in Phase 9B by applying the pre-registered F1-maximisation policy to out-of-fold probabilities of the training pool, after a nested evaluation showed the procedure beating the 0.5 default in 5/5 outer folds. See reports/threshold_report.md; the result is not reinterpreted here"
+  },
+  "decision_rule": {
+    "expression": "positive = probability >= final_threshold",
+    "comparison": ">=",
+    "probability_expression": "pipeline.predict_proba(prepare_features(X))[:, positive_class_column]",
+    "classes": [
+      0,
+      1
+    ],
+    "positive_class_label": 1,
+    "positive_class_column": 1,
+    "positive_class_meaning": "Churn = Yes",
+    "negative_class_label": 0,
+    "boundary_note": "a customer whose probability equals the threshold exactly is predicted POSITIVE. The comparison is >=, not >"
+  },
+  "artifacts": {
+    "pipeline_path": "artifacts/model/churn_pipeline.joblib",
+    "pipeline_sha256": "574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8",
+    "pipeline_bytes": 8218,
+    "model_fingerprint_sha256": "a57568e18ec0333e1c85b590f98e75da93ebbfafff063860ec5daf4e460d939f",
+    "serialization": {
+      "library": "joblib",
+      "joblib_version": "1.5.3",
+      "protocol": 5,
+      "compress": 0,
+      "pinned": true
+    },
+    "versioned_in_git": false,
+    "authoritative_fingerprint": "model_fingerprint_sha256",
+    "note": "the file is regenerable by `uv run python scripts/freeze_model.py` from the frozen split, the frozen builder and the frozen training pool; both fingerprints must come out unchanged"
+  },
+  "provenance": {
+    "upstream_artefact_digests": {
+      "reports/split_manifest.json": "834eb1313536c49e1e0f82976f4455138d89be65bd9d0e3e9ff50c4e8d36242c",
+      "reports/experiments/baseline_results.json": "2bd6eb992a4ed235e5a0b70f7c9b8d5f45929c076f6a440c16ab68e28a907f95",
+      "reports/experiments/feature_engineering_results.json": "bd8a3f03df405f7b0ca0b5f67de53f8a7106cd4b27feeb6ac40f952c589d57b3",
+      "reports/experiments/model_comparison_results.json": "648aca646146e6bcee42d8a6727e66f08f32798eff51866147a486e64077082e",
+      "reports/experiments/hgb_representation_results.json": "794bd1bde4a78240f63130c04985239a3cf8588a2d79a5a9cd25d13e2ece5ea3",
+      "reports/experiments/tuning_results.json": "d9d245e22fc893208673322ea39bb73ea02efca8bd1410908c27f6921468ef74",
+      "reports/experiments/calibration_results.json": "0119ca11c5c471906f82845482897d2e8a13ffd6598ccb58f77370e40cbbe778",
+      "reports/experiments/threshold_results.json": "6e58772b7fc954f17072d9612fc9c076975dcb755059b916b48f745d9a3cd905"
+    },
+    "references": {
+      "tuning": {
+        "artefact": "reports/experiments/tuning_results.json",
+        "experiment": "phase8b-nested-hyperparameter-tuning",
+        "schema_version": 1
+      },
+      "calibration": {
+        "artefact": "reports/experiments/calibration_results.json",
+        "experiment": "phase9a-calibration-gate",
+        "schema_version": 1
+      },
+      "threshold": {
+        "artefact": "reports/experiments/threshold_results.json",
+        "experiment": "phase9b-decision-threshold-policy",
+        "schema_version": 1
+      }
+    },
+    "configuration": "configs/base.toml",
+    "split": {
+      "manifest": "reports/split_manifest.json",
+      "note": "the manifest digest above covers the whole frozen partition. No holdout identifier, row or statistic is copied into this policy"
+    }
+  },
+  "environment": {
+    "python": "3.12",
+    "scikit_learn": "1.9.0",
+    "numpy": "2.5.1",
+    "pandas": "3.0.5",
+    "joblib": "1.5.3"
+  },
+  "holdout_touched": false,
+  "holdout_status": "untouched. No holdout row was loaded, transformed, predicted, thresholded or counted in this phase, and no holdout statistic exists anywhere in this repository",
+  "evaluation_status": "no holdout/test performance has been measured at this stage. The first and only holdout evaluation is Phase 9D",
+  "reopened_decisions": [],
+  "notes": [
+    "Phase 9C decides nothing. It materialises decisions taken in Phases 5-8B (estimator and hyperparameters), 9A (calibration policy) and 9B (threshold policy) as one persisted object plus this contract.",
+    "The final fit uses the WHOLE frozen training pool. Earlier phases fitted on four fifths at a time because they needed a validation fold; that need is over once the configuration is frozen. No metric was computed from this fit, and none could change anything if it were.",
+    "No holdout row was loaded, transformed, predicted or counted at any point in this phase. The modules that do the work never load data at all: the training pool is handed to them.",
+    "NO HOLDOUT OR TEST PERFORMANCE HAS BEEN MEASURED AT THIS STAGE. There is no performance figure anywhere in this repository yet.",
+    "The persisted pipeline starts AFTER prepare_features(). It expects a validated, canonically ordered feature matrix; producing one is the caller's responsibility. That boundary was fixed in Phase 4 and is not moved here.",
+    "Two fingerprints are recorded and they answer different questions. model_fingerprint_sha256 hashes the learned parameters under a canonical JSON encoding that round-trips every double exactly: it is the IDENTITY of the model and is invariant to how the object was serialised. pipeline_sha256 hashes the file bytes: it catches a corrupted or swapped file but is a property of the file, not of the model, and is not guaranteed to survive a change of environment. The first is authoritative.",
+    "The serialised pipeline is a regenerable artefact and is NOT committed: artifacts/ is git-ignored by an existing repository convention. Rebuilding it from the frozen split, the frozen builder and the frozen training pool must reproduce both fingerprints, which is a stronger guarantee than storing the binary would be.",
+    "joblib protocol and compression are pinned rather than left at their defaults. A future interpreter raising pickle.DEFAULT_PROTOCOL would otherwise change every byte of the file, and its digest, without anything about the model having changed.",
+    "The decision comparison is >=, written down explicitly. > and >= differ on exactly the customers whose probability equals the threshold, and a rule that leaves the boundary implicit is not a frozen rule.",
+    "The positive-class probability column is resolved from classes_, not assumed to be column 1. The assumption happens to hold here and is still the wrong thing to record: reading the wrong column would invert every decision without raising anything.",
+    "The threshold is stored unrounded. A threshold rounded in the sixth decimal can move customers across the decision boundary.",
+    "class_weight stays None and stays closed. It changes the objective the model is fitted on, so reopening it would reopen model selection; the threshold only changes a post-fit decision rule, which is why it could be chosen in Phase 9B.",
+    "This phase builds no serving layer. What exists here are persistence and integrity primitives; the public prediction interface is Phase 11's subject."
+  ]
+}
