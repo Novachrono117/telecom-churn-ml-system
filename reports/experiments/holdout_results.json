@@ -1,0 +1,356 @@
+{
+  "schema_version": 1,
+  "experiment": "phase9d-final-holdout-evaluation",
+  "evaluation_type": "FINAL_HOLDOUT",
+  "holdout_touched": true,
+  "holdout_purpose": "FINAL_EVALUATION",
+  "holdout_opened_after_model_freeze": true,
+  "selection_allowed": false,
+  "selection_after_holdout": false,
+  "evaluations_performed": 1,
+  "frozen_model_provenance": {
+    "freeze_commit": "9d1db4962769093a617f1db2db66354536acffb3",
+    "freeze_commit_short": "9d1db49",
+    "freeze_commit_subject": "feat: freeze final churn model and decision policy",
+    "freeze_preceded_holdout_opening": true,
+    "decision_policy_artefact": "reports/decision_policy.json",
+    "decision_policy_sha256": "bd7aa800ae36ac04ecf951f7377ce71d16d084faeee771b01eb6c9655a4bc714",
+    "pipeline_artefact": "artifacts/model/churn_pipeline.joblib",
+    "pipeline_sha256_recorded": "574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8",
+    "pipeline_sha256_before_evaluation": "574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8",
+    "pipeline_sha256_after_evaluation": "574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8",
+    "pipeline_unchanged_by_evaluation": true,
+    "model_fingerprint_sha256_recorded": "a57568e18ec0333e1c85b590f98e75da93ebbfafff063860ec5daf4e460d939f",
+    "model_fingerprint_sha256_after_load": "a57568e18ec0333e1c85b590f98e75da93ebbfafff063860ec5daf4e460d939f",
+    "model_fingerprint_verified": true,
+    "prepare_features_source_sha256": "94ca586de7235df5ada0a5dedf857eb93e05b3351fc6f47f239f783ec5b42a2e",
+    "inference_source_digests": {
+      "src/churn/preprocessing/contracts.py": "eb450e53b9098e3b7746c1f97fe462b7ead859ac0b37f8eb8c1d03cfcb76e4cd",
+      "src/churn/preprocessing/transformers.py": "5b081e8bf8b6c471312d36a4c1dc0c02a1024aa59bc79f008660e5c09567fec7",
+      "src/churn/preprocessing/pipeline.py": "2a77e9d24674cea0282a3b6241cfecd0ebbc3a73485be7e92d0d9706ff51f5f8",
+      "src/churn/features/pipeline.py": "9eaebd389af13ea94f0ac0d5c6fc9ee482e7a2e66188888584c3ec624f883533",
+      "src/churn/modeling/tuning.py": "1827c4a1e0bf937ebd5ed6855ee41f6488a88bbd7c89bcdb7682567264406eba",
+      "src/churn/modeling/models.py": "b93d9399a86adb58a4756f75b750aa0b62ba43b64257aecd0875948bdc3ccbce",
+      "src/churn/preprocessing/target.py": "fb038d9e2603d0a3a3531b55b088598ce0e48f0a7fa11d061300ebcd5fbe6507",
+      "src/churn/modeling/freeze.py": "8bc31ca057c7f4e3e33f4f4cb6c64ae4d852c5bb6047562ee32bc547f994f1f6"
+    },
+    "configuration_digests": {
+      "configs/base.toml": "c69ccbcb84c4f6b3197e7749e384146c2ccbee7afe8d67555cf3e3ccce88faa5",
+      "pyproject.toml": "d6eaa68766005bc601792a7dc75aa02091d836ecf8af1aac8797f00bf0b72155",
+      "uv.lock": "a262860cfc50bf7eddf05d5e2592c75cadf1f5993ea561ec40dcc121b146c59c"
+    },
+    "split_manifest_sha256": "834eb1313536c49e1e0f82976f4455138d89be65bd9d0e3e9ff50c4e8d36242c",
+    "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd",
+    "holdout_ids_sha256": "1ad8aefb7e34776a78d76765d2465c630a41b3813b1d7d96d0d1b03d049776f6",
+    "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+    "refitted_here": false
+  },
+  "upstream_artefact_digests": {
+    "reports/split_manifest.json": "834eb1313536c49e1e0f82976f4455138d89be65bd9d0e3e9ff50c4e8d36242c",
+    "reports/decision_policy.json": "bd7aa800ae36ac04ecf951f7377ce71d16d084faeee771b01eb6c9655a4bc714",
+    "reports/model_freeze_report.md": "01a00472a3366327799da7ff2e9864f90c9fe629b074f262f32656d578c89910",
+    "reports/experiments/baseline_results.json": "2bd6eb992a4ed235e5a0b70f7c9b8d5f45929c076f6a440c16ab68e28a907f95",
+    "reports/experiments/feature_engineering_results.json": "bd8a3f03df405f7b0ca0b5f67de53f8a7106cd4b27feeb6ac40f952c589d57b3",
+    "reports/experiments/model_comparison_results.json": "648aca646146e6bcee42d8a6727e66f08f32798eff51866147a486e64077082e",
+    "reports/experiments/hgb_representation_results.json": "794bd1bde4a78240f63130c04985239a3cf8588a2d79a5a9cd25d13e2ece5ea3",
+    "reports/experiments/tuning_results.json": "d9d245e22fc893208673322ea39bb73ea02efca8bd1410908c27f6921468ef74",
+    "reports/experiments/calibration_results.json": "0119ca11c5c471906f82845482897d2e8a13ffd6598ccb58f77370e40cbbe778",
+    "reports/experiments/threshold_results.json": "6e58772b7fc954f17072d9612fc9c076975dcb755059b916b48f745d9a3cd905"
+  },
+  "holdout": {
+    "loader": "churn.preprocessing.splitting.load_holdout",
+    "n_samples": 1409,
+    "n_positive": 374,
+    "n_negative": 1035,
+    "prevalence": 0.265436,
+    "positive_label_meaning": "Churn = Yes",
+    "verification": {
+      "n_rows_expected": 1409,
+      "n_rows_observed": 1409,
+      "holdout_ids_sha256_expected": "1ad8aefb7e34776a78d76765d2465c630a41b3813b1d7d96d0d1b03d049776f6",
+      "holdout_ids_sha256_observed": "1ad8aefb7e34776a78d76765d2465c630a41b3813b1d7d96d0d1b03d049776f6",
+      "matches_frozen_manifest": true,
+      "regenerated_not_stored": true,
+      "note": "the partition is a pure function of the raw bytes plus configs/base.toml, so it is regenerated rather than stored; the identifier digest depends on the set of rows, not on their order"
+    },
+    "status": "OPENED for the final evaluation in this phase. It is no longer untouched and can no longer provide an unbiased estimate for any decision taken from here on"
+  },
+  "policy": {
+    "source": "reports/decision_policy.json",
+    "estimator": "LogisticRegression",
+    "hyperparameters": {
+      "C": 1.0,
+      "class_weight": null,
+      "l1_ratio": 0.0,
+      "max_iter": 100,
+      "solver": "lbfgs"
+    },
+    "n_features": 19,
+    "engineered_features": [],
+    "calibration_policy": "NONE",
+    "threshold_policy": "F1_MAXIMIZATION",
+    "final_threshold": 0.3272694566222328,
+    "comparison": ">=",
+    "positive_class_label": 1,
+    "positive_class_column": 1,
+    "decision_rule": "positive = probability >= final_threshold",
+    "feature_entry_point": "churn.preprocessing.contracts.prepare_features",
+    "reopened_here": false
+  },
+  "metrics": {
+    "discrimination_primary": {
+      "average_precision": 0.633702,
+      "roc_auc": 0.842034
+    },
+    "operating_point": {
+      "f1": 0.616438,
+      "precision": 0.537849,
+      "recall": 0.721925,
+      "specificity": 0.775845,
+      "balanced_accuracy": 0.748885,
+      "predicted_positive_rate": 0.356281
+    },
+    "auxiliary": {
+      "accuracy": 0.761533,
+      "negative_predictive_value": 0.885336,
+      "false_positive_rate": 0.224155,
+      "false_negative_rate": 0.278075
+    },
+    "probability_diagnostics": {
+      "brier_score": 0.138035,
+      "log_loss": 0.420362
+    },
+    "reference_baselines": {
+      "majority_class_accuracy": 0.734564,
+      "no_skill_average_precision": 0.265436,
+      "no_skill_roc_auc": 0.5
+    }
+  },
+  "confusion_matrix": {
+    "true_negatives": 803,
+    "false_positives": 232,
+    "false_negatives": 104,
+    "true_positives": 270,
+    "total": 1409,
+    "orientation": "rows are the true class, columns the predicted class: [[TN, FP], [FN, TP]] with labels pinned to [0, 1]",
+    "actual_positives": 374,
+    "actual_negatives": 1035,
+    "predicted_positives": 502,
+    "actual_positive_rate": 0.265436,
+    "predicted_positive_rate": 0.356281,
+    "cells_sum_to_n_samples": true,
+    "rate_note": "actual_positive_rate is the share of customers who had churned; predicted_positive_rate is the share the frozen rule flags. They are different quantities and a gap between them is a property of the operating point, not an error: a rule tuned to recall necessarily flags more customers than churn"
+  },
+  "confidence_intervals": {
+    "average_precision": {
+      "metric": "average_precision",
+      "estimate": 0.633702,
+      "ci_lower": 0.577681,
+      "ci_upper": 0.686356,
+      "confidence_level": 0.95,
+      "method": "bootstrap_percentile",
+      "n_bootstrap": 2000,
+      "n_valid_replications": 2000,
+      "n_degenerate_replications": 0
+    },
+    "roc_auc": {
+      "metric": "roc_auc",
+      "estimate": 0.842034,
+      "ci_lower": 0.818325,
+      "ci_upper": 0.863266,
+      "confidence_level": 0.95,
+      "method": "bootstrap_percentile",
+      "n_bootstrap": 2000,
+      "n_valid_replications": 2000,
+      "n_degenerate_replications": 0
+    },
+    "f1": {
+      "metric": "f1",
+      "estimate": 0.616438,
+      "ci_lower": 0.576228,
+      "ci_upper": 0.653423,
+      "confidence_level": 0.95,
+      "method": "bootstrap_percentile",
+      "n_bootstrap": 2000,
+      "n_valid_replications": 2000,
+      "n_degenerate_replications": 0
+    },
+    "precision": {
+      "metric": "precision",
+      "estimate": 0.537849,
+      "ci_lower": 0.493714,
+      "ci_upper": 0.579059,
+      "confidence_level": 0.95,
+      "method": "bootstrap_percentile",
+      "n_bootstrap": 2000,
+      "n_valid_replications": 2000,
+      "n_degenerate_replications": 0
+    },
+    "recall": {
+      "metric": "recall",
+      "estimate": 0.721925,
+      "ci_lower": 0.675974,
+      "ci_upper": 0.765196,
+      "confidence_level": 0.95,
+      "method": "bootstrap_percentile",
+      "n_bootstrap": 2000,
+      "n_valid_replications": 2000,
+      "n_degenerate_replications": 0
+    },
+    "specificity": {
+      "metric": "specificity",
+      "estimate": 0.775845,
+      "ci_lower": 0.749505,
+      "ci_upper": 0.800756,
+      "confidence_level": 0.95,
+      "method": "bootstrap_percentile",
+      "n_bootstrap": 2000,
+      "n_valid_replications": 2000,
+      "n_degenerate_replications": 0
+    }
+  },
+  "bootstrap": {
+    "method": "bootstrap_percentile",
+    "resampling_unit": "holdout observation, with replacement",
+    "n_bootstrap": 2000,
+    "confidence_level": 0.95,
+    "seed": 42,
+    "percentiles": [
+      "2.5",
+      "97.5"
+    ],
+    "model_refitted_per_replication": false,
+    "threshold_reselected_per_replication": false,
+    "point_estimate_source": "the metric on the real holdout, never the mean of the replications",
+    "degenerate_replication_policy": "a replication in which a metric is mathematically undefined is excluded from that metric's percentiles and counted, never filled with a substituted value",
+    "purpose": "uncertainty quantification only; the bootstrap selects nothing",
+    "not_a_significance_test": true
+  },
+  "comparison_with_development": {
+    "purpose": "generalization check, descriptive only",
+    "selection": false,
+    "gate": null,
+    "cutoff": null,
+    "checks": [
+      {
+        "metric": "average_precision",
+        "holdout": 0.633702,
+        "development": 0.661493,
+        "development_source": "phase9b outer-fold mean (threshold-independent)",
+        "difference": -0.027791,
+        "directly_comparable": true,
+        "caveat": "directly comparable: no threshold enters either estimate"
+      },
+      {
+        "metric": "roc_auc",
+        "holdout": 0.842034,
+        "development": 0.846149,
+        "development_source": "phase9b outer-fold mean (threshold-independent)",
+        "difference": -0.004115,
+        "directly_comparable": true,
+        "caveat": "directly comparable: no threshold enters either estimate"
+      },
+      {
+        "metric": "average_precision",
+        "holdout": 0.633702,
+        "development": 0.658425,
+        "development_source": "phase9a pooled out-of-fold (C0)",
+        "difference": -0.024723,
+        "directly_comparable": true,
+        "caveat": "directly comparable; pooled out-of-fold rather than a mean of folds"
+      },
+      {
+        "metric": "roc_auc",
+        "holdout": 0.842034,
+        "development": 0.845606,
+        "development_source": "phase9a pooled out-of-fold (C0)",
+        "difference": -0.003572,
+        "directly_comparable": true,
+        "caveat": "directly comparable; pooled out-of-fold rather than a mean of folds"
+      },
+      {
+        "metric": "f1",
+        "holdout": 0.616438,
+        "development": 0.633317,
+        "development_source": "phase9b nested D1 mean",
+        "difference": -0.016879,
+        "directly_comparable": false,
+        "caveat": "NOT directly comparable: Phase 9B measured a nested procedure in which each outer fold used a threshold selected inside its own training fold, while this phase applies one fixed threshold to one sample. A difference can come from the change of protocol alone"
+      },
+      {
+        "metric": "precision",
+        "holdout": 0.537849,
+        "development": 0.539572,
+        "development_source": "phase9b nested D1 mean",
+        "difference": -0.001723,
+        "directly_comparable": false,
+        "caveat": "NOT directly comparable: Phase 9B measured a nested procedure in which each outer fold used a threshold selected inside its own training fold, while this phase applies one fixed threshold to one sample. A difference can come from the change of protocol alone"
+      },
+      {
+        "metric": "recall",
+        "holdout": 0.721925,
+        "development": 0.767224,
+        "development_source": "phase9b nested D1 mean",
+        "difference": -0.045299,
+        "directly_comparable": false,
+        "caveat": "NOT directly comparable: Phase 9B measured a nested procedure in which each outer fold used a threshold selected inside its own training fold, while this phase applies one fixed threshold to one sample. A difference can come from the change of protocol alone"
+      }
+    ],
+    "note": "Average Precision and ROC-AUC are directly comparable: both phases computed them on probabilities, with no threshold involved. The threshold-dependent metrics are NOT directly comparable, because Phase 9B measured a nested procedure in which each outer fold used a threshold chosen inside its own training fold, while this phase applies one fixed threshold to one sample"
+  },
+  "methodology": {
+    "evaluated_configurations": 1,
+    "physical_executions": "may exceed one. Deterministic verification and the automated test suite re-run the identical frozen evaluation, which reproduces byte-identical artefacts. Those re-runs are not additional attempts at selection: there is nothing to select between, and no decision varies across them",
+    "fit_calls_after_holdout_opened": 0,
+    "models_evaluated": 1,
+    "thresholds_evaluated": 1,
+    "calibrations_performed": 0,
+    "hyperparameter_searches": 0,
+    "feature_selections": 0,
+    "subgroup_slices_evaluated": 0,
+    "holdout_evaluations": 1,
+    "predict_used": false,
+    "predict_proba_used": true,
+    "financial_costs_assumed": false,
+    "causal_claims": false,
+    "sequence": [
+      "verify the split manifest",
+      "verify the Phase 9C freeze (29 integrity checks) BEFORE opening the holdout",
+      "load the frozen pipeline from disk and re-verify its model fingerprint",
+      "open the holdout and verify it against the frozen manifest",
+      "prepare_features on the holdout",
+      "predict_proba, positive column resolved from classes_",
+      "apply the frozen threshold with >=",
+      "compute metrics, bootstrap the uncertainty, write the record"
+    ],
+    "statement": "No selection, fit, calibration, tuning or threshold choice occurred after the holdout was opened"
+  },
+  "random_seed": 42,
+  "scikit_learn_version": "1.9.0",
+  "environment": {
+    "python": "3.12",
+    "scikit_learn": "1.9.0",
+    "numpy": "2.5.1",
+    "pandas": "3.0.5"
+  },
+  "methodological_notes": [
+    "This is the FINAL evaluation. Exactly ONE frozen model-and-decision-policy configuration was evaluated on the holdout, after that configuration had been frozen and committed, and the holdout was used for measurement only. This is a statement about how many configurations were evaluated, NOT a claim that the file was physically read once: deterministic verification and the automated test suite re-run the identical frozen evaluation, which reproduces byte-identical artefacts and cannot select anything.",
+    "NO SELECTION OF ANY KIND FOLLOWED THE OPENING OF THE HOLDOUT. No model, no hyperparameter, no feature, no calibrator, no threshold and no preprocessing step was chosen, changed or reconsidered on the basis of anything in this artefact.",
+    "NOTHING WAS FITTED IN THIS PHASE. The pipeline was loaded from the frozen .joblib, its model fingerprint was verified against the decision policy before use, and the same file is byte-identical after the evaluation.",
+    "Exactly one model, one policy and one threshold were evaluated. No alternative estimator was tried 'for comparison', no second threshold was scored, and no configuration was searched.",
+    "The threshold is the single value frozen in Phase 9B and is held constant everywhere, including inside every bootstrap replication. Re-selecting it per replication would measure a procedure rather than this operating point.",
+    "pipeline.predict() was deliberately not used. It applies scikit-learn's internal 0.5, not the frozen threshold, so it would have measured a different operating point than the one frozen.",
+    "The positive-class probability column is resolved from classes_ rather than assumed, so the reported metrics provably describe P(Churn = Yes) and not its complement.",
+    "Metrics are grouped by what they may claim. Average Precision and ROC-AUC are the PRIMARY results and are threshold-independent. The operating-point metrics describe what the frozen decision rule does. Accuracy is AUXILIARY: it is dominated by the majority class, so a large value is reachable with no skill at all, and it collapses false positives and false negatives into one number that cannot show which way the decision rule leans. The majority-class baseline is recorded next to it so the comparison can be made without recomputing anything; the comparison is reported and decides nothing.",
+    "Brier score and log loss are reported as probabilistic DIAGNOSTICS. They were never selection criteria; the calibration policy was decided in Phase 9A under cross-validation and is NONE. Nothing in this artefact reopens that decision.",
+    "The confidence intervals are PERCENTILE BOOTSTRAP intervals over the holdout observations with a fixed, recorded seed. They estimate how far each number would move if the holdout had been a different sample of the same size. They are not significance tests, they contain no null hypothesis, and they select nothing.",
+    "No model was refitted inside the bootstrap. The existing probabilities are re-indexed, so the intervals describe the uncertainty of the EVALUATION, not of the training.",
+    "A bootstrap replication in which a metric is mathematically undefined is counted as degenerate and excluded from that metric's percentiles rather than filled with a substituted value, which would drag the interval.",
+    "The comparison with development estimates is a GENERALIZATION CHECK, not a gate. No cutoff exists that turns a difference into a pass or a fail, and none was introduced after seeing the numbers.",
+    "For the threshold-dependent metrics the comparison is NOT like-for-like and is marked as such. Phase 9B measured a nested PROCEDURE in which each outer fold received a threshold chosen inside its own training fold; this phase applies one fixed threshold to one sample. The two answer different questions and a difference between them is not evidence of decay.",
+    "No financial quantity appears anywhere. The confusion matrix is not converted into money: this dataset carries no cost of losing a customer and no cost of a retention contact, so any such number would be an assumption wearing the clothes of a result.",
+    "No causal claim is made. The model describes association between a customer's recorded attributes and whether that customer had churned; it does not establish that changing an attribute would change the outcome.",
+    "No subgroup battery was run. A slice analysis improvised after opening the holdout invites opportunistic narratives; fairness and monitoring slices belong to the later phases that can pre-specify them.",
+    "The holdout is now CONSUMED. It has served its single purpose and can no longer provide an unbiased estimate for any decision taken from here on."
+  ]
+}

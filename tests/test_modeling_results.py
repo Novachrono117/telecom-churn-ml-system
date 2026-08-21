@@ -198,12 +198,42 @@ def _identifiers(source: Path) -> set[str]:
     return used
 
 
+#: Modules authorised to name the holdout partition, and why.
+#:
+#: This audit was written in Phase 5, when no module under ``modeling/`` was
+#: allowed to touch the holdout at all. Phase 9D is the authorised exception: it
+#: is the final evaluation, and it necessarily names the partition it measures.
+#: The exemption is a **declared list rather than a relaxed rule**, so a module
+#: that starts naming the holdout without being on it still fails — and even the
+#: exempt modules may not import the loader, which stays forbidden everywhere
+#: under ``modeling/``. Only the orchestration script opens the partition.
+_HOLDOUT_CONSUMERS: frozenset[str] = frozenset(
+    {
+        "holdout.py",  # Phase 9D: computes the final metrics on arrays handed to it
+        "holdout_results.py",  # Phase 9D: records the final evaluation
+    }
+)
+
+
 @pytest.mark.parametrize("source", _PHASE5_SOURCES, ids=lambda path: path.name)
 def test_phase5_code_never_reaches_the_holdout(source: Path) -> None:
     used = _identifiers(source)
 
     assert "load_holdout" not in used, f"{source.name} imports or calls the holdout loader"
+    if source.name in _HOLDOUT_CONSUMERS:
+        return
     assert "holdout" not in used, f"{source.name} reads a holdout partition"
+
+
+def test_only_the_declared_phase9d_modules_name_the_holdout() -> None:
+    """The exemption list is exactly the set of modules that use the name."""
+    naming = {
+        source.name
+        for source in _PHASE5_SOURCES
+        if source.parent.name == "modeling" and "holdout" in _identifiers(source)
+    }
+
+    assert naming == set(_HOLDOUT_CONSUMERS)
 
 
 def test_evaluation_module_cannot_load_data() -> None:
