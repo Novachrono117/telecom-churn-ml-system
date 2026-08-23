@@ -1,0 +1,1496 @@
+{
+  "schema_version": 1,
+  "experiment": "phase9e-post-hoc-error-analysis",
+  "phase": "9E",
+  "analysis_type": "POST_HOC_ERROR_ANALYSIS",
+  "selection_allowed": false,
+  "model_change_allowed": false,
+  "holdout_already_consumed": true,
+  "post_hoc": true,
+  "descriptive_only": true,
+  "selection_after_analysis": false,
+  "provenance": {
+    "evaluation_commit": "8c8e2663a2756a0fbb95188e96d7771bd9816265",
+    "evaluation_commit_short": "8c8e266",
+    "evaluation_commit_subject": "feat: evaluate frozen churn model on final holdout",
+    "evaluation_preceded_this_analysis": true,
+    "evaluation_record": "reports/experiments/holdout_results.json",
+    "evaluation_record_sha256": "de174fe94dd49206ca0d33d734030edf150dd1dae415c9faf37f481d6d895043",
+    "decision_policy": "reports/decision_policy.json",
+    "decision_policy_sha256": "bd7aa800ae36ac04ecf951f7377ce71d16d084faeee771b01eb6c9655a4bc714",
+    "split_manifest_sha256": "834eb1313536c49e1e0f82976f4455138d89be65bd9d0e3e9ff50c4e8d36242c",
+    "freeze_commit_short": "9d1db49",
+    "model_fingerprint_sha256_recorded": "a57568e18ec0333e1c85b590f98e75da93ebbfafff063860ec5daf4e460d939f",
+    "model_fingerprint_sha256_after_load": "a57568e18ec0333e1c85b590f98e75da93ebbfafff063860ec5daf4e460d939f",
+    "model_fingerprint_verified": true,
+    "pipeline_sha256_before_analysis": "574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8",
+    "pipeline_sha256_after_analysis": "574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8",
+    "pipeline_unchanged_by_analysis": true,
+    "refitted_here": false
+  },
+  "upstream_artefact_digests": {
+    "reports/split_manifest.json": "834eb1313536c49e1e0f82976f4455138d89be65bd9d0e3e9ff50c4e8d36242c",
+    "reports/decision_policy.json": "bd7aa800ae36ac04ecf951f7377ce71d16d084faeee771b01eb6c9655a4bc714",
+    "reports/model_freeze_report.md": "01a00472a3366327799da7ff2e9864f90c9fe629b074f262f32656d578c89910",
+    "reports/holdout_evaluation_report.md": "fdab7ad2005b1aff4cbb5fd82a54315aee4537fedd526262aca796a1d4227990",
+    "reports/experiments/baseline_results.json": "2bd6eb992a4ed235e5a0b70f7c9b8d5f45929c076f6a440c16ab68e28a907f95",
+    "reports/experiments/feature_engineering_results.json": "bd8a3f03df405f7b0ca0b5f67de53f8a7106cd4b27feeb6ac40f952c589d57b3",
+    "reports/experiments/model_comparison_results.json": "648aca646146e6bcee42d8a6727e66f08f32798eff51866147a486e64077082e",
+    "reports/experiments/hgb_representation_results.json": "794bd1bde4a78240f63130c04985239a3cf8588a2d79a5a9cd25d13e2ece5ea3",
+    "reports/experiments/tuning_results.json": "d9d245e22fc893208673322ea39bb73ea02efca8bd1410908c27f6921468ef74",
+    "reports/experiments/calibration_results.json": "0119ca11c5c471906f82845482897d2e8a13ffd6598ccb58f77370e40cbbe778",
+    "reports/experiments/threshold_results.json": "6e58772b7fc954f17072d9612fc9c076975dcb755059b916b48f745d9a3cd905",
+    "reports/experiments/holdout_results.json": "de174fe94dd49206ca0d33d734030edf150dd1dae415c9faf37f481d6d895043"
+  },
+  "frozen_policy": {
+    "source": "reports/decision_policy.json",
+    "final_threshold": 0.3272694566222328,
+    "comparison": ">=",
+    "positive_class_label": 1,
+    "positive_class_column": 1,
+    "calibration_policy": "NONE",
+    "threshold_policy": "F1_MAXIMIZATION",
+    "estimator": "LogisticRegression",
+    "reopened_here": false,
+    "alternative_thresholds_scored": 0
+  },
+  "confusion_reproduction": {
+    "derived": {
+      "TN": 803,
+      "FP": 232,
+      "FN": 104,
+      "TP": 270
+    },
+    "recorded": {
+      "TN": 803,
+      "FP": 232,
+      "FN": 104,
+      "TP": 270
+    },
+    "reproduced": true,
+    "total": 1409
+  },
+  "evaluation_sample": {
+    "n_samples": 1409,
+    "n_positive": 374,
+    "n_negative": 1035,
+    "prevalence": 0.265436,
+    "status": "already consumed as the final evaluation set in Phase 9D. Described here, never used to choose anything",
+    "identifiers_persisted": false
+  },
+  "probability_summaries": {
+    "TN": {
+      "count": 803,
+      "mean": 0.092903,
+      "median": 0.058385,
+      "q1": 0.017464,
+      "q3": 0.152947,
+      "min": 0.001707,
+      "max": 0.326449
+    },
+    "FP": {
+      "count": 232,
+      "mean": 0.517512,
+      "median": 0.490823,
+      "q1": 0.421523,
+      "q3": 0.602572,
+      "min": 0.327506,
+      "max": 0.817939
+    },
+    "FN": {
+      "count": 104,
+      "mean": 0.192834,
+      "median": 0.196472,
+      "q1": 0.122331,
+      "q3": 0.262405,
+      "min": 0.005379,
+      "max": 0.324822
+    },
+    "TP": {
+      "count": 270,
+      "mean": 0.602381,
+      "median": 0.617697,
+      "q1": 0.508584,
+      "q3": 0.700646,
+      "min": 0.329023,
+      "max": 0.855041
+    }
+  },
+  "margin_analysis": {
+    "definition": "margin = probability - final_threshold",
+    "sign_meaning": {
+      "positive": "flagged side of the frozen cut",
+      "negative": "unflagged side of the frozen cut"
+    },
+    "threshold_used": 0.3272694566222328,
+    "threshold_re_derived": false,
+    "band_edges": [
+      0.0,
+      0.025,
+      0.05,
+      0.1
+    ],
+    "band_labels": [
+      "|margin| < 0.025",
+      "0.025 <= |margin| < 0.05",
+      "0.05 <= |margin| < 0.10",
+      "|margin| >= 0.10"
+    ],
+    "bands_fixed_before_analysis": true,
+    "counts_by_band": {
+      "|margin| < 0.025": {
+        "TN": 29,
+        "FP": 11,
+        "FN": 12,
+        "TP": 6
+      },
+      "0.025 <= |margin| < 0.05": {
+        "TN": 12,
+        "FP": 16,
+        "FN": 10,
+        "TP": 5
+      },
+      "0.05 <= |margin| < 0.10": {
+        "TN": 57,
+        "FP": 33,
+        "FN": 19,
+        "TP": 21
+      },
+      "|margin| >= 0.10": {
+        "TN": 705,
+        "FP": 172,
+        "FN": 63,
+        "TP": 238
+      }
+    },
+    "absolute_margin_by_outcome": {
+      "TN": {
+        "count": 803,
+        "mean": 0.234366,
+        "median": 0.268884,
+        "q1": 0.174323,
+        "q3": 0.309805,
+        "max": 0.325562
+      },
+      "FP": {
+        "count": 232,
+        "mean": 0.190243,
+        "median": 0.163554,
+        "q1": 0.094253,
+        "q3": 0.275302,
+        "max": 0.490669
+      },
+      "FN": {
+        "count": 104,
+        "mean": 0.134435,
+        "median": 0.130798,
+        "q1": 0.064864,
+        "q3": 0.204938,
+        "max": 0.321891
+      },
+      "TP": {
+        "count": 270,
+        "mean": 0.275111,
+        "median": 0.290427,
+        "q1": 0.181315,
+        "q3": 0.373376,
+        "max": 0.527772
+      }
+    },
+    "marginal_errors": {
+      "margin_limit": 0.05,
+      "marginal_false_positives": 27,
+      "marginal_false_negatives": 22,
+      "total_false_positives": 232,
+      "total_false_negatives": 104
+    }
+  },
+  "high_confidence_errors": {
+    "false_positive_probability_minimum": 0.7,
+    "false_negative_probability_maximum": 0.1,
+    "n_false_positives": 232,
+    "n_high_confidence_false_positives": 24,
+    "share_of_false_positives": 0.103448,
+    "n_false_negatives": 104,
+    "n_high_confidence_false_negatives": 20,
+    "share_of_false_negatives": 0.192308,
+    "diagnostic_only": true,
+    "decision_policy_candidate": false,
+    "terminology": "'high confidence' is descriptive shorthand for an EXTREME MODEL PROBABILITY under the frozen score. It is NOT a validated per-case confidence guarantee: the probabilities are uncalibrated by the Phase 9A decision, so an extreme score is an extreme output of the model, not a demonstrated likelihood for the individual customer. The field names keep this wording for compatibility; the report says 'extreme-score errors'",
+    "note": "these cut-offs answer whether the model ever assigns an extreme probability and still gets the case wrong. They are not candidate thresholds and must not be used to move the decision boundary or to reopen the calibration policy"
+  },
+  "error_composition": {
+    "FP": {
+      "Contract": [
+        {
+          "group": "Month-to-month",
+          "errors": 224,
+          "share_of_errors": 0.965517,
+          "eligible": 444,
+          "share_of_eligible": 0.428986
+        },
+        {
+          "group": "One year",
+          "errors": 8,
+          "share_of_errors": 0.034483,
+          "eligible": 264,
+          "share_of_eligible": 0.255072
+        },
+        {
+          "group": "Two year",
+          "errors": 0,
+          "share_of_errors": 0.0,
+          "eligible": 327,
+          "share_of_eligible": 0.315942
+        }
+      ],
+      "tenure_band": [
+        {
+          "group": "0-6",
+          "errors": 68,
+          "share_of_errors": 0.293103,
+          "eligible": 138,
+          "share_of_eligible": 0.133333
+        },
+        {
+          "group": "7-12",
+          "errors": 40,
+          "share_of_errors": 0.172414,
+          "eligible": 96,
+          "share_of_eligible": 0.092754
+        },
+        {
+          "group": "13-24",
+          "errors": 61,
+          "share_of_errors": 0.262931,
+          "eligible": 146,
+          "share_of_eligible": 0.141063
+        },
+        {
+          "group": "25-48",
+          "errors": 46,
+          "share_of_errors": 0.198276,
+          "eligible": 240,
+          "share_of_eligible": 0.231884
+        },
+        {
+          "group": "49-72",
+          "errors": 17,
+          "share_of_errors": 0.073276,
+          "eligible": 415,
+          "share_of_eligible": 0.400966
+        }
+      ],
+      "InternetService": [
+        {
+          "group": "DSL",
+          "errors": 58,
+          "share_of_errors": 0.25,
+          "eligible": 387,
+          "share_of_eligible": 0.373913
+        },
+        {
+          "group": "Fiber optic",
+          "errors": 174,
+          "share_of_errors": 0.75,
+          "eligible": 361,
+          "share_of_eligible": 0.348792
+        },
+        {
+          "group": "No",
+          "errors": 0,
+          "share_of_errors": 0.0,
+          "eligible": 287,
+          "share_of_eligible": 0.277295
+        }
+      ],
+      "PaymentMethod": [
+        {
+          "group": "Bank transfer (automatic)",
+          "errors": 25,
+          "share_of_errors": 0.107759,
+          "eligible": 243,
+          "share_of_eligible": 0.234783
+        },
+        {
+          "group": "Credit card (automatic)",
+          "errors": 29,
+          "share_of_errors": 0.125,
+          "eligible": 258,
+          "share_of_eligible": 0.249275
+        },
+        {
+          "group": "Electronic check",
+          "errors": 136,
+          "share_of_errors": 0.586207,
+          "eligible": 268,
+          "share_of_eligible": 0.258937
+        },
+        {
+          "group": "Mailed check",
+          "errors": 42,
+          "share_of_errors": 0.181034,
+          "eligible": 266,
+          "share_of_eligible": 0.257005
+        }
+      ],
+      "SeniorCitizen": [
+        {
+          "group": "0",
+          "errors": 175,
+          "share_of_errors": 0.75431,
+          "eligible": 911,
+          "share_of_eligible": 0.880193
+        },
+        {
+          "group": "1",
+          "errors": 57,
+          "share_of_errors": 0.24569,
+          "eligible": 124,
+          "share_of_eligible": 0.119807
+        }
+      ]
+    },
+    "FN": {
+      "Contract": [
+        {
+          "group": "Month-to-month",
+          "errors": 63,
+          "share_of_errors": 0.605769,
+          "eligible": 329,
+          "share_of_eligible": 0.879679
+        },
+        {
+          "group": "One year",
+          "errors": 32,
+          "share_of_errors": 0.307692,
+          "eligible": 36,
+          "share_of_eligible": 0.096257
+        },
+        {
+          "group": "Two year",
+          "errors": 9,
+          "share_of_errors": 0.086538,
+          "eligible": 9,
+          "share_of_eligible": 0.024064
+        }
+      ],
+      "tenure_band": [
+        {
+          "group": "0-6",
+          "errors": 33,
+          "share_of_errors": 0.317308,
+          "eligible": 173,
+          "share_of_eligible": 0.462567
+        },
+        {
+          "group": "7-12",
+          "errors": 10,
+          "share_of_errors": 0.096154,
+          "eligible": 42,
+          "share_of_eligible": 0.112299
+        },
+        {
+          "group": "13-24",
+          "errors": 9,
+          "share_of_errors": 0.086538,
+          "eligible": 60,
+          "share_of_eligible": 0.160428
+        },
+        {
+          "group": "25-48",
+          "errors": 24,
+          "share_of_errors": 0.230769,
+          "eligible": 64,
+          "share_of_eligible": 0.171123
+        },
+        {
+          "group": "49-72",
+          "errors": 28,
+          "share_of_errors": 0.269231,
+          "eligible": 35,
+          "share_of_eligible": 0.093583
+        }
+      ],
+      "InternetService": [
+        {
+          "group": "DSL",
+          "errors": 44,
+          "share_of_errors": 0.423077,
+          "eligible": 97,
+          "share_of_eligible": 0.259358
+        },
+        {
+          "group": "Fiber optic",
+          "errors": 35,
+          "share_of_errors": 0.336538,
+          "eligible": 252,
+          "share_of_eligible": 0.673797
+        },
+        {
+          "group": "No",
+          "errors": 25,
+          "share_of_errors": 0.240385,
+          "eligible": 25,
+          "share_of_eligible": 0.066845
+        }
+      ],
+      "PaymentMethod": [
+        {
+          "group": "Bank transfer (automatic)",
+          "errors": 24,
+          "share_of_errors": 0.230769,
+          "eligible": 57,
+          "share_of_eligible": 0.152406
+        },
+        {
+          "group": "Credit card (automatic)",
+          "errors": 22,
+          "share_of_errors": 0.211538,
+          "eligible": 51,
+          "share_of_eligible": 0.136364
+        },
+        {
+          "group": "Electronic check",
+          "errors": 28,
+          "share_of_errors": 0.269231,
+          "eligible": 206,
+          "share_of_eligible": 0.550802
+        },
+        {
+          "group": "Mailed check",
+          "errors": 30,
+          "share_of_errors": 0.288462,
+          "eligible": 60,
+          "share_of_eligible": 0.160428
+        }
+      ],
+      "SeniorCitizen": [
+        {
+          "group": "0",
+          "errors": 89,
+          "share_of_errors": 0.855769,
+          "eligible": 276,
+          "share_of_eligible": 0.737968
+        },
+        {
+          "group": "1",
+          "errors": 15,
+          "share_of_errors": 0.144231,
+          "eligible": 98,
+          "share_of_eligible": 0.262032
+        }
+      ]
+    }
+  },
+  "slice_analyses": {
+    "Contract": [
+      {
+        "group": "Month-to-month",
+        "n": 773,
+        "positives": 329,
+        "negatives": 444,
+        "predicted_positives": 490,
+        "true_positives": 266,
+        "false_positives": 224,
+        "false_negatives": 63,
+        "true_negatives": 220,
+        "prevalence": 0.425614,
+        "predicted_positive_rate": 0.633894,
+        "precision": 0.542857,
+        "recall": 0.808511,
+        "specificity": 0.495495,
+        "false_positive_rate": 0.504505,
+        "false_negative_rate": 0.191489,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      },
+      {
+        "group": "One year",
+        "n": 300,
+        "positives": 36,
+        "negatives": 264,
+        "predicted_positives": 12,
+        "true_positives": 4,
+        "false_positives": 8,
+        "false_negatives": 32,
+        "true_negatives": 256,
+        "prevalence": 0.12,
+        "predicted_positive_rate": 0.04,
+        "precision": null,
+        "recall": 0.111111,
+        "specificity": 0.969697,
+        "false_positive_rate": 0.030303,
+        "false_negative_rate": 0.888889,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": false
+      },
+      {
+        "group": "Two year",
+        "n": 336,
+        "positives": 9,
+        "negatives": 327,
+        "predicted_positives": 0,
+        "true_positives": 0,
+        "false_positives": 0,
+        "false_negatives": 9,
+        "true_negatives": 327,
+        "prevalence": 0.026786,
+        "predicted_positive_rate": 0.0,
+        "precision": null,
+        "recall": null,
+        "specificity": 1.0,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": null,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": false,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": false
+      }
+    ],
+    "tenure_band": [
+      {
+        "group": "0-6",
+        "n": 311,
+        "positives": 173,
+        "negatives": 138,
+        "predicted_positives": 208,
+        "true_positives": 140,
+        "false_positives": 68,
+        "false_negatives": 33,
+        "true_negatives": 70,
+        "prevalence": 0.55627,
+        "predicted_positive_rate": 0.66881,
+        "precision": 0.673077,
+        "recall": 0.809249,
+        "specificity": 0.507246,
+        "false_positive_rate": 0.492754,
+        "false_negative_rate": 0.190751,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      },
+      {
+        "group": "7-12",
+        "n": 138,
+        "positives": 42,
+        "negatives": 96,
+        "predicted_positives": 72,
+        "true_positives": 32,
+        "false_positives": 40,
+        "false_negatives": 10,
+        "true_negatives": 56,
+        "prevalence": 0.304348,
+        "predicted_positive_rate": 0.521739,
+        "precision": 0.444444,
+        "recall": 0.761905,
+        "specificity": 0.583333,
+        "false_positive_rate": 0.416667,
+        "false_negative_rate": 0.238095,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      },
+      {
+        "group": "13-24",
+        "n": 206,
+        "positives": 60,
+        "negatives": 146,
+        "predicted_positives": 112,
+        "true_positives": 51,
+        "false_positives": 61,
+        "false_negatives": 9,
+        "true_negatives": 85,
+        "prevalence": 0.291262,
+        "predicted_positive_rate": 0.543689,
+        "precision": 0.455357,
+        "recall": 0.85,
+        "specificity": 0.582192,
+        "false_positive_rate": 0.417808,
+        "false_negative_rate": 0.15,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      },
+      {
+        "group": "25-48",
+        "n": 304,
+        "positives": 64,
+        "negatives": 240,
+        "predicted_positives": 86,
+        "true_positives": 40,
+        "false_positives": 46,
+        "false_negatives": 24,
+        "true_negatives": 194,
+        "prevalence": 0.210526,
+        "predicted_positive_rate": 0.282895,
+        "precision": 0.465116,
+        "recall": 0.625,
+        "specificity": 0.808333,
+        "false_positive_rate": 0.191667,
+        "false_negative_rate": 0.375,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      },
+      {
+        "group": "49-72",
+        "n": 450,
+        "positives": 35,
+        "negatives": 415,
+        "predicted_positives": 24,
+        "true_positives": 7,
+        "false_positives": 17,
+        "false_negatives": 28,
+        "true_negatives": 398,
+        "prevalence": 0.077778,
+        "predicted_positive_rate": 0.053333,
+        "precision": 0.291667,
+        "recall": 0.2,
+        "specificity": 0.959036,
+        "false_positive_rate": 0.040964,
+        "false_negative_rate": 0.8,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      }
+    ],
+    "InternetService": [
+      {
+        "group": "DSL",
+        "n": 484,
+        "positives": 97,
+        "negatives": 387,
+        "predicted_positives": 111,
+        "true_positives": 53,
+        "false_positives": 58,
+        "false_negatives": 44,
+        "true_negatives": 329,
+        "prevalence": 0.200413,
+        "predicted_positive_rate": 0.229339,
+        "precision": 0.477477,
+        "recall": 0.546392,
+        "specificity": 0.850129,
+        "false_positive_rate": 0.149871,
+        "false_negative_rate": 0.453608,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      },
+      {
+        "group": "Fiber optic",
+        "n": 613,
+        "positives": 252,
+        "negatives": 361,
+        "predicted_positives": 391,
+        "true_positives": 217,
+        "false_positives": 174,
+        "false_negatives": 35,
+        "true_negatives": 187,
+        "prevalence": 0.411093,
+        "predicted_positive_rate": 0.637847,
+        "precision": 0.554987,
+        "recall": 0.861111,
+        "specificity": 0.518006,
+        "false_positive_rate": 0.481994,
+        "false_negative_rate": 0.138889,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      },
+      {
+        "group": "No",
+        "n": 312,
+        "positives": 25,
+        "negatives": 287,
+        "predicted_positives": 0,
+        "true_positives": 0,
+        "false_positives": 0,
+        "false_negatives": 25,
+        "true_negatives": 287,
+        "prevalence": 0.080128,
+        "predicted_positive_rate": 0.0,
+        "precision": null,
+        "recall": 0.0,
+        "specificity": 1.0,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 1.0,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": false
+      }
+    ],
+    "PaymentMethod": [
+      {
+        "group": "Bank transfer (automatic)",
+        "n": 300,
+        "positives": 57,
+        "negatives": 243,
+        "predicted_positives": 58,
+        "true_positives": 33,
+        "false_positives": 25,
+        "false_negatives": 24,
+        "true_negatives": 218,
+        "prevalence": 0.19,
+        "predicted_positive_rate": 0.193333,
+        "precision": 0.568966,
+        "recall": 0.578947,
+        "specificity": 0.897119,
+        "false_positive_rate": 0.102881,
+        "false_negative_rate": 0.421053,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      },
+      {
+        "group": "Credit card (automatic)",
+        "n": 309,
+        "positives": 51,
+        "negatives": 258,
+        "predicted_positives": 58,
+        "true_positives": 29,
+        "false_positives": 29,
+        "false_negatives": 22,
+        "true_negatives": 229,
+        "prevalence": 0.165049,
+        "predicted_positive_rate": 0.187702,
+        "precision": 0.5,
+        "recall": 0.568627,
+        "specificity": 0.887597,
+        "false_positive_rate": 0.112403,
+        "false_negative_rate": 0.431373,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      },
+      {
+        "group": "Electronic check",
+        "n": 474,
+        "positives": 206,
+        "negatives": 268,
+        "predicted_positives": 314,
+        "true_positives": 178,
+        "false_positives": 136,
+        "false_negatives": 28,
+        "true_negatives": 132,
+        "prevalence": 0.434599,
+        "predicted_positive_rate": 0.662447,
+        "precision": 0.566879,
+        "recall": 0.864078,
+        "specificity": 0.492537,
+        "false_positive_rate": 0.507463,
+        "false_negative_rate": 0.135922,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      },
+      {
+        "group": "Mailed check",
+        "n": 326,
+        "positives": 60,
+        "negatives": 266,
+        "predicted_positives": 72,
+        "true_positives": 30,
+        "false_positives": 42,
+        "false_negatives": 30,
+        "true_negatives": 224,
+        "prevalence": 0.184049,
+        "predicted_positive_rate": 0.220859,
+        "precision": 0.416667,
+        "recall": 0.5,
+        "specificity": 0.842105,
+        "false_positive_rate": 0.157895,
+        "false_negative_rate": 0.5,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      }
+    ],
+    "SeniorCitizen": [
+      {
+        "group": "0",
+        "n": 1187,
+        "positives": 276,
+        "negatives": 911,
+        "predicted_positives": 362,
+        "true_positives": 187,
+        "false_positives": 175,
+        "false_negatives": 89,
+        "true_negatives": 736,
+        "prevalence": 0.232519,
+        "predicted_positive_rate": 0.304971,
+        "precision": 0.516575,
+        "recall": 0.677536,
+        "specificity": 0.807903,
+        "false_positive_rate": 0.192097,
+        "false_negative_rate": 0.322464,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      },
+      {
+        "group": "1",
+        "n": 222,
+        "positives": 98,
+        "negatives": 124,
+        "predicted_positives": 140,
+        "true_positives": 83,
+        "false_positives": 57,
+        "false_negatives": 15,
+        "true_negatives": 67,
+        "prevalence": 0.441441,
+        "predicted_positive_rate": 0.630631,
+        "precision": 0.592857,
+        "recall": 0.846939,
+        "specificity": 0.540323,
+        "false_positive_rate": 0.459677,
+        "false_negative_rate": 0.153061,
+        "sufficient_for_group_rates": true,
+        "sufficient_for_recall": true,
+        "sufficient_for_specificity": true,
+        "sufficient_for_precision": true
+      }
+    ]
+  },
+  "demographic_audit": {
+    "status": "descriptive subgroup audit",
+    "is_fairness_assessment": false,
+    "establishes_bias": false,
+    "inferential_tests_run": 0,
+    "note": "reported as observations about this sample. A difference between two groups' rates is not evidence of bias or discrimination, no inferential test was run, and nothing here may be used to modify the model",
+    "axes": {
+      "gender": [
+        {
+          "group": "Female",
+          "n": 687,
+          "positives": 193,
+          "negatives": 494,
+          "predicted_positives": 246,
+          "true_positives": 138,
+          "false_positives": 108,
+          "false_negatives": 55,
+          "true_negatives": 386,
+          "prevalence": 0.280932,
+          "predicted_positive_rate": 0.358079,
+          "precision": 0.560976,
+          "recall": 0.715026,
+          "specificity": 0.781377,
+          "false_positive_rate": 0.218623,
+          "false_negative_rate": 0.284974,
+          "sufficient_for_group_rates": true,
+          "sufficient_for_recall": true,
+          "sufficient_for_specificity": true,
+          "sufficient_for_precision": true
+        },
+        {
+          "group": "Male",
+          "n": 722,
+          "positives": 181,
+          "negatives": 541,
+          "predicted_positives": 256,
+          "true_positives": 132,
+          "false_positives": 124,
+          "false_negatives": 49,
+          "true_negatives": 417,
+          "prevalence": 0.250693,
+          "predicted_positive_rate": 0.354571,
+          "precision": 0.515625,
+          "recall": 0.729282,
+          "specificity": 0.770795,
+          "false_positive_rate": 0.229205,
+          "false_negative_rate": 0.270718,
+          "sufficient_for_group_rates": true,
+          "sufficient_for_recall": true,
+          "sufficient_for_specificity": true,
+          "sufficient_for_precision": true
+        }
+      ]
+    }
+  },
+  "interactions": {
+    "status": "secondary and descriptive",
+    "pairs_examined": [
+      [
+        "Contract",
+        "tenure_band"
+      ]
+    ],
+    "automatic_combination_search": false,
+    "note": "only the pair the Phase 3 EDA already crossed. Cells are small by construction, so most rates fail their guardrails and are reported as unavailable",
+    "cells": {
+      "Contract x tenure_band": [
+        {
+          "group": "Month-to-month | 0-6",
+          "n": 291,
+          "positives": 170,
+          "negatives": 121,
+          "predicted_positives": 206,
+          "true_positives": 139,
+          "false_positives": 67,
+          "false_negatives": 31,
+          "true_negatives": 54,
+          "prevalence": 0.584192,
+          "predicted_positive_rate": 0.707904,
+          "precision": 0.674757,
+          "recall": 0.817647,
+          "specificity": 0.446281,
+          "false_positive_rate": 0.553719,
+          "false_negative_rate": 0.182353,
+          "sufficient_for_group_rates": true,
+          "sufficient_for_recall": true,
+          "sufficient_for_specificity": true,
+          "sufficient_for_precision": true
+        },
+        {
+          "group": "Month-to-month | 7-12",
+          "n": 109,
+          "positives": 40,
+          "negatives": 69,
+          "predicted_positives": 69,
+          "true_positives": 31,
+          "false_positives": 38,
+          "false_negatives": 9,
+          "true_negatives": 31,
+          "prevalence": 0.366972,
+          "predicted_positive_rate": 0.633028,
+          "precision": 0.449275,
+          "recall": 0.775,
+          "specificity": 0.449275,
+          "false_positive_rate": 0.550725,
+          "false_negative_rate": 0.225,
+          "sufficient_for_group_rates": true,
+          "sufficient_for_recall": true,
+          "sufficient_for_specificity": true,
+          "sufficient_for_precision": true
+        },
+        {
+          "group": "Month-to-month | 13-24",
+          "n": 157,
+          "positives": 56,
+          "negatives": 101,
+          "predicted_positives": 108,
+          "true_positives": 50,
+          "false_positives": 58,
+          "false_negatives": 6,
+          "true_negatives": 43,
+          "prevalence": 0.356688,
+          "predicted_positive_rate": 0.687898,
+          "precision": 0.462963,
+          "recall": 0.892857,
+          "specificity": 0.425743,
+          "false_positive_rate": 0.574257,
+          "false_negative_rate": 0.107143,
+          "sufficient_for_group_rates": true,
+          "sufficient_for_recall": true,
+          "sufficient_for_specificity": true,
+          "sufficient_for_precision": true
+        },
+        {
+          "group": "Month-to-month | 25-48",
+          "n": 152,
+          "positives": 51,
+          "negatives": 101,
+          "predicted_positives": 85,
+          "true_positives": 39,
+          "false_positives": 46,
+          "false_negatives": 12,
+          "true_negatives": 55,
+          "prevalence": 0.335526,
+          "predicted_positive_rate": 0.559211,
+          "precision": 0.458824,
+          "recall": 0.764706,
+          "specificity": 0.544554,
+          "false_positive_rate": 0.455446,
+          "false_negative_rate": 0.235294,
+          "sufficient_for_group_rates": true,
+          "sufficient_for_recall": true,
+          "sufficient_for_specificity": true,
+          "sufficient_for_precision": true
+        },
+        {
+          "group": "Month-to-month | 49-72",
+          "n": 64,
+          "positives": 12,
+          "negatives": 52,
+          "predicted_positives": 22,
+          "true_positives": 7,
+          "false_positives": 15,
+          "false_negatives": 5,
+          "true_negatives": 37,
+          "prevalence": 0.1875,
+          "predicted_positive_rate": 0.34375,
+          "precision": 0.318182,
+          "recall": null,
+          "specificity": 0.711538,
+          "false_positive_rate": 0.288462,
+          "false_negative_rate": null,
+          "sufficient_for_group_rates": true,
+          "sufficient_for_recall": false,
+          "sufficient_for_specificity": true,
+          "sufficient_for_precision": true
+        },
+        {
+          "group": "One year | 0-6",
+          "n": 16,
+          "positives": 3,
+          "negatives": 13,
+          "predicted_positives": 2,
+          "true_positives": 1,
+          "false_positives": 1,
+          "false_negatives": 2,
+          "true_negatives": 12,
+          "prevalence": null,
+          "predicted_positive_rate": null,
+          "precision": null,
+          "recall": null,
+          "specificity": null,
+          "false_positive_rate": null,
+          "false_negative_rate": null,
+          "sufficient_for_group_rates": false,
+          "sufficient_for_recall": false,
+          "sufficient_for_specificity": false,
+          "sufficient_for_precision": false
+        },
+        {
+          "group": "One year | 7-12",
+          "n": 20,
+          "positives": 2,
+          "negatives": 18,
+          "predicted_positives": 3,
+          "true_positives": 1,
+          "false_positives": 2,
+          "false_negatives": 1,
+          "true_negatives": 16,
+          "prevalence": null,
+          "predicted_positive_rate": null,
+          "precision": null,
+          "recall": null,
+          "specificity": null,
+          "false_positive_rate": null,
+          "false_negative_rate": null,
+          "sufficient_for_group_rates": false,
+          "sufficient_for_recall": false,
+          "sufficient_for_specificity": false,
+          "sufficient_for_precision": false
+        },
+        {
+          "group": "One year | 13-24",
+          "n": 31,
+          "positives": 4,
+          "negatives": 27,
+          "predicted_positives": 4,
+          "true_positives": 1,
+          "false_positives": 3,
+          "false_negatives": 3,
+          "true_negatives": 24,
+          "prevalence": 0.129032,
+          "predicted_positive_rate": 0.129032,
+          "precision": null,
+          "recall": null,
+          "specificity": 0.888889,
+          "false_positive_rate": 0.111111,
+          "false_negative_rate": null,
+          "sufficient_for_group_rates": true,
+          "sufficient_for_recall": false,
+          "sufficient_for_specificity": true,
+          "sufficient_for_precision": false
+        },
+        {
+          "group": "One year | 25-48",
+          "n": 105,
+          "positives": 11,
+          "negatives": 94,
+          "predicted_positives": 1,
+          "true_positives": 1,
+          "false_positives": 0,
+          "false_negatives": 10,
+          "true_negatives": 94,
+          "prevalence": 0.104762,
+          "predicted_positive_rate": 0.009524,
+          "precision": null,
+          "recall": null,
+          "specificity": 1.0,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": null,
+          "sufficient_for_group_rates": true,
+          "sufficient_for_recall": false,
+          "sufficient_for_specificity": true,
+          "sufficient_for_precision": false
+        },
+        {
+          "group": "One year | 49-72",
+          "n": 128,
+          "positives": 16,
+          "negatives": 112,
+          "predicted_positives": 2,
+          "true_positives": 0,
+          "false_positives": 2,
+          "false_negatives": 16,
+          "true_negatives": 110,
+          "prevalence": 0.125,
+          "predicted_positive_rate": 0.015625,
+          "precision": null,
+          "recall": null,
+          "specificity": 0.982143,
+          "false_positive_rate": 0.017857,
+          "false_negative_rate": null,
+          "sufficient_for_group_rates": true,
+          "sufficient_for_recall": false,
+          "sufficient_for_specificity": true,
+          "sufficient_for_precision": false
+        },
+        {
+          "group": "Two year | 0-6",
+          "n": 4,
+          "positives": 0,
+          "negatives": 4,
+          "predicted_positives": 0,
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 4,
+          "prevalence": null,
+          "predicted_positive_rate": null,
+          "precision": null,
+          "recall": null,
+          "specificity": null,
+          "false_positive_rate": null,
+          "false_negative_rate": null,
+          "sufficient_for_group_rates": false,
+          "sufficient_for_recall": false,
+          "sufficient_for_specificity": false,
+          "sufficient_for_precision": false
+        },
+        {
+          "group": "Two year | 7-12",
+          "n": 9,
+          "positives": 0,
+          "negatives": 9,
+          "predicted_positives": 0,
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 9,
+          "prevalence": null,
+          "predicted_positive_rate": null,
+          "precision": null,
+          "recall": null,
+          "specificity": null,
+          "false_positive_rate": null,
+          "false_negative_rate": null,
+          "sufficient_for_group_rates": false,
+          "sufficient_for_recall": false,
+          "sufficient_for_specificity": false,
+          "sufficient_for_precision": false
+        },
+        {
+          "group": "Two year | 13-24",
+          "n": 18,
+          "positives": 0,
+          "negatives": 18,
+          "predicted_positives": 0,
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 18,
+          "prevalence": null,
+          "predicted_positive_rate": null,
+          "precision": null,
+          "recall": null,
+          "specificity": null,
+          "false_positive_rate": null,
+          "false_negative_rate": null,
+          "sufficient_for_group_rates": false,
+          "sufficient_for_recall": false,
+          "sufficient_for_specificity": false,
+          "sufficient_for_precision": false
+        },
+        {
+          "group": "Two year | 25-48",
+          "n": 47,
+          "positives": 2,
+          "negatives": 45,
+          "predicted_positives": 0,
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 2,
+          "true_negatives": 45,
+          "prevalence": 0.042553,
+          "predicted_positive_rate": 0.0,
+          "precision": null,
+          "recall": null,
+          "specificity": 1.0,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": null,
+          "sufficient_for_group_rates": true,
+          "sufficient_for_recall": false,
+          "sufficient_for_specificity": true,
+          "sufficient_for_precision": false
+        },
+        {
+          "group": "Two year | 49-72",
+          "n": 258,
+          "positives": 7,
+          "negatives": 251,
+          "predicted_positives": 0,
+          "true_positives": 0,
+          "false_positives": 0,
+          "false_negatives": 7,
+          "true_negatives": 251,
+          "prevalence": 0.027132,
+          "predicted_positive_rate": 0.0,
+          "precision": null,
+          "recall": null,
+          "specificity": 1.0,
+          "false_positive_rate": 0.0,
+          "false_negative_rate": null,
+          "sufficient_for_group_rates": true,
+          "sufficient_for_recall": false,
+          "sufficient_for_specificity": true,
+          "sufficient_for_precision": false
+        }
+      ]
+    }
+  },
+  "guardrails": {
+    "fixed_before_interpretation": true,
+    "applied_uniformly": true,
+    "categories_merged_to_clear_a_threshold": false,
+    "minimum_group_size": 30,
+    "minimum_actual_positives_for_recall_and_fnr": 20,
+    "minimum_actual_negatives_for_specificity_and_fpr": 20,
+    "minimum_predicted_positives_for_precision": 20,
+    "insufficient_rate_representation": "null, never zero and never a number",
+    "marginal_error_absolute_margin": 0.05
+  },
+  "insufficient_cells": [
+    {
+      "axis": "Contract",
+      "group": "One year",
+      "reasons": [
+        "predicted_positives=12 < 20"
+      ]
+    },
+    {
+      "axis": "Contract",
+      "group": "Two year",
+      "reasons": [
+        "positives=9 < 20",
+        "predicted_positives=0 < 20"
+      ]
+    },
+    {
+      "axis": "InternetService",
+      "group": "No",
+      "reasons": [
+        "predicted_positives=0 < 20"
+      ]
+    },
+    {
+      "axis": "Contract x tenure_band",
+      "group": "Month-to-month | 49-72",
+      "reasons": [
+        "positives=12 < 20"
+      ]
+    },
+    {
+      "axis": "Contract x tenure_band",
+      "group": "One year | 0-6",
+      "reasons": [
+        "n=16 < 30",
+        "positives=3 < 20",
+        "negatives=13 < 20",
+        "predicted_positives=2 < 20"
+      ]
+    },
+    {
+      "axis": "Contract x tenure_band",
+      "group": "One year | 7-12",
+      "reasons": [
+        "n=20 < 30",
+        "positives=2 < 20",
+        "negatives=18 < 20",
+        "predicted_positives=3 < 20"
+      ]
+    },
+    {
+      "axis": "Contract x tenure_band",
+      "group": "One year | 13-24",
+      "reasons": [
+        "positives=4 < 20",
+        "predicted_positives=4 < 20"
+      ]
+    },
+    {
+      "axis": "Contract x tenure_band",
+      "group": "One year | 25-48",
+      "reasons": [
+        "positives=11 < 20",
+        "predicted_positives=1 < 20"
+      ]
+    },
+    {
+      "axis": "Contract x tenure_band",
+      "group": "One year | 49-72",
+      "reasons": [
+        "positives=16 < 20",
+        "predicted_positives=2 < 20"
+      ]
+    },
+    {
+      "axis": "Contract x tenure_band",
+      "group": "Two year | 0-6",
+      "reasons": [
+        "n=4 < 30",
+        "positives=0 < 20",
+        "negatives=4 < 20",
+        "predicted_positives=0 < 20"
+      ]
+    },
+    {
+      "axis": "Contract x tenure_band",
+      "group": "Two year | 7-12",
+      "reasons": [
+        "n=9 < 30",
+        "positives=0 < 20",
+        "negatives=9 < 20",
+        "predicted_positives=0 < 20"
+      ]
+    },
+    {
+      "axis": "Contract x tenure_band",
+      "group": "Two year | 13-24",
+      "reasons": [
+        "n=18 < 30",
+        "positives=0 < 20",
+        "negatives=18 < 20",
+        "predicted_positives=0 < 20"
+      ]
+    },
+    {
+      "axis": "Contract x tenure_band",
+      "group": "Two year | 25-48",
+      "reasons": [
+        "positives=2 < 20",
+        "predicted_positives=0 < 20"
+      ]
+    },
+    {
+      "axis": "Contract x tenure_band",
+      "group": "Two year | 49-72",
+      "reasons": [
+        "positives=7 < 20",
+        "predicted_positives=0 < 20"
+      ]
+    }
+  ],
+  "prior_eda_observations": [
+    {
+      "axis": "Contract",
+      "prior_observation": "month-to-month contracts showed a far higher churn rate than one-year or two-year contracts",
+      "source": "reports/eda_report.md, reports/figures/eda/04_churn_rate_by_contract.png"
+    },
+    {
+      "axis": "tenure_band",
+      "prior_observation": "low tenure was associated with higher churn",
+      "source": "reports/eda_report.md, reports/figures/eda/03_churn_rate_by_tenure_band.png"
+    },
+    {
+      "axis": "InternetService",
+      "prior_observation": "fiber optic showed a higher churn rate than DSL or no internet",
+      "source": "reports/eda_report.md, reports/figures/eda/06_service_churn_rates.png"
+    },
+    {
+      "axis": "PaymentMethod",
+      "prior_observation": "electronic check was associated with higher churn",
+      "source": "reports/eda_report.md, reports/figures/eda/09_churn_rate_by_payment_method.png"
+    },
+    {
+      "axis": "SeniorCitizen",
+      "prior_observation": "a descriptive difference in churn rate was recorded",
+      "source": "reports/eda_report.md"
+    },
+    {
+      "axis": "gender",
+      "prior_observation": "association with churn was essentially null",
+      "source": "reports/eda_report.md, reports/figures/eda/15_association_ranking.png"
+    }
+  ],
+  "methodology": {
+    "post_hoc": true,
+    "descriptive_only": true,
+    "selection_after_analysis": false,
+    "fit_calls": 0,
+    "models_loaded": 1,
+    "alternative_models_evaluated": 0,
+    "thresholds_scored": 1,
+    "alternative_thresholds_scored": 0,
+    "calibrations_performed": 0,
+    "hyperparameter_searches": 0,
+    "feature_selections": 0,
+    "significance_tests_run": 0,
+    "slice_axes_fixed_before_analysis": true,
+    "slice_axes": [
+      "Contract",
+      "tenure_band",
+      "InternetService",
+      "PaymentMethod",
+      "SeniorCitizen"
+    ],
+    "audit_axes": [
+      "gender"
+    ],
+    "features_swept": 0,
+    "explainability_computed": false,
+    "financial_costs_assumed": false,
+    "causal_claims": false,
+    "identifiers_persisted": false,
+    "statement": "The analysis describes the errors of the frozen configuration on the already consumed evaluation sample. No selection, fit, calibration, tuning, threshold choice or model change followed it"
+  },
+  "environment": {
+    "python": "3.12",
+    "scikit_learn": "1.9.0",
+    "numpy": "2.5.1",
+    "pandas": "3.0.5"
+  },
+  "methodological_notes": [
+    "This analysis is POST HOC and DESCRIPTIVE. It runs after the final estimate was produced and committed, and it describes where the errors that estimate counted fell. It is not part of the estimate and does not revise it.",
+    "NOTHING WAS SELECTED, CHANGED OR RECONSIDERED AS A RESULT OF THIS ANALYSIS. No model, hyperparameter, feature, preprocessing step, calibration policy or threshold was modified, and none may be modified on the basis of anything recorded here: the Phase 9D figures describe the system as it was frozen, and this project has no remaining held-out sample on which a modified system could be measured.",
+    "The Phase 9D result is the DESIGNATED FINAL HELD-OUT EVALUATION under the frozen protocol: the estimate produced after the model and the decision policy were frozen and committed, on rows that took no part in any fit, fold, feature decision, calibration gate or threshold search. It is NOT described as an unbiased estimate. The Phase 3 exploratory analysis ran on all 7,043 rows, including those that later formed the evaluation sample; the sample was protected against fitting, tuning and selection from Phase 4 onwards, but that earlier ANALYST EXPOSURE preceded the protection and can carry an optimistic bias this project cannot quantify. The protection and the limitation are both real and both stated.",
+    "NOTHING WAS FITTED. The pipeline was loaded from the frozen artefact, its model fingerprint was verified before use, and the file is byte-identical afterwards.",
+    "The confusion matrix rederived here reproduces the Phase 9D record EXACTLY. That is an integrity gate, not a coincidence: an analysis of a different classification than the one the final estimate came from would describe nothing relevant, so the run aborts on any disagreement.",
+    "The threshold is the single frozen value and is never re-derived, re-optimised or varied. No alternative threshold was scored, including thresholds that would have reduced false negatives.",
+    "The extreme-score error cut-offs are DIAGNOSTIC ONLY and are explicitly not decision-policy candidates. They answer whether the model ever assigns an extreme probability and still gets the case wrong. 'High confidence' in the field names is descriptive shorthand for an extreme model probability under the frozen score, NOT a validated per-case confidence guarantee: the probabilities are uncalibrated by the Phase 9A decision. Nothing in this project may use these cut-offs to move the decision boundary or to reopen the calibration policy.",
+    "MARGINAL means BOUNDARY-PROXIMATE under the frozen operating point: the score lies within a fixed distance of the frozen decision boundary. It does NOT mean the estimated churn probability is close to 50%. Both boundary-proximate and distant errors remain errors of the frozen decision; the margin analysis distinguishes proximity to the boundary, not real errors from incidental ones.",
+    "NO ALTERNATIVE THRESHOLD WAS SCORED, SIMULATED OR DESCRIBED QUANTITATIVELY. Boundary proximity is descriptive only: moving the threshold would change the precision/recall trade-off, but evaluating such alternatives on this already consumed sample would reopen decision selection and is outside the scope of this analysis.",
+    "The slice axes were FIXED BEFORE the analysis ran, and each carries a justification that predates the opening of the evaluation sample. They are not the axes that turned out to look interesting: no sweep over the 19 features was performed and no automatic search over their combinations was performed.",
+    "Only ONE two-way interaction is reported, the pair the Phase 3 EDA already crossed, and it is secondary. A three-way breakdown would multiply the cells past the point where any of them supports a rate, and the exercise would become mining.",
+    "Every rate is conditioned on the population that could have produced it: false-negative rate on the actual churners, false-positive rate on the actual non-churners. A raw error count per category is not used to call a group problematic, because a larger group produces more errors for reasons unrelated to the model.",
+    "Guardrails were fixed before interpretation and applied uniformly. A rate whose own denominator falls below its minimum is reported as null, never as a number and never as zero, and categories were NOT merged to clear a threshold. Every insufficient cell is listed rather than silently omitted.",
+    "NO SIGNIFICANCE TEST OF ANY KIND was run: no chi-square, t-test, Mann-Whitney, ANOVA, Fisher or p-value. With this many descriptive cells examined after the outcome was known, a search for significant subgroups would find some whether or not anything is there.",
+    "The subgroup tables are a DESCRIPTIVE AUDIT. They are not a fairness assessment, they do not establish bias or discrimination, and a difference between two groups' rates is reported as an observation about this sample, not as a property of the model or of the population.",
+    "Association with churn and error behaviour are DIFFERENT THINGS and are kept separate. A feature strongly associated with churn does not thereby have a higher error rate, and the prior EDA observations are quoted as context, never as an explanation of an error rate.",
+    "NO CAUSAL CLAIM is made anywhere. The analysis describes where a frozen model's decisions disagreed with recorded outcomes; it does not establish why.",
+    "NO EXPLAINABILITY. No SHAP value, no coefficient interpretation, no permutation importance and no feature-importance ranking appears here. How the features influence the predictions is Phase 10's subject; this phase is only about where the decisions were wrong.",
+    "NO FINANCIAL QUANTITY. No retention cost, customer lifetime value, lost revenue, campaign ROI or contact capacity. A false negative is a churner the system did not identify and a false positive is a flagged customer who stayed; neither is assigned a monetary value.",
+    "NO IDENTIFIER IS PERSISTED. Row-level outcomes, probabilities and margins exist only inside the process. This artefact contains aggregates: counts, guarded rates and distribution summaries.",
+    "The evaluation sample was already consumed by Phase 9D. It cannot provide a fresh independent estimate for any decision made after it was examined, which is precisely why analysing it descriptively is permitted and acting on it is not."
+  ]
+}
