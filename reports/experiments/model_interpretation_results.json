@@ -1,0 +1,2121 @@
+{
+  "schema_version": 1,
+  "experiment": "phase10-frozen-model-interpretation",
+  "phase": "10",
+  "analysis_type": "FROZEN_MODEL_INTERPRETATION",
+  "selection_allowed": false,
+  "model_change_allowed": false,
+  "fit_calls": 0,
+  "holdout_used_for_global_interpretation": false,
+  "interpretation_population": {
+    "partition": "training pool",
+    "loader": "churn.preprocessing.splitting.load_training_pool",
+    "n_rows": 5634,
+    "holdout_loaded": false,
+    "why": "the holdout was consumed by the Phase 9D evaluation; ranking features on it would be post-hoc mining of a spent sample. The training pool is also the population the coefficients and the scaler statistics were learned from",
+    "target_used": false,
+    "target_note": "no label is read in this phase: the decomposition describes the function, and no performance metric is computed anywhere"
+  },
+  "provenance": {
+    "freeze_commit": "9d1db4962769093a617f1db2db66354536acffb3",
+    "freeze_commit_short": "9d1db49",
+    "freeze_commit_subject": "feat: freeze final churn model and decision policy",
+    "evaluation_commit": "8c8e2663a2756a0fbb95188e96d7771bd9816265",
+    "evaluation_commit_short": "8c8e266",
+    "evaluation_commit_subject": "feat: evaluate frozen churn model on final holdout",
+    "error_analysis_commit": "5e9c4e95a48bad4c9e6f4428fc2daac63032bdc5",
+    "error_analysis_commit_short": "5e9c4e9",
+    "error_analysis_commit_subject": "feat: analyze final churn prediction errors",
+    "decision_policy": "reports/decision_policy.json",
+    "decision_policy_sha256": "bd7aa800ae36ac04ecf951f7377ce71d16d084faeee771b01eb6c9655a4bc714",
+    "split_manifest_sha256": "834eb1313536c49e1e0f82976f4455138d89be65bd9d0e3e9ff50c4e8d36242c",
+    "model_fingerprint_sha256_recorded": "a57568e18ec0333e1c85b590f98e75da93ebbfafff063860ec5daf4e460d939f",
+    "model_fingerprint_sha256_after_load": "a57568e18ec0333e1c85b590f98e75da93ebbfafff063860ec5daf4e460d939f",
+    "model_fingerprint_verified": true,
+    "pipeline_sha256_recorded": "574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8",
+    "pipeline_sha256_before_analysis": "574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8",
+    "pipeline_sha256_after_analysis": "574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8",
+    "pipeline_unchanged_by_analysis": true,
+    "refitted_here": false,
+    "reopened_here": false
+  },
+  "upstream_artefact_digests": {
+    "reports/split_manifest.json": "834eb1313536c49e1e0f82976f4455138d89be65bd9d0e3e9ff50c4e8d36242c",
+    "reports/decision_policy.json": "bd7aa800ae36ac04ecf951f7377ce71d16d084faeee771b01eb6c9655a4bc714",
+    "reports/model_freeze_report.md": "01a00472a3366327799da7ff2e9864f90c9fe629b074f262f32656d578c89910",
+    "reports/holdout_evaluation_report.md": "fdab7ad2005b1aff4cbb5fd82a54315aee4537fedd526262aca796a1d4227990",
+    "reports/error_analysis_report.md": "826658b6ea807aafa94438d5120ad762c4622adf0fe18941ae53b57c1b8e7f44",
+    "reports/experiments/baseline_results.json": "2bd6eb992a4ed235e5a0b70f7c9b8d5f45929c076f6a440c16ab68e28a907f95",
+    "reports/experiments/feature_engineering_results.json": "bd8a3f03df405f7b0ca0b5f67de53f8a7106cd4b27feeb6ac40f952c589d57b3",
+    "reports/experiments/model_comparison_results.json": "648aca646146e6bcee42d8a6727e66f08f32798eff51866147a486e64077082e",
+    "reports/experiments/hgb_representation_results.json": "794bd1bde4a78240f63130c04985239a3cf8588a2d79a5a9cd25d13e2ece5ea3",
+    "reports/experiments/tuning_results.json": "d9d245e22fc893208673322ea39bb73ea02efca8bd1410908c27f6921468ef74",
+    "reports/experiments/calibration_results.json": "0119ca11c5c471906f82845482897d2e8a13ffd6598ccb58f77370e40cbbe778",
+    "reports/experiments/threshold_results.json": "6e58772b7fc954f17072d9612fc9c076975dcb755059b916b48f745d9a3cd905",
+    "reports/experiments/holdout_results.json": "de174fe94dd49206ca0d33d734030edf150dd1dae415c9faf37f481d6d895043",
+    "reports/experiments/error_analysis_results.json": "004a6d3b6d0a033ea6a5e1a9a1c4b4c3552f2eb33d9bd972dd0a5b969ff134eb"
+  },
+  "source_digests": {
+    "src/churn/preprocessing/contracts.py": "eb450e53b9098e3b7746c1f97fe462b7ead859ac0b37f8eb8c1d03cfcb76e4cd",
+    "src/churn/preprocessing/transformers.py": "5b081e8bf8b6c471312d36a4c1dc0c02a1024aa59bc79f008660e5c09567fec7",
+    "src/churn/preprocessing/pipeline.py": "2a77e9d24674cea0282a3b6241cfecd0ebbc3a73485be7e92d0d9706ff51f5f8",
+    "src/churn/features/pipeline.py": "9eaebd389af13ea94f0ac0d5c6fc9ee482e7a2e66188888584c3ec624f883533",
+    "src/churn/modeling/tuning.py": "1827c4a1e0bf937ebd5ed6855ee41f6488a88bbd7c89bcdb7682567264406eba",
+    "src/churn/modeling/models.py": "b93d9399a86adb58a4756f75b750aa0b62ba43b64257aecd0875948bdc3ccbce",
+    "src/churn/preprocessing/target.py": "fb038d9e2603d0a3a3531b55b088598ce0e48f0a7fa11d061300ebcd5fbe6507",
+    "src/churn/modeling/freeze.py": "8bc31ca057c7f4e3e33f4f4cb6c64ae4d852c5bb6047562ee32bc547f994f1f6"
+  },
+  "configuration_digests": {
+    "configs/base.toml": "c69ccbcb84c4f6b3197e7749e384146c2ccbee7afe8d67555cf3e3ccce88faa5",
+    "pyproject.toml": "d6eaa68766005bc601792a7dc75aa02091d836ecf8af1aac8797f00bf0b72155",
+    "uv.lock": "a262860cfc50bf7eddf05d5e2592c75cadf1f5993ea561ec40dcc121b146c59c"
+  },
+  "model": {
+    "estimator": "LogisticRegression",
+    "classes": [
+      0,
+      1
+    ],
+    "intercept": -0.5300483006137556,
+    "n_iter": [
+      42
+    ],
+    "converged": true,
+    "max_iter": 100,
+    "hyperparameters": {
+      "C": 1.0,
+      "class_weight": null,
+      "l1_ratio": 0.0,
+      "max_iter": 100,
+      "solver": "lbfgs"
+    },
+    "n_transformed_features": 46,
+    "n_coefficients": 46,
+    "n_raw_features": 19,
+    "n_numeric_features": 3,
+    "n_categorical_features": 16,
+    "engineered_features": [],
+    "positive_class_label": 1,
+    "positive_class_column": 1,
+    "positive_class_resolution": "resolved from classifier.classes_, never assumed. decision_function scores classes_[1], which is the positive class here"
+  },
+  "exact_functional_form": {
+    "logit": "logit(P(Churn=1|x)) = intercept + sum_j coefficient_j * transformed_feature_j",
+    "probability": "P(Churn=1|x) = sigmoid(logit) = 1 / (1 + exp(-logit))",
+    "grouped": "logit = intercept + sum over the 19 raw features of contribution_g(x), where contribution_g = sum over that feature's transformed columns of coefficient_j * z_j",
+    "numeric_contribution": "coefficient * (raw_value - scaler_mean) / scaler_scale",
+    "categorical_contribution": "coefficient of the ACTIVE level; the feature's other columns are zero, and an unseen category is all-zeros under handle_unknown='ignore'",
+    "approximation_used": false,
+    "explainer_library_used": null
+  },
+  "reconstruction": {
+    "n_rows": 5634,
+    "max_abs_logit_error": 0.0,
+    "max_abs_probability_error": 1.1102230246251565e-16,
+    "max_grouped_reconstruction_error": 1.7763568394002505e-15,
+    "tolerance": 1e-12,
+    "within_tolerance": true,
+    "population": "training pool",
+    "logit_reference": "pipeline.decision_function(X)",
+    "probability_reference": "pipeline.predict_proba(X)[:, positive_class_column]",
+    "grouped_reference": "pipeline.decision_function(X)",
+    "tolerance_justification": "Both quantities are order 1 and are computed as a dot product of 46 float64 terms, so the accumulated rounding error is bounded by a few multiples of 2**-52 ~ 2.2e-16. The tolerance sits about four orders of magnitude above that noise floor and far below any error that would signal a wrong column, a missed intercept or a transposed coefficient",
+    "gate": "the phase raises and produces no report if any error exceeds the tolerance"
+  },
+  "frozen_decision": {
+    "threshold_probability": 0.3272694566222328,
+    "threshold_logit": -0.7205610102182292,
+    "threshold_logit_definition": "log(threshold / (1 - threshold))",
+    "comparison": ">=",
+    "positive_class_label": 1,
+    "equivalent_rule": "predicted positive when model_logit >= threshold_logit, which is the SAME frozen rule as probability >= threshold, not a new one",
+    "threshold_policy": "F1_MAXIMIZATION",
+    "calibration_policy": "NONE",
+    "threshold_changed_here": false,
+    "calibration_changed_here": false,
+    "alternative_thresholds_scored": 0
+  },
+  "feature_mapping": {
+    "n_raw_features": 19,
+    "n_transformed_columns": 46,
+    "derivation": "index arithmetic over the fitted encoder's own structure: the numeric block emits one column per scaled feature in feature_names_in_ order, then the categorical block emits len(categories_[i]) consecutive columns for the i-th categorical feature",
+    "textual_parsing_used": false,
+    "cross_checked_against_generated_names": true,
+    "partition_verified": true,
+    "groups": [
+      {
+        "feature": "tenure",
+        "kind": "numeric",
+        "n_transformed_columns": 1,
+        "transformed_columns": [
+          0
+        ],
+        "levels": []
+      },
+      {
+        "feature": "MonthlyCharges",
+        "kind": "numeric",
+        "n_transformed_columns": 1,
+        "transformed_columns": [
+          1
+        ],
+        "levels": []
+      },
+      {
+        "feature": "TotalCharges",
+        "kind": "numeric",
+        "n_transformed_columns": 1,
+        "transformed_columns": [
+          2
+        ],
+        "levels": []
+      },
+      {
+        "feature": "gender",
+        "kind": "categorical",
+        "n_transformed_columns": 2,
+        "transformed_columns": [
+          3,
+          4
+        ],
+        "levels": [
+          "Female",
+          "Male"
+        ]
+      },
+      {
+        "feature": "SeniorCitizen",
+        "kind": "categorical",
+        "n_transformed_columns": 2,
+        "transformed_columns": [
+          5,
+          6
+        ],
+        "levels": [
+          "0",
+          "1"
+        ]
+      },
+      {
+        "feature": "Partner",
+        "kind": "categorical",
+        "n_transformed_columns": 2,
+        "transformed_columns": [
+          7,
+          8
+        ],
+        "levels": [
+          "No",
+          "Yes"
+        ]
+      },
+      {
+        "feature": "Dependents",
+        "kind": "categorical",
+        "n_transformed_columns": 2,
+        "transformed_columns": [
+          9,
+          10
+        ],
+        "levels": [
+          "No",
+          "Yes"
+        ]
+      },
+      {
+        "feature": "PhoneService",
+        "kind": "categorical",
+        "n_transformed_columns": 2,
+        "transformed_columns": [
+          11,
+          12
+        ],
+        "levels": [
+          "No",
+          "Yes"
+        ]
+      },
+      {
+        "feature": "MultipleLines",
+        "kind": "categorical",
+        "n_transformed_columns": 3,
+        "transformed_columns": [
+          13,
+          14,
+          15
+        ],
+        "levels": [
+          "No",
+          "No phone service",
+          "Yes"
+        ]
+      },
+      {
+        "feature": "InternetService",
+        "kind": "categorical",
+        "n_transformed_columns": 3,
+        "transformed_columns": [
+          16,
+          17,
+          18
+        ],
+        "levels": [
+          "DSL",
+          "Fiber optic",
+          "No"
+        ]
+      },
+      {
+        "feature": "OnlineSecurity",
+        "kind": "categorical",
+        "n_transformed_columns": 3,
+        "transformed_columns": [
+          19,
+          20,
+          21
+        ],
+        "levels": [
+          "No",
+          "No internet service",
+          "Yes"
+        ]
+      },
+      {
+        "feature": "OnlineBackup",
+        "kind": "categorical",
+        "n_transformed_columns": 3,
+        "transformed_columns": [
+          22,
+          23,
+          24
+        ],
+        "levels": [
+          "No",
+          "No internet service",
+          "Yes"
+        ]
+      },
+      {
+        "feature": "DeviceProtection",
+        "kind": "categorical",
+        "n_transformed_columns": 3,
+        "transformed_columns": [
+          25,
+          26,
+          27
+        ],
+        "levels": [
+          "No",
+          "No internet service",
+          "Yes"
+        ]
+      },
+      {
+        "feature": "TechSupport",
+        "kind": "categorical",
+        "n_transformed_columns": 3,
+        "transformed_columns": [
+          28,
+          29,
+          30
+        ],
+        "levels": [
+          "No",
+          "No internet service",
+          "Yes"
+        ]
+      },
+      {
+        "feature": "StreamingTV",
+        "kind": "categorical",
+        "n_transformed_columns": 3,
+        "transformed_columns": [
+          31,
+          32,
+          33
+        ],
+        "levels": [
+          "No",
+          "No internet service",
+          "Yes"
+        ]
+      },
+      {
+        "feature": "StreamingMovies",
+        "kind": "categorical",
+        "n_transformed_columns": 3,
+        "transformed_columns": [
+          34,
+          35,
+          36
+        ],
+        "levels": [
+          "No",
+          "No internet service",
+          "Yes"
+        ]
+      },
+      {
+        "feature": "Contract",
+        "kind": "categorical",
+        "n_transformed_columns": 3,
+        "transformed_columns": [
+          37,
+          38,
+          39
+        ],
+        "levels": [
+          "Month-to-month",
+          "One year",
+          "Two year"
+        ]
+      },
+      {
+        "feature": "PaperlessBilling",
+        "kind": "categorical",
+        "n_transformed_columns": 2,
+        "transformed_columns": [
+          40,
+          41
+        ],
+        "levels": [
+          "No",
+          "Yes"
+        ]
+      },
+      {
+        "feature": "PaymentMethod",
+        "kind": "categorical",
+        "n_transformed_columns": 4,
+        "transformed_columns": [
+          42,
+          43,
+          44,
+          45
+        ],
+        "levels": [
+          "Bank transfer (automatic)",
+          "Credit card (automatic)",
+          "Electronic check",
+          "Mailed check"
+        ]
+      }
+    ]
+  },
+  "structural_dependencies": {
+    "status": "verified empirically on the interpretation population",
+    "population": "training pool",
+    "n_rows_checked": 5634,
+    "holdout_used": false,
+    "rules_declared_before_checking": true,
+    "rules_source": "the product semantics recorded in the Phase 2 data dictionary — a sentinel category such as 'No internet service' exists because the customer has no internet. NOT derived from the model's coefficients and NOT derived from the holdout",
+    "n_rules_checked": 7,
+    "n_deterministic": 7,
+    "n_with_violations": 0,
+    "rules": [
+      {
+        "relationship": "InternetService=No <-> OnlineSecurity=No internet service",
+        "features": [
+          "InternetService",
+          "OnlineSecurity"
+        ],
+        "left": {
+          "feature": "InternetService",
+          "level": "No"
+        },
+        "right": {
+          "feature": "OnlineSecurity",
+          "level": "No internet service"
+        },
+        "observed_rule": "a row has InternetService='No' if and only if it has OnlineSecurity='No internet service'",
+        "population": "training pool",
+        "n_rows_checked": 5634,
+        "n_left": 1214,
+        "n_right": 1214,
+        "n_both": 1214,
+        "left_only": 0,
+        "right_only": 0,
+        "violations": 0,
+        "deterministic_in_training_pool": true,
+        "interpretation_consequence": "the two encoded states are the same state in this population, so a counterfactual that moves one of them while holding the other raw feature fixed describes a row that never occurs. Contrasts touching either level are flagged structurally_coupled and are algebraic contrasts only"
+      },
+      {
+        "relationship": "InternetService=No <-> OnlineBackup=No internet service",
+        "features": [
+          "InternetService",
+          "OnlineBackup"
+        ],
+        "left": {
+          "feature": "InternetService",
+          "level": "No"
+        },
+        "right": {
+          "feature": "OnlineBackup",
+          "level": "No internet service"
+        },
+        "observed_rule": "a row has InternetService='No' if and only if it has OnlineBackup='No internet service'",
+        "population": "training pool",
+        "n_rows_checked": 5634,
+        "n_left": 1214,
+        "n_right": 1214,
+        "n_both": 1214,
+        "left_only": 0,
+        "right_only": 0,
+        "violations": 0,
+        "deterministic_in_training_pool": true,
+        "interpretation_consequence": "the two encoded states are the same state in this population, so a counterfactual that moves one of them while holding the other raw feature fixed describes a row that never occurs. Contrasts touching either level are flagged structurally_coupled and are algebraic contrasts only"
+      },
+      {
+        "relationship": "InternetService=No <-> DeviceProtection=No internet service",
+        "features": [
+          "InternetService",
+          "DeviceProtection"
+        ],
+        "left": {
+          "feature": "InternetService",
+          "level": "No"
+        },
+        "right": {
+          "feature": "DeviceProtection",
+          "level": "No internet service"
+        },
+        "observed_rule": "a row has InternetService='No' if and only if it has DeviceProtection='No internet service'",
+        "population": "training pool",
+        "n_rows_checked": 5634,
+        "n_left": 1214,
+        "n_right": 1214,
+        "n_both": 1214,
+        "left_only": 0,
+        "right_only": 0,
+        "violations": 0,
+        "deterministic_in_training_pool": true,
+        "interpretation_consequence": "the two encoded states are the same state in this population, so a counterfactual that moves one of them while holding the other raw feature fixed describes a row that never occurs. Contrasts touching either level are flagged structurally_coupled and are algebraic contrasts only"
+      },
+      {
+        "relationship": "InternetService=No <-> TechSupport=No internet service",
+        "features": [
+          "InternetService",
+          "TechSupport"
+        ],
+        "left": {
+          "feature": "InternetService",
+          "level": "No"
+        },
+        "right": {
+          "feature": "TechSupport",
+          "level": "No internet service"
+        },
+        "observed_rule": "a row has InternetService='No' if and only if it has TechSupport='No internet service'",
+        "population": "training pool",
+        "n_rows_checked": 5634,
+        "n_left": 1214,
+        "n_right": 1214,
+        "n_both": 1214,
+        "left_only": 0,
+        "right_only": 0,
+        "violations": 0,
+        "deterministic_in_training_pool": true,
+        "interpretation_consequence": "the two encoded states are the same state in this population, so a counterfactual that moves one of them while holding the other raw feature fixed describes a row that never occurs. Contrasts touching either level are flagged structurally_coupled and are algebraic contrasts only"
+      },
+      {
+        "relationship": "InternetService=No <-> StreamingTV=No internet service",
+        "features": [
+          "InternetService",
+          "StreamingTV"
+        ],
+        "left": {
+          "feature": "InternetService",
+          "level": "No"
+        },
+        "right": {
+          "feature": "StreamingTV",
+          "level": "No internet service"
+        },
+        "observed_rule": "a row has InternetService='No' if and only if it has StreamingTV='No internet service'",
+        "population": "training pool",
+        "n_rows_checked": 5634,
+        "n_left": 1214,
+        "n_right": 1214,
+        "n_both": 1214,
+        "left_only": 0,
+        "right_only": 0,
+        "violations": 0,
+        "deterministic_in_training_pool": true,
+        "interpretation_consequence": "the two encoded states are the same state in this population, so a counterfactual that moves one of them while holding the other raw feature fixed describes a row that never occurs. Contrasts touching either level are flagged structurally_coupled and are algebraic contrasts only"
+      },
+      {
+        "relationship": "InternetService=No <-> StreamingMovies=No internet service",
+        "features": [
+          "InternetService",
+          "StreamingMovies"
+        ],
+        "left": {
+          "feature": "InternetService",
+          "level": "No"
+        },
+        "right": {
+          "feature": "StreamingMovies",
+          "level": "No internet service"
+        },
+        "observed_rule": "a row has InternetService='No' if and only if it has StreamingMovies='No internet service'",
+        "population": "training pool",
+        "n_rows_checked": 5634,
+        "n_left": 1214,
+        "n_right": 1214,
+        "n_both": 1214,
+        "left_only": 0,
+        "right_only": 0,
+        "violations": 0,
+        "deterministic_in_training_pool": true,
+        "interpretation_consequence": "the two encoded states are the same state in this population, so a counterfactual that moves one of them while holding the other raw feature fixed describes a row that never occurs. Contrasts touching either level are flagged structurally_coupled and are algebraic contrasts only"
+      },
+      {
+        "relationship": "PhoneService=No <-> MultipleLines=No phone service",
+        "features": [
+          "PhoneService",
+          "MultipleLines"
+        ],
+        "left": {
+          "feature": "PhoneService",
+          "level": "No"
+        },
+        "right": {
+          "feature": "MultipleLines",
+          "level": "No phone service"
+        },
+        "observed_rule": "a row has PhoneService='No' if and only if it has MultipleLines='No phone service'",
+        "population": "training pool",
+        "n_rows_checked": 5634,
+        "n_left": 559,
+        "n_right": 559,
+        "n_both": 559,
+        "left_only": 0,
+        "right_only": 0,
+        "violations": 0,
+        "deterministic_in_training_pool": true,
+        "interpretation_consequence": "the two encoded states are the same state in this population, so a counterfactual that moves one of them while holding the other raw feature fixed describes a row that never occurs. Contrasts touching either level are flagged structurally_coupled and are algebraic contrasts only"
+      }
+    ],
+    "coupled_levels": {
+      "DeviceProtection": [
+        "No internet service"
+      ],
+      "InternetService": [
+        "No"
+      ],
+      "MultipleLines": [
+        "No phone service"
+      ],
+      "OnlineBackup": [
+        "No internet service"
+      ],
+      "OnlineSecurity": [
+        "No internet service"
+      ],
+      "PhoneService": [
+        "No"
+      ],
+      "StreamingMovies": [
+        "No internet service"
+      ],
+      "StreamingTV": [
+        "No internet service"
+      ],
+      "TechSupport": [
+        "No internet service"
+      ]
+    },
+    "coupled_column_blocks": [
+      {
+        "n_columns": 2,
+        "transformed_columns": [
+          11,
+          14
+        ],
+        "members": [
+          {
+            "feature": "PhoneService",
+            "level": "No"
+          },
+          {
+            "feature": "MultipleLines",
+            "level": "No phone service"
+          }
+        ],
+        "raw_features": [
+          "MultipleLines",
+          "PhoneService"
+        ],
+        "spans_multiple_raw_features": true,
+        "n_active_rows": 559,
+        "coefficient_per_column": [
+          -0.1305052099429405,
+          -0.1305052099429405
+        ],
+        "aggregate_coefficient": -0.261010419885881,
+        "equal_split_share": -0.1305052099429405,
+        "max_pairwise_coefficient_difference": 0.0,
+        "note": "these columns are the SAME vector on the interpretation population, so they are perfectly collinear. The per-column coefficients are one point in a family of parameterisations that all produce identical predictions; the L2 penalty selects the one that splits the shared weight evenly. The aggregate is what the model actually applies when the underlying state is active, and repeated equal coefficients are NOT evidence of one effect per column"
+      },
+      {
+        "n_columns": 7,
+        "transformed_columns": [
+          18,
+          20,
+          23,
+          26,
+          29,
+          32,
+          35
+        ],
+        "members": [
+          {
+            "feature": "InternetService",
+            "level": "No"
+          },
+          {
+            "feature": "OnlineSecurity",
+            "level": "No internet service"
+          },
+          {
+            "feature": "OnlineBackup",
+            "level": "No internet service"
+          },
+          {
+            "feature": "DeviceProtection",
+            "level": "No internet service"
+          },
+          {
+            "feature": "TechSupport",
+            "level": "No internet service"
+          },
+          {
+            "feature": "StreamingTV",
+            "level": "No internet service"
+          },
+          {
+            "feature": "StreamingMovies",
+            "level": "No internet service"
+          }
+        ],
+        "raw_features": [
+          "DeviceProtection",
+          "InternetService",
+          "OnlineBackup",
+          "OnlineSecurity",
+          "StreamingMovies",
+          "StreamingTV",
+          "TechSupport"
+        ],
+        "spans_multiple_raw_features": true,
+        "n_active_rows": 1214,
+        "coefficient_per_column": [
+          -0.2929549704281795,
+          -0.2929549704281795,
+          -0.2929549704281795,
+          -0.2929549704281795,
+          -0.2929549704281795,
+          -0.2929549704281795,
+          -0.2929549704281795
+        ],
+        "aggregate_coefficient": -2.0506847929972563,
+        "equal_split_share": -0.2929549704281795,
+        "max_pairwise_coefficient_difference": 0.0,
+        "note": "these columns are the SAME vector on the interpretation population, so they are perfectly collinear. The per-column coefficients are one point in a family of parameterisations that all produce identical predictions; the L2 penalty selects the one that splits the shared weight evenly. The aggregate is what the model actually applies when the underlying state is active, and repeated equal coefficients are NOT evidence of one effect per column"
+      }
+    ],
+    "n_coupled_column_blocks": 2,
+    "detection_method": "two independent passes. The rules above compare RAW CATEGORY VALUES row by row; the blocks below compare the TRANSFORMED COLUMNS for exact vector equality on the same population. Neither is a general constraint solver, and neither declares a coupling the data does not show",
+    "interpretation_consequence": "a contrast whose level participates in a deterministic rule is flagged structurally_coupled and carries raw_single_feature_counterfactual_supported = false: the algebraic difference beta_a - beta_b is still exact, but 'change only this feature and hold the rest fixed' would describe a row that does not occur. Repeated equal coefficients across a coupled block are one shared weight split by the L2 penalty, not one effect per feature",
+    "contrasts_removed_or_altered": false,
+    "coefficients_removed_or_altered": false
+  },
+  "numeric_terms": [
+    {
+      "feature": "tenure",
+      "transformed_column": 0,
+      "standardized_coefficient": -1.2552019565035495,
+      "scaler_mean": 32.48509052183174,
+      "scaler_scale": 24.56656301538815,
+      "raw_logit_coefficient": -0.05109391801031787,
+      "odds_ratio_per_1_sd": 0.2850182811161214,
+      "raw_unit": "one month of tenure"
+    },
+    {
+      "feature": "MonthlyCharges",
+      "transformed_column": 1,
+      "standardized_coefficient": -0.6011680689372669,
+      "scaler_mean": 64.92996095136671,
+      "scaler_scale": 30.135430576006627,
+      "raw_logit_coefficient": -0.0199488793571746,
+      "odds_ratio_per_1_sd": 0.5481709605189574,
+      "raw_unit": "one monetary unit of the dataset's monthly charge scale"
+    },
+    {
+      "feature": "TotalCharges",
+      "transformed_column": 2,
+      "standardized_coefficient": 0.5325916799613446,
+      "scaler_mean": 2299.33468228612,
+      "scaler_scale": 2279.001996496138,
+      "raw_logit_coefficient": 0.00023369513531808225,
+      "odds_ratio_per_1_sd": 1.7033411080693197,
+      "raw_unit": "one monetary unit of the dataset's total charge scale"
+    }
+  ],
+  "categorical_terms": [
+    {
+      "feature": "gender",
+      "n_levels": 2,
+      "levels": [
+        "Female",
+        "Male"
+      ],
+      "transformed_columns": [
+        3,
+        4
+      ],
+      "coefficient_per_level": {
+        "Female": -0.15523015708460874,
+        "Male": -0.13333976996139096
+      },
+      "lowest_coefficient_level": "Female",
+      "highest_coefficient_level": "Male",
+      "minimum": -0.15523015708460874,
+      "maximum": -0.13333976996139096,
+      "spread": 0.02189038712321778,
+      "max_pairwise_modeled_odds_ratio": 1.022131739529346,
+      "structurally_coupled_levels": [],
+      "has_structurally_coupled_level": false,
+      "structurally_coupled_per_level": {
+        "Female": false,
+        "Male": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "gender",
+        "level_a": "Male",
+        "level_b": "Female",
+        "delta_log_odds": 0.02189038712321778,
+        "modeled_odds_ratio": 1.022131739529346,
+        "structurally_coupled": false,
+        "raw_single_feature_counterfactual_supported": true,
+        "reading": "within the frozen model, encoding gender as 'Male' instead of 'Female' and holding every other transformed feature fixed changes the model log-odds by +0.0219"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "SeniorCitizen",
+      "n_levels": 2,
+      "levels": [
+        "0",
+        "1"
+      ],
+      "transformed_columns": [
+        5,
+        6
+      ],
+      "coefficient_per_level": {
+        "0": -0.21764610484180083,
+        "1": -0.07092382220419872
+      },
+      "lowest_coefficient_level": "0",
+      "highest_coefficient_level": "1",
+      "minimum": -0.21764610484180083,
+      "maximum": -0.07092382220419872,
+      "spread": 0.14672228263760212,
+      "max_pairwise_modeled_odds_ratio": 1.158032312688529,
+      "structurally_coupled_levels": [],
+      "has_structurally_coupled_level": false,
+      "structurally_coupled_per_level": {
+        "0": false,
+        "1": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "SeniorCitizen",
+        "level_a": "1",
+        "level_b": "0",
+        "delta_log_odds": 0.14672228263760212,
+        "modeled_odds_ratio": 1.158032312688529,
+        "structurally_coupled": false,
+        "raw_single_feature_counterfactual_supported": true,
+        "reading": "within the frozen model, encoding SeniorCitizen as '1' instead of '0' and holding every other transformed feature fixed changes the model log-odds by +0.1467"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "Partner",
+      "n_levels": 2,
+      "levels": [
+        "No",
+        "Yes"
+      ],
+      "transformed_columns": [
+        7,
+        8
+      ],
+      "coefficient_per_level": {
+        "No": -0.15503554905942601,
+        "Yes": -0.13353437798658183
+      },
+      "lowest_coefficient_level": "No",
+      "highest_coefficient_level": "Yes",
+      "minimum": -0.15503554905942601,
+      "maximum": -0.13353437798658183,
+      "spread": 0.02150117107284419,
+      "max_pairwise_modeled_odds_ratio": 1.0217339868616073,
+      "structurally_coupled_levels": [],
+      "has_structurally_coupled_level": false,
+      "structurally_coupled_per_level": {
+        "No": false,
+        "Yes": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "Partner",
+        "level_a": "Yes",
+        "level_b": "No",
+        "delta_log_odds": 0.02150117107284419,
+        "modeled_odds_ratio": 1.0217339868616073,
+        "structurally_coupled": false,
+        "raw_single_feature_counterfactual_supported": true,
+        "reading": "within the frozen model, encoding Partner as 'Yes' instead of 'No' and holding every other transformed feature fixed changes the model log-odds by +0.0215"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "Dependents",
+      "n_levels": 2,
+      "levels": [
+        "No",
+        "Yes"
+      ],
+      "transformed_columns": [
+        9,
+        10
+      ],
+      "coefficient_per_level": {
+        "No": -0.03238701569479568,
+        "Yes": -0.2561829113512068
+      },
+      "lowest_coefficient_level": "Yes",
+      "highest_coefficient_level": "No",
+      "minimum": -0.2561829113512068,
+      "maximum": -0.03238701569479568,
+      "spread": 0.22379589565641111,
+      "max_pairwise_modeled_odds_ratio": 1.2508156964563089,
+      "structurally_coupled_levels": [],
+      "has_structurally_coupled_level": false,
+      "structurally_coupled_per_level": {
+        "No": false,
+        "Yes": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "Dependents",
+        "level_a": "No",
+        "level_b": "Yes",
+        "delta_log_odds": 0.22379589565641111,
+        "modeled_odds_ratio": 1.2508156964563089,
+        "structurally_coupled": false,
+        "raw_single_feature_counterfactual_supported": true,
+        "reading": "within the frozen model, encoding Dependents as 'No' instead of 'Yes' and holding every other transformed feature fixed changes the model log-odds by +0.2238"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "PhoneService",
+      "n_levels": 2,
+      "levels": [
+        "No",
+        "Yes"
+      ],
+      "transformed_columns": [
+        11,
+        12
+      ],
+      "coefficient_per_level": {
+        "No": -0.1305052099429405,
+        "Yes": -0.1580647171030679
+      },
+      "lowest_coefficient_level": "Yes",
+      "highest_coefficient_level": "No",
+      "minimum": -0.1580647171030679,
+      "maximum": -0.1305052099429405,
+      "spread": 0.027559507160127422,
+      "max_pairwise_modeled_odds_ratio": 1.0279427832430679,
+      "structurally_coupled_levels": [
+        "No"
+      ],
+      "has_structurally_coupled_level": true,
+      "structurally_coupled_per_level": {
+        "No": true,
+        "Yes": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "PhoneService",
+        "level_a": "No",
+        "level_b": "Yes",
+        "delta_log_odds": 0.027559507160127422,
+        "modeled_odds_ratio": 1.0279427832430679,
+        "structurally_coupled": true,
+        "raw_single_feature_counterfactual_supported": false,
+        "reading": "the algebraic contrast between the encoded levels 'No' and 'Yes' of PhoneService is +0.0276 in model log-odds. At least one of these levels is structurally coupled to another raw feature in this dataset, so this is NOT a single-feature change a real customer could undergo: altering only this one-hot while holding the other raw features fixed would describe a combination that does not occur in the training pool"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "MultipleLines",
+      "n_levels": 3,
+      "levels": [
+        "No",
+        "No phone service",
+        "Yes"
+      ],
+      "transformed_columns": [
+        13,
+        14,
+        15
+      ],
+      "coefficient_per_level": {
+        "No": -0.27142891351266246,
+        "No phone service": -0.1305052099429405,
+        "Yes": 0.11336419640960181
+      },
+      "lowest_coefficient_level": "No",
+      "highest_coefficient_level": "Yes",
+      "minimum": -0.27142891351266246,
+      "maximum": 0.11336419640960181,
+      "spread": 0.3847931099222643,
+      "max_pairwise_modeled_odds_ratio": 1.4693103042700923,
+      "structurally_coupled_levels": [
+        "No phone service"
+      ],
+      "has_structurally_coupled_level": true,
+      "structurally_coupled_per_level": {
+        "No": false,
+        "No phone service": true,
+        "Yes": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "MultipleLines",
+        "level_a": "Yes",
+        "level_b": "No",
+        "delta_log_odds": 0.3847931099222643,
+        "modeled_odds_ratio": 1.4693103042700923,
+        "structurally_coupled": false,
+        "raw_single_feature_counterfactual_supported": true,
+        "reading": "within the frozen model, encoding MultipleLines as 'Yes' instead of 'No' and holding every other transformed feature fixed changes the model log-odds by +0.3848"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "InternetService",
+      "n_levels": 3,
+      "levels": [
+        "DSL",
+        "Fiber optic",
+        "No"
+      ],
+      "transformed_columns": [
+        16,
+        17,
+        18
+      ],
+      "coefficient_per_level": {
+        "DSL": -0.6436422353547686,
+        "Fiber optic": 0.6480272787369497,
+        "No": -0.2929549704281795
+      },
+      "lowest_coefficient_level": "DSL",
+      "highest_coefficient_level": "Fiber optic",
+      "minimum": -0.6436422353547686,
+      "maximum": 0.6480272787369497,
+      "spread": 1.2916695140917183,
+      "max_pairwise_modeled_odds_ratio": 3.6388566097102424,
+      "structurally_coupled_levels": [
+        "No"
+      ],
+      "has_structurally_coupled_level": true,
+      "structurally_coupled_per_level": {
+        "DSL": false,
+        "Fiber optic": false,
+        "No": true
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "InternetService",
+        "level_a": "Fiber optic",
+        "level_b": "DSL",
+        "delta_log_odds": 1.2916695140917183,
+        "modeled_odds_ratio": 3.6388566097102424,
+        "structurally_coupled": false,
+        "raw_single_feature_counterfactual_supported": true,
+        "reading": "within the frozen model, encoding InternetService as 'Fiber optic' instead of 'DSL' and holding every other transformed feature fixed changes the model log-odds by +1.2917"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "OnlineSecurity",
+      "n_levels": 3,
+      "levels": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "transformed_columns": [
+        19,
+        20,
+        21
+      ],
+      "coefficient_per_level": {
+        "No": 0.16554953713417206,
+        "No internet service": -0.2929549704281795,
+        "Yes": -0.16116449375199554
+      },
+      "lowest_coefficient_level": "No internet service",
+      "highest_coefficient_level": "No",
+      "minimum": -0.2929549704281795,
+      "maximum": 0.16554953713417206,
+      "spread": 0.4585045075623515,
+      "max_pairwise_modeled_odds_ratio": 1.5817067848354014,
+      "structurally_coupled_levels": [
+        "No internet service"
+      ],
+      "has_structurally_coupled_level": true,
+      "structurally_coupled_per_level": {
+        "No": false,
+        "No internet service": true,
+        "Yes": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "OnlineSecurity",
+        "level_a": "No",
+        "level_b": "No internet service",
+        "delta_log_odds": 0.4585045075623515,
+        "modeled_odds_ratio": 1.5817067848354014,
+        "structurally_coupled": true,
+        "raw_single_feature_counterfactual_supported": false,
+        "reading": "the algebraic contrast between the encoded levels 'No' and 'No internet service' of OnlineSecurity is +0.4585 in model log-odds. At least one of these levels is structurally coupled to another raw feature in this dataset, so this is NOT a single-feature change a real customer could undergo: altering only this one-hot while holding the other raw features fixed would describe a combination that does not occur in the training pool"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "OnlineBackup",
+      "n_levels": 3,
+      "levels": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "transformed_columns": [
+        22,
+        23,
+        24
+      ],
+      "coefficient_per_level": {
+        "No": 0.04150046574921036,
+        "No internet service": -0.2929549704281795,
+        "Yes": -0.0371154223670278
+      },
+      "lowest_coefficient_level": "No internet service",
+      "highest_coefficient_level": "No",
+      "minimum": -0.2929549704281795,
+      "maximum": 0.04150046574921036,
+      "spread": 0.3344554361773898,
+      "max_pairwise_modeled_odds_ratio": 1.3971793247043294,
+      "structurally_coupled_levels": [
+        "No internet service"
+      ],
+      "has_structurally_coupled_level": true,
+      "structurally_coupled_per_level": {
+        "No": false,
+        "No internet service": true,
+        "Yes": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "OnlineBackup",
+        "level_a": "No",
+        "level_b": "No internet service",
+        "delta_log_odds": 0.3344554361773898,
+        "modeled_odds_ratio": 1.3971793247043294,
+        "structurally_coupled": true,
+        "raw_single_feature_counterfactual_supported": false,
+        "reading": "the algebraic contrast between the encoded levels 'No' and 'No internet service' of OnlineBackup is +0.3345 in model log-odds. At least one of these levels is structurally coupled to another raw feature in this dataset, so this is NOT a single-feature change a real customer could undergo: altering only this one-hot while holding the other raw features fixed would describe a combination that does not occur in the training pool"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "DeviceProtection",
+      "n_levels": 3,
+      "levels": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "transformed_columns": [
+        25,
+        26,
+        27
+      ],
+      "coefficient_per_level": {
+        "No": -0.026421278833234044,
+        "No internet service": -0.2929549704281795,
+        "Yes": 0.030806322215421185
+      },
+      "lowest_coefficient_level": "No internet service",
+      "highest_coefficient_level": "Yes",
+      "minimum": -0.2929549704281795,
+      "maximum": 0.030806322215421185,
+      "spread": 0.32376129264360065,
+      "max_pairwise_modeled_odds_ratio": 1.382317298425283,
+      "structurally_coupled_levels": [
+        "No internet service"
+      ],
+      "has_structurally_coupled_level": true,
+      "structurally_coupled_per_level": {
+        "No": false,
+        "No internet service": true,
+        "Yes": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "DeviceProtection",
+        "level_a": "Yes",
+        "level_b": "No internet service",
+        "delta_log_odds": 0.32376129264360065,
+        "modeled_odds_ratio": 1.382317298425283,
+        "structurally_coupled": true,
+        "raw_single_feature_counterfactual_supported": false,
+        "reading": "the algebraic contrast between the encoded levels 'Yes' and 'No internet service' of DeviceProtection is +0.3238 in model log-odds. At least one of these levels is structurally coupled to another raw feature in this dataset, so this is NOT a single-feature change a real customer could undergo: altering only this one-hot while holding the other raw features fixed would describe a combination that does not occur in the training pool"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "TechSupport",
+      "n_levels": 3,
+      "levels": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "transformed_columns": [
+        28,
+        29,
+        30
+      ],
+      "coefficient_per_level": {
+        "No": 0.14131957444948492,
+        "No internet service": -0.2929549704281795,
+        "Yes": -0.13693453106730555
+      },
+      "lowest_coefficient_level": "No internet service",
+      "highest_coefficient_level": "No",
+      "minimum": -0.2929549704281795,
+      "maximum": 0.14131957444948492,
+      "spread": 0.43427454487766437,
+      "max_pairwise_modeled_odds_ratio": 1.5438426640336562,
+      "structurally_coupled_levels": [
+        "No internet service"
+      ],
+      "has_structurally_coupled_level": true,
+      "structurally_coupled_per_level": {
+        "No": false,
+        "No internet service": true,
+        "Yes": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "TechSupport",
+        "level_a": "No",
+        "level_b": "No internet service",
+        "delta_log_odds": 0.43427454487766437,
+        "modeled_odds_ratio": 1.5438426640336562,
+        "structurally_coupled": true,
+        "raw_single_feature_counterfactual_supported": false,
+        "reading": "the algebraic contrast between the encoded levels 'No' and 'No internet service' of TechSupport is +0.4343 in model log-odds. At least one of these levels is structurally coupled to another raw feature in this dataset, so this is NOT a single-feature change a real customer could undergo: altering only this one-hot while holding the other raw features fixed would describe a combination that does not occur in the training pool"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "StreamingTV",
+      "n_levels": 3,
+      "levels": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "transformed_columns": [
+        31,
+        32,
+        33
+      ],
+      "coefficient_per_level": {
+        "No": -0.20753736623588565,
+        "No internet service": -0.2929549704281795,
+        "Yes": 0.21192240961806794
+      },
+      "lowest_coefficient_level": "No internet service",
+      "highest_coefficient_level": "Yes",
+      "minimum": -0.2929549704281795,
+      "maximum": 0.21192240961806794,
+      "spread": 0.5048773800462474,
+      "max_pairwise_modeled_odds_ratio": 1.6567823534293837,
+      "structurally_coupled_levels": [
+        "No internet service"
+      ],
+      "has_structurally_coupled_level": true,
+      "structurally_coupled_per_level": {
+        "No": false,
+        "No internet service": true,
+        "Yes": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "StreamingTV",
+        "level_a": "Yes",
+        "level_b": "No internet service",
+        "delta_log_odds": 0.5048773800462474,
+        "modeled_odds_ratio": 1.6567823534293837,
+        "structurally_coupled": true,
+        "raw_single_feature_counterfactual_supported": false,
+        "reading": "the algebraic contrast between the encoded levels 'Yes' and 'No internet service' of StreamingTV is +0.5049 in model log-odds. At least one of these levels is structurally coupled to another raw feature in this dataset, so this is NOT a single-feature change a real customer could undergo: altering only this one-hot while holding the other raw features fixed would describe a combination that does not occur in the training pool"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "StreamingMovies",
+      "n_levels": 3,
+      "levels": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "transformed_columns": [
+        34,
+        35,
+        36
+      ],
+      "coefficient_per_level": {
+        "No": -0.20788464580524807,
+        "No internet service": -0.2929549704281795,
+        "Yes": 0.2122696891874323
+      },
+      "lowest_coefficient_level": "No internet service",
+      "highest_coefficient_level": "Yes",
+      "minimum": -0.2929549704281795,
+      "maximum": 0.2122696891874323,
+      "spread": 0.5052246596156118,
+      "max_pairwise_modeled_odds_ratio": 1.6573578200097228,
+      "structurally_coupled_levels": [
+        "No internet service"
+      ],
+      "has_structurally_coupled_level": true,
+      "structurally_coupled_per_level": {
+        "No": false,
+        "No internet service": true,
+        "Yes": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "StreamingMovies",
+        "level_a": "Yes",
+        "level_b": "No internet service",
+        "delta_log_odds": 0.5052246596156118,
+        "modeled_odds_ratio": 1.6573578200097228,
+        "structurally_coupled": true,
+        "raw_single_feature_counterfactual_supported": false,
+        "reading": "the algebraic contrast between the encoded levels 'Yes' and 'No internet service' of StreamingMovies is +0.5052 in model log-odds. At least one of these levels is structurally coupled to another raw feature in this dataset, so this is NOT a single-feature change a real customer could undergo: altering only this one-hot while holding the other raw features fixed would describe a combination that does not occur in the training pool"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "Contract",
+      "n_levels": 3,
+      "levels": [
+        "Month-to-month",
+        "One year",
+        "Two year"
+      ],
+      "transformed_columns": [
+        37,
+        38,
+        39
+      ],
+      "coefficient_per_level": {
+        "Month-to-month": 0.5859982070401255,
+        "One year": -0.1151664858959662,
+        "Two year": -0.7594016481901532
+      },
+      "lowest_coefficient_level": "Two year",
+      "highest_coefficient_level": "Month-to-month",
+      "minimum": -0.7594016481901532,
+      "maximum": 0.5859982070401255,
+      "spread": 1.3453998552302786,
+      "max_pairwise_modeled_odds_ratio": 3.839721566436591,
+      "structurally_coupled_levels": [],
+      "has_structurally_coupled_level": false,
+      "structurally_coupled_per_level": {
+        "Month-to-month": false,
+        "One year": false,
+        "Two year": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "Contract",
+        "level_a": "Month-to-month",
+        "level_b": "Two year",
+        "delta_log_odds": 1.3453998552302786,
+        "modeled_odds_ratio": 3.839721566436591,
+        "structurally_coupled": false,
+        "raw_single_feature_counterfactual_supported": true,
+        "reading": "within the frozen model, encoding Contract as 'Month-to-month' instead of 'Two year' and holding every other transformed feature fixed changes the model log-odds by +1.3454"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "PaperlessBilling",
+      "n_levels": 2,
+      "levels": [
+        "No",
+        "Yes"
+      ],
+      "transformed_columns": [
+        40,
+        41
+      ],
+      "coefficient_per_level": {
+        "No": -0.33073472389345043,
+        "Yes": 0.0421647968474438
+      },
+      "lowest_coefficient_level": "No",
+      "highest_coefficient_level": "Yes",
+      "minimum": -0.33073472389345043,
+      "maximum": 0.0421647968474438,
+      "spread": 0.3728995207408942,
+      "max_pairwise_modeled_odds_ratio": 1.4519384428040851,
+      "structurally_coupled_levels": [],
+      "has_structurally_coupled_level": false,
+      "structurally_coupled_per_level": {
+        "No": false,
+        "Yes": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "PaperlessBilling",
+        "level_a": "Yes",
+        "level_b": "No",
+        "delta_log_odds": 0.3728995207408942,
+        "modeled_odds_ratio": 1.4519384428040851,
+        "structurally_coupled": false,
+        "raw_single_feature_counterfactual_supported": true,
+        "reading": "within the frozen model, encoding PaperlessBilling as 'Yes' instead of 'No' and holding every other transformed feature fixed changes the model log-odds by +0.3729"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    },
+    {
+      "feature": "PaymentMethod",
+      "n_levels": 4,
+      "levels": [
+        "Bank transfer (automatic)",
+        "Credit card (automatic)",
+        "Electronic check",
+        "Mailed check"
+      ],
+      "transformed_columns": [
+        42,
+        43,
+        44,
+        45
+      ],
+      "coefficient_per_level": {
+        "Bank transfer (automatic)": -0.18029614993626097,
+        "Credit card (automatic)": -0.20858337883000655,
+        "Electronic check": 0.20558511288020664,
+        "Mailed check": -0.10527551115994684
+      },
+      "lowest_coefficient_level": "Credit card (automatic)",
+      "highest_coefficient_level": "Electronic check",
+      "minimum": -0.20858337883000655,
+      "maximum": 0.20558511288020664,
+      "spread": 0.4141684917102132,
+      "max_pairwise_modeled_odds_ratio": 1.5131120522448134,
+      "structurally_coupled_levels": [],
+      "has_structurally_coupled_level": false,
+      "structurally_coupled_per_level": {
+        "Bank transfer (automatic)": false,
+        "Credit card (automatic)": false,
+        "Electronic check": false,
+        "Mailed check": false
+      },
+      "strongest_pairwise_contrast": {
+        "feature": "PaymentMethod",
+        "level_a": "Electronic check",
+        "level_b": "Credit card (automatic)",
+        "delta_log_odds": 0.4141684917102132,
+        "modeled_odds_ratio": 1.5131120522448134,
+        "structurally_coupled": false,
+        "raw_single_feature_counterfactual_supported": true,
+        "reading": "within the frozen model, encoding PaymentMethod as 'Electronic check' instead of 'Credit card (automatic)' and holding every other transformed feature fixed changes the model log-odds by +0.4142"
+      },
+      "reference_level_removed": false,
+      "reference_level": null,
+      "encoding_note": "OneHotEncoder(handle_unknown='ignore') with NO dropped baseline: every level has its own column and the model also has an intercept, so exp(beta) of a single level is NOT an odds ratio against a reference category. The identified quantity is the within-feature contrast beta_a - beta_b"
+    }
+  ],
+  "contribution_dispersion": {
+    "population": "training pool",
+    "n_rows": 5634,
+    "unit": "log-odds (the additive term this feature contributes to the logit)",
+    "definition": "contribution_g(x) is that raw feature's additive term in the logit, so intercept + sum of the 19 contributions reproduces the logit exactly",
+    "ranking_metric": "std",
+    "ranking_metric_definition": "population standard deviation (ddof=0) of that feature's additive contribution to the logit over the training pool, in log-odds units",
+    "ranking_metric_fixed_before_computing_values": true,
+    "supporting_metrics": [
+      "mean_absolute_centered_contribution",
+      "iqr"
+    ],
+    "mean_absolute_centered_contribution_definition": "mean(abs(contribution - mean(contribution))), taken about the MEAN of that feature's contribution over the training pool, in log-odds units",
+    "ranking_name": "empirical contribution dispersion in the training pool",
+    "ranking_is_not": [
+      "true feature importance",
+      "causal importance",
+      "business importance"
+    ],
+    "depends_on": [
+      "the fitted coefficients",
+      "the fitted preprocessing (scaler statistics and encoder categories)",
+      "the composition of the training pool",
+      "the correlations among the features",
+      "the chosen representation, wherever features are structurally redundant"
+    ],
+    "representation_dependent": true,
+    "redundancy_caveat": "the ranking is an EXACT decomposition of the frozen function under the CURRENT encoding, but structurally redundant features split between them the variability of one underlying state. Consequently: do NOT sum ranks; do NOT read the coupled service features as that many independent signals; do NOT call any position importance without the qualifier; and note that a different representation with similar predictive behaviour could redistribute the same variability across different columns",
+    "ranks_may_be_summed": false,
+    "coupled_features_are_independent_signals": false,
+    "features_with_a_structurally_coupled_level": [
+      "DeviceProtection",
+      "InternetService",
+      "MultipleLines",
+      "OnlineBackup",
+      "OnlineSecurity",
+      "PhoneService",
+      "StreamingMovies",
+      "StreamingTV",
+      "TechSupport"
+    ],
+    "by_feature": [
+      {
+        "feature": "tenure",
+        "kind": "numeric",
+        "n_rows": 5634,
+        "mean": 1.5134030580619814e-17,
+        "std": 1.2552019565035495,
+        "median": 0.17806692938100666,
+        "q1": -1.150374938887258,
+        "q3": 1.199945289587364,
+        "min": -2.0189715450626617,
+        "max": 1.659790551680225,
+        "iqr": 2.350320228474622,
+        "range": 3.6787620967428865,
+        "mean_absolute_centered_contribution": 1.1175569810842494
+      },
+      {
+        "feature": "MonthlyCharges",
+        "kind": "numeric",
+        "n_rows": 5634,
+        "mean": 1.4282741360459947e-16,
+        "std": 0.6011680689372669,
+        "median": -0.11111603699593711,
+        "q1": -0.5001191844608419,
+        "q3": 0.5838530476096331,
+        "min": -1.0736494659796116,
+        "max": 0.9282205775128597,
+        "iqr": 1.083972232070475,
+        "range": 2.001870043492471,
+        "mean_absolute_centered_contribution": 0.5244703599838443
+      },
+      {
+        "feature": "TotalCharges",
+        "kind": "numeric",
+        "n_rows": 5634,
+        "mean": 1.5764615188145637e-17,
+        "std": 0.5325916799613446,
+        "median": -0.21135614308483858,
+        "q1": -0.4431700325636103,
+        "q3": 0.35907031271306844,
+        "min": -0.5373433297184145,
+        "max": 1.4922521814920662,
+        "iqr": 0.8022403452766788,
+        "range": 2.0295955112104807,
+        "mean_absolute_centered_contribution": 0.4476784703997159
+      },
+      {
+        "feature": "gender",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.14422279699939825,
+        "std": 0.010945017013437117,
+        "median": -0.13333976996139096,
+        "q1": -0.15523015708460874,
+        "q3": -0.13333976996139096,
+        "min": -0.15523015708460874,
+        "max": -0.13333976996139096,
+        "iqr": 0.02189038712321778,
+        "range": 0.02189038712321778,
+        "mean_absolute_centered_contribution": 0.010944840468113105
+      },
+      {
+        "feature": "SeniorCitizen",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.19368719464893716,
+        "std": 0.05423353773613301,
+        "median": -0.21764610484180083,
+        "q1": -0.21764610484180083,
+        "q3": -0.21764610484180083,
+        "min": -0.21764610484180083,
+        "max": -0.07092382220419872,
+        "iqr": 0.0,
+        "range": 0.14672228263760212,
+        "mean_absolute_centered_contribution": 0.04009311418145522
+      },
+      {
+        "feature": "Partner",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.14462080006088293,
+        "std": 0.01074533867292015,
+        "median": -0.15503554905942601,
+        "q1": -0.15503554905942601,
+        "q3": -0.13353437798658183,
+        "min": -0.15503554905942601,
+        "max": -0.13353437798658183,
+        "iqr": 0.02150117107284419,
+        "range": 0.02150117107284419,
+        "mean_absolute_centered_contribution": 0.010740094370169572
+      },
+      {
+        "feature": "Dependents",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.09908089372232749,
+        "std": 0.10236084603802194,
+        "median": -0.03238701569479568,
+        "q1": -0.2561829113512068,
+        "q3": -0.03238701569479568,
+        "min": -0.2561829113512068,
+        "max": -0.03238701569479568,
+        "iqr": 0.22379589565641111,
+        "range": 0.22379589565641111,
+        "mean_absolute_centered_contribution": 0.09363659481678678
+      },
+      {
+        "feature": "PhoneService",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.1553302896088345,
+        "std": 0.008239076427910845,
+        "median": -0.1580647171030679,
+        "q1": -0.1580647171030679,
+        "q3": -0.1580647171030679,
+        "min": -0.1580647171030679,
+        "max": -0.1305052099429405,
+        "iqr": 0.0,
+        "range": 0.027559507160127422,
+        "mean_absolute_centered_contribution": 0.00492624051588025
+      },
+      {
+        "feature": "MultipleLines",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.09421345681942742,
+        "std": 0.18269129780910381,
+        "median": -0.1305052099429405,
+        "q1": -0.27142891351266246,
+        "q3": 0.11336419640960181,
+        "min": -0.27142891351266246,
+        "max": 0.11336419640960181,
+        "iqr": 0.3847931099222643,
+        "range": 0.3847931099222643,
+        "mean_absolute_centered_contribution": 0.17611309592381252
+      },
+      {
+        "feature": "InternetService",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": 0.0011837751369984627,
+        "std": 0.5882142496685384,
+        "median": -0.2929549704281795,
+        "q1": -0.6436422353547686,
+        "q3": 0.6480272787369497,
+        "min": -0.6436422353547686,
+        "max": 0.6480272787369497,
+        "iqr": 1.2916695140917183,
+        "range": 1.2916695140917183,
+        "mean_absolute_centered_contribution": 0.5701499536523532
+      },
+      {
+        "feature": "OnlineSecurity",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.02736514946663461,
+        "std": 0.19705941528583654,
+        "median": -0.16116449375199554,
+        "q1": -0.16116449375199554,
+        "q3": 0.16554953713417206,
+        "min": -0.2929549704281795,
+        "max": 0.16554953713417206,
+        "iqr": 0.3267140308861676,
+        "range": 0.4585045075623515,
+        "mean_absolute_centered_contribution": 0.19154504026356275
+      },
+      {
+        "feature": "OnlineBackup",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.05816782076361717,
+        "std": 0.12782600520201387,
+        "median": -0.0371154223670278,
+        "q1": -0.0371154223670278,
+        "q3": 0.04150046574921036,
+        "min": -0.2929549704281795,
+        "max": 0.04150046574921036,
+        "iqr": 0.07861588811623815,
+        "range": 0.3344554361773898,
+        "mean_absolute_centered_contribution": 0.10118267649725901
+      },
+      {
+        "feature": "DeviceProtection",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.06406638617322044,
+        "std": 0.12256739390840997,
+        "median": -0.026421278833234044,
+        "q1": -0.026421278833234044,
+        "q3": 0.030806322215421185,
+        "min": -0.2929549704281795,
+        "max": 0.030806322215421185,
+        "iqr": 0.05722760104865523,
+        "range": 0.32376129264360065,
+        "mean_absolute_centered_contribution": 0.09864066073323402
+      },
+      {
+        "feature": "TechSupport",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.03369823127977884,
+        "std": 0.18074296064294187,
+        "median": -0.13693453106730555,
+        "q1": -0.13693453106730555,
+        "q3": 0.14131957444948492,
+        "min": -0.2929549704281795,
+        "max": 0.14131957444948492,
+        "iqr": 0.2782541055167905,
+        "range": 0.43427454487766437,
+        "mean_absolute_centered_contribution": 0.17215986498963076
+      },
+      {
+        "feature": "StreamingTV",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.06259633380171287,
+        "std": 0.22154364167661017,
+        "median": -0.20753736623588565,
+        "q1": -0.20753736623588565,
+        "q3": 0.21192240961806794,
+        "min": -0.2929549704281795,
+        "max": 0.21192240961806794,
+        "iqr": 0.41945977585395355,
+        "range": 0.5048773800462474,
+        "mean_absolute_centered_contribution": 0.21380693044479912
+      },
+      {
+        "feature": "StreamingMovies",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.06192713322153559,
+        "std": 0.221996006006827,
+        "median": -0.20788464580524807,
+        "q1": -0.20788464580524807,
+        "q3": 0.2122696891874323,
+        "min": -0.2929549704281795,
+        "max": 0.2122696891874323,
+        "iqr": 0.4201543349926804,
+        "range": 0.5052246596156118,
+        "mean_absolute_centered_contribution": 0.21443223278912188
+      },
+      {
+        "feature": "Contract",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": 0.11548621057722448,
+        "std": 0.5635584125538438,
+        "median": 0.5859982070401255,
+        "q1": -0.1151664858959662,
+        "q3": 0.5859982070401255,
+        "min": -0.7594016481901532,
+        "max": 0.5859982070401255,
+        "iqr": 0.7011646929360917,
+        "range": 1.3453998552302786,
+        "mean_absolute_centered_contribution": 0.5181143816215544
+      },
+      {
+        "feature": "PaperlessBilling",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.11026466645860507,
+        "std": 0.18331975488159277,
+        "median": 0.0421647968474438,
+        "q1": -0.33073472389345043,
+        "q3": 0.0421647968474438,
+        "min": -0.33073472389345043,
+        "max": 0.0421647968474438,
+        "iqr": 0.3728995207408942,
+        "range": 0.3728995207408942,
+        "mean_absolute_centered_contribution": 0.1802422940264284
+      },
+      {
+        "feature": "PaymentMethod",
+        "kind": "categorical",
+        "n_rows": 5634,
+        "mean": -0.039744925086391096,
+        "std": 0.17799058787432992,
+        "median": -0.10527551115994684,
+        "q1": -0.18029614993626097,
+        "q3": 0.20558511288020664,
+        "min": -0.20858337883000655,
+        "max": 0.20558511288020664,
+        "iqr": 0.3858812628164676,
+        "range": 0.4141684917102132,
+        "mean_absolute_centered_contribution": 0.16468551714406685
+      }
+    ],
+    "ranking": [
+      {
+        "rank": 1,
+        "feature": "tenure",
+        "kind": "numeric",
+        "ranking_metric": "std",
+        "ranking_value": 1.2552019565035495,
+        "mean_absolute_centered_contribution": 1.1175569810842494,
+        "iqr": 2.350320228474622
+      },
+      {
+        "rank": 2,
+        "feature": "MonthlyCharges",
+        "kind": "numeric",
+        "ranking_metric": "std",
+        "ranking_value": 0.6011680689372669,
+        "mean_absolute_centered_contribution": 0.5244703599838443,
+        "iqr": 1.083972232070475
+      },
+      {
+        "rank": 3,
+        "feature": "InternetService",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.5882142496685384,
+        "mean_absolute_centered_contribution": 0.5701499536523532,
+        "iqr": 1.2916695140917183
+      },
+      {
+        "rank": 4,
+        "feature": "Contract",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.5635584125538438,
+        "mean_absolute_centered_contribution": 0.5181143816215544,
+        "iqr": 0.7011646929360917
+      },
+      {
+        "rank": 5,
+        "feature": "TotalCharges",
+        "kind": "numeric",
+        "ranking_metric": "std",
+        "ranking_value": 0.5325916799613446,
+        "mean_absolute_centered_contribution": 0.4476784703997159,
+        "iqr": 0.8022403452766788
+      },
+      {
+        "rank": 6,
+        "feature": "StreamingMovies",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.221996006006827,
+        "mean_absolute_centered_contribution": 0.21443223278912188,
+        "iqr": 0.4201543349926804
+      },
+      {
+        "rank": 7,
+        "feature": "StreamingTV",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.22154364167661017,
+        "mean_absolute_centered_contribution": 0.21380693044479912,
+        "iqr": 0.41945977585395355
+      },
+      {
+        "rank": 8,
+        "feature": "OnlineSecurity",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.19705941528583654,
+        "mean_absolute_centered_contribution": 0.19154504026356275,
+        "iqr": 0.3267140308861676
+      },
+      {
+        "rank": 9,
+        "feature": "PaperlessBilling",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.18331975488159277,
+        "mean_absolute_centered_contribution": 0.1802422940264284,
+        "iqr": 0.3728995207408942
+      },
+      {
+        "rank": 10,
+        "feature": "MultipleLines",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.18269129780910381,
+        "mean_absolute_centered_contribution": 0.17611309592381252,
+        "iqr": 0.3847931099222643
+      },
+      {
+        "rank": 11,
+        "feature": "TechSupport",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.18074296064294187,
+        "mean_absolute_centered_contribution": 0.17215986498963076,
+        "iqr": 0.2782541055167905
+      },
+      {
+        "rank": 12,
+        "feature": "PaymentMethod",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.17799058787432992,
+        "mean_absolute_centered_contribution": 0.16468551714406685,
+        "iqr": 0.3858812628164676
+      },
+      {
+        "rank": 13,
+        "feature": "OnlineBackup",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.12782600520201387,
+        "mean_absolute_centered_contribution": 0.10118267649725901,
+        "iqr": 0.07861588811623815
+      },
+      {
+        "rank": 14,
+        "feature": "DeviceProtection",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.12256739390840997,
+        "mean_absolute_centered_contribution": 0.09864066073323402,
+        "iqr": 0.05722760104865523
+      },
+      {
+        "rank": 15,
+        "feature": "Dependents",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.10236084603802194,
+        "mean_absolute_centered_contribution": 0.09363659481678678,
+        "iqr": 0.22379589565641111
+      },
+      {
+        "rank": 16,
+        "feature": "SeniorCitizen",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.05423353773613301,
+        "mean_absolute_centered_contribution": 0.04009311418145522,
+        "iqr": 0.0
+      },
+      {
+        "rank": 17,
+        "feature": "gender",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.010945017013437117,
+        "mean_absolute_centered_contribution": 0.010944840468113105,
+        "iqr": 0.02189038712321778
+      },
+      {
+        "rank": 18,
+        "feature": "Partner",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.01074533867292015,
+        "mean_absolute_centered_contribution": 0.010740094370169572,
+        "iqr": 0.02150117107284419
+      },
+      {
+        "rank": 19,
+        "feature": "PhoneService",
+        "kind": "categorical",
+        "ranking_metric": "std",
+        "ranking_value": 0.008239076427910845,
+        "mean_absolute_centered_contribution": 0.00492624051588025,
+        "iqr": 0.0
+      }
+    ]
+  },
+  "intercept_interpretation": {
+    "value": -0.5300483006137556,
+    "is_the_risk_of_an_average_customer": false,
+    "why_not": "the numeric features are centred, so their zero is the training-pool mean, but every categorical feature always has exactly one level active. A vector of all zeros in the transformed space is not a customer: it is a row with no gender, no contract and no internet service. The intercept is the constant of the linear function and nothing more",
+    "redundant_parameterisation": true,
+    "reference_level_declared": false
+  },
+  "eda_comparison": [
+    {
+      "feature": "tenure",
+      "marginal_observation": "low tenure was associated with higher churn (median 10 months for churners against 38 for those retained; rank-biserial -0.480)",
+      "source": "reports/eda_report.md, reports/figures/eda/03_churn_rate_by_tenure_band.png"
+    },
+    {
+      "feature": "MonthlyCharges",
+      "marginal_observation": "churners showed HIGHER monthly charges marginally (median 79.65 against 64.43; rank-biserial +0.242), but the EDA also recorded that this association REVERSES once InternetService is held fixed: inside every tier the churners' median monthly charge was not above that of those retained",
+      "source": "reports/eda_report.md, reports/figures/eda/11_internet_monthly_charges_by_churn.png"
+    },
+    {
+      "feature": "TotalCharges",
+      "marginal_observation": "churners showed LOWER total charges marginally (median 703.55 against 1683.60; rank-biserial -0.303). The EDA also recorded Spearman 0.889 between TotalCharges and tenure, and 0.9996 against tenure x MonthlyCharges",
+      "source": "reports/eda_report.md"
+    },
+    {
+      "feature": "Contract",
+      "marginal_observation": "month-to-month contracts showed a far higher churn rate than one-year or two-year contracts, and the gap survived inside every tenure band",
+      "source": "reports/eda_report.md, reports/figures/eda/04_churn_rate_by_contract.png"
+    },
+    {
+      "feature": "InternetService",
+      "marginal_observation": "fiber optic showed a higher churn rate than DSL or no internet",
+      "source": "reports/eda_report.md, reports/figures/eda/06_service_churn_rates.png"
+    },
+    {
+      "feature": "PaymentMethod",
+      "marginal_observation": "electronic check was associated with higher churn",
+      "source": "reports/eda_report.md, reports/figures/eda/09_churn_rate_by_payment_method.png"
+    },
+    {
+      "feature": "SeniorCitizen",
+      "marginal_observation": "a descriptive difference in churn rate was recorded",
+      "source": "reports/eda_report.md"
+    },
+    {
+      "feature": "gender",
+      "marginal_observation": "association with churn was essentially null",
+      "source": "reports/eda_report.md, reports/figures/eda/15_association_ranking.png"
+    }
+  ],
+  "methodology": {
+    "post_hoc_holdout_selection": false,
+    "shap_used": false,
+    "lime_used": false,
+    "eli5_used": false,
+    "permutation_importance_used": false,
+    "pdp_used": false,
+    "ice_used": false,
+    "identifiers_persisted": false,
+    "individual_explanations_persisted": false,
+    "causal_claims": false,
+    "naive_abs_coefficient_ranking_produced": false,
+    "reference_category_declared": false,
+    "structural_dependencies_verified_empirically": true,
+    "structural_dependencies_assumed_without_checking": false,
+    "coupled_contrasts_flagged": true,
+    "coupled_contrasts_removed": false,
+    "repeated_coefficients_read_as_independent_evidence": false,
+    "contribution_dispersion_representation_dependent": true,
+    "fit_calls": 0,
+    "models_loaded": 1,
+    "alternative_models_evaluated": 0,
+    "thresholds_scored": 0,
+    "alternative_thresholds_scored": 0,
+    "calibrations_performed": 0,
+    "hyperparameter_searches": 0,
+    "feature_selections": 0,
+    "features_added": 0,
+    "features_removed": 0,
+    "new_performance_estimates_produced": 0,
+    "uncertainty_intervals_computed": 0,
+    "new_dependencies_added": 0,
+    "holdout_loaded": false,
+    "holdout_used_for_global_interpretation": false,
+    "selection_after_analysis": false,
+    "model_changed": false,
+    "threshold_changed": false,
+    "calibration_changed": false,
+    "statement": "The analysis decomposes the frozen predictive function exactly and describes it over the training pool. No selection, fit, calibration, tuning, threshold choice, feature change or model change preceded or followed it"
+  },
+  "limitations": [
+    "Analyst exposure: the Phase 3 exploratory analysis ran on all 7,043 rows, including those that later formed the holdout. The protection against fitting, tuning and selection began at Phase 4, so an optimistic bias this project cannot quantify precedes it.",
+    "L2 regularisation (C = 1.0) shrinks every coefficient toward zero, so every magnitude reported here is a penalised magnitude, not a maximum-likelihood one.",
+    "Correlated features share their association. tenure and TotalCharges have Spearman 0.889 in this dataset, and TotalCharges tracks tenure x MonthlyCharges at 0.9996, so the split of a shared signal between them is a property of the fit, not of the world.",
+    "The one-hot parameterisation is redundant and no baseline was dropped, so individual dummy coefficients are not identified and only within-feature contrasts are.",
+    "Structural coupling between raw features, verified on the training pool, means some one-hot columns are the same vector. Their coefficients are one point in a family of equivalent parameterisations, repeated equal values are not independent evidence from several features, and contrasts touching a coupled level are algebraic contrasts rather than single-feature counterfactuals a customer could undergo.",
+    "The contribution dispersion ranking is representation-dependent wherever features are structurally redundant: coupled features split the variability of one underlying state between them, so ranks must not be summed and a different encoding with similar predictive behaviour could redistribute the same variability.",
+    "No uncertainty interval is attached to any coefficient.",
+    "No causal claim can be supported. The dataset is a cross-sectional snapshot with no time ordering and no counterfactual.",
+    "The contribution dispersion is a property of THIS training pool's composition as well as of the model. A population with a different mix of contracts or tenures would produce a different dispersion from the same coefficients.",
+    "For the three numeric features the dispersion metric reduces almost exactly to the absolute standardised coefficient, because the scaler was fitted on this same pool and the standardised columns therefore have unit variance on it. That is an arithmetic identity of the population being described, not an independent confirmation of the coefficient.",
+    "The interpretation is valid for THIS frozen model on THIS dataset snapshot. It is not a general account of telecom churn and does not transfer to another operator, another period or another model.",
+    "The probabilities are uncalibrated by the Phase 9A decision, so a modelled probability is the model's own output rather than a validated likelihood."
+  ],
+  "environment": {
+    "python": "3.12",
+    "scikit_learn": "1.9.0",
+    "numpy": "2.5.1",
+    "pandas": "3.0.5"
+  },
+  "methodological_notes": [
+    "This phase INTERPRETS a frozen model. It is not model selection. No estimator, hyperparameter, feature, preprocessing step, calibration policy or threshold was chosen, compared, removed, added or changed, and nothing recorded here may be used to change one.",
+    "NOTHING WAS FITTED. The pipeline was loaded from the frozen artefact, its model fingerprint was verified before use, only `.transform`, `.decision_function` and `.predict_proba` were called, and the file is byte-identical afterwards. No fit, fit_transform, GridSearchCV, RandomizedSearchCV or CalibratedClassifierCV appears anywhere in this phase.",
+    "THE GLOBAL INTERPRETATION USES THE TRAINING POOL, NEVER THE HOLDOUT. The holdout was consumed by the Phase 9D evaluation; ranking features on it would be post-hoc mining of a spent sample. The Phase 10 modules do not call load_holdout at all.",
+    "NO SHAP, NO LIME, NO ELI5, NO PERMUTATION IMPORTANCE, NO PARTIAL DEPENDENCE AND NO ICE. Those are approximations for models whose response surface is unknown. This model is additive and linear after a fixed transformation, so its decomposition is exact and closed-form; an approximate estimator would add a dependency and an approximation error in exchange for nothing.",
+    "THE DECOMPOSITION REPRODUCES THE PIPELINE EXACTLY, and that is a gate rather than a claim. The manual logit is checked against decision_function, its sigmoid against predict_proba, and the sum of the 19 regrouped contributions against decision_function again. A failure raises and the phase does not produce a report.",
+    "THE ONE-HOT PARAMETERISATION IS REDUNDANT AND NO BASELINE CATEGORY WAS DROPPED. Every level of every categorical feature has its own column and the model also has an intercept, so the parameters are not identified: a constant can be moved between a feature's levels and the intercept without changing a single prediction. exp(beta) OF A SINGLE LEVEL IS THEREFORE NOT AN ODDS RATIO AGAINST A REFERENCE CATEGORY, and no reference category is declared anywhere.",
+    "THE IDENTIFIED CATEGORICAL QUANTITY IS THE WITHIN-FEATURE CONTRAST beta_a - beta_b, whose value is invariant to that shift, and its exponential exp(beta_a - beta_b) is the modelled odds ratio between two levels of the SAME feature holding every other transformed feature fixed. It is a statement about the frozen predictive function, not a causal effect.",
+    "NO NAIVE abs(coefficient) RANKING IS PRODUCED. Mixing standardised numeric coefficients with 0/1 dummy coefficients on one axis would compare quantities that do not share an operational scale. The comparable view across the 19 raw features is the empirical contribution dispersion, which is a joint property of the coefficients, the preprocessing AND the training pool's composition.",
+    "THE RANKING METRIC WAS FIXED IN CODE BEFORE ANY VALUE WAS COMPUTED: the standard deviation of each raw feature's additive contribution to the logit over the training pool. The other dispersion measures are reported beside it as supporting columns, not as alternatives chosen after seeing the ordering.",
+    "THE RANKING IS NOT AN IMPORTANCE RANKING IN ANY UNIVERSAL SENSE. It depends on the fitted coefficients, on the preprocessing, on the distribution of the training pool and on the correlations among features. It is not causal importance, not business importance and not a property of telecom churn.",
+    "L2 REGULARISATION IS ACTIVE (C = 1.0). It shrinks coefficients toward zero and, when features are correlated, distributes a shared association among them rather than assigning it to one. tenure, TotalCharges and Contract are correlated in this dataset, so their individual coefficients must not be read as if each variable were experimentally independent.",
+    "THE INTERCEPT IS NOT THE RISK OF AN AVERAGE CUSTOMER. The numeric features are centred, so their zero is the training-pool mean, but every categorical feature always has exactly one level active, and the intercept alone corresponds to no such customer. It is the constant of the linear function, nothing more.",
+    "ODDS ARE NOT PROBABILITY. An odds ratio of 2 does NOT mean the probability doubles: it multiplies p/(1-p) by 2, and the resulting change in p depends on where p started. Near the frozen threshold the effect is largest; in either tail it is small.",
+    "THE PROBABILITIES ARE UNCALIBRATED BY THE PHASE 9A DECISION (calibration_policy = NONE). The sigmoid of the logit is the model's own output, not a validated likelihood for an individual customer.",
+    "NO CAUSAL CLAIM IS MADE ANYWHERE. A coefficient describes how the frozen function responds to a change in an encoded input, holding the other encoded inputs fixed. It does not establish that changing the underlying attribute of a real customer would change their behaviour.",
+    "THE PHASE 9E ERROR ANALYSIS DID NOT SELECT WHAT IS EXPLAINED HERE. All 19 raw features and all 46 transformed columns are reported; none was included or excluded because of anything observed in the holdout errors.",
+    "NO INDIVIDUAL EXPLANATION IS PERSISTED AND NO IDENTIFIER IS PERSISTED. Per-row contributions exist only inside the process, and no customer was selected for a case study. A future serving interface can explain a single prediction when it receives a real payload.",
+    "NO UNCERTAINTY INTERVAL IS ATTACHED TO ANY COEFFICIENT. Standard errors for a penalised logistic regression are not the textbook maximum-likelihood ones, and none was computed. Every coefficient here is a point value of one fitted object.",
+    "NO NEW PERFORMANCE ESTIMATE WAS PRODUCED. This phase reports no accuracy, precision, recall, F1, ROC-AUC or average precision. The final estimate is the Phase 9D one and is unchanged.",
+    "SOME RAW FEATURES ARE STRUCTURALLY COUPLED IN THIS DATASET, and the coupling was VERIFIED on the training pool rather than assumed. Where an equivalence holds on every row, the two encoded states are the same state, several one-hot columns become the SAME VECTOR, and those columns are perfectly collinear. Every such relationship is recorded in structural_dependencies with its own row counts and violation count.",
+    "REPEATED EQUAL COEFFICIENTS ACROSS COUPLED COLUMNS ARE NOT INDEPENDENT EVIDENCE FROM SEVERAL FEATURES. When columns are identical, the L2 penalty is minimised by splitting the shared weight evenly among them, so equal coefficients are a property of the penalty and the parameterisation, not a demonstration of one effect per column. The quantity the model actually applies is the block AGGREGATE, which is recorded beside the per-column values.",
+    "AN ALGEBRAIC CONTRAST IS NOT AUTOMATICALLY A RAW SINGLE-FEATURE COUNTERFACTUAL. beta_a - beta_b is always the exact difference the linear function assigns to two encoded levels. But when a level participates in a verified structural dependency, moving only that one-hot while holding the other raw features fixed describes a combination that does not occur in the population, so the contrast is flagged structurally_coupled and raw_single_feature_counterfactual_supported is false. NO CONTRAST IS REMOVED OR ALTERED — only qualified.",
+    "THE CONTRIBUTION DISPERSION RANKING IS REPRESENTATION-DEPENDENT WHERE FEATURES ARE REDUNDANT. It is an exact decomposition of the frozen function under the current encoding, but structurally redundant features can SPLIT BETWEEN THEM the variability of one underlying state. Ranks must therefore not be summed, coupled service features must not be read as that many independent signals, and a different representation with similar predictive behaviour could redistribute the same variability across different columns."
+  ]
+}
