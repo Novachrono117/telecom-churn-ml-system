@@ -109,8 +109,8 @@ no empty placeholders):
 ├── configs/
 │   └── base.toml          # seed, paths, target, split
 ├── data/
-│   ├── README.md          # acquisition + provenance (the only tracked file here)
-│   └── raw/               # untouched source CSV, never committed
+│   ├── README.md          # acquisition + provenance
+│   └── raw/               # untouched source CSV (versioned: <1 MB, immutable)
 ├── notebooks/
 │   └── 01_eda.ipynb       # Phase 3 narrative (committed without outputs)
 ├── reports/
@@ -142,9 +142,15 @@ no empty placeholders):
 └── tests/
 ```
 
-Planned as the project advances: `data/{interim,processed}/`,
-`src/churn/{features,modeling,explainability,monitoring}/` and `artifacts/`.
-Raw data and model artifacts are never committed.
+Planned as the project advances: `data/{interim,processed}/` and
+`src/churn/{explainability,monitoring}/`.
+
+The raw CSV (`data/raw/`) and the frozen inference pipeline
+(`artifacts/model/churn_pipeline.joblib`) **are** versioned: together under 1 MB,
+they let a fresh clone reproduce every result and serve predictions without a
+Kaggle account or a retraining run. Derived data (`data/{interim,processed}/`),
+virtual environments and caches are not — `uv sync` rebuilds the environment
+from `uv.lock`.
 
 ## Regenerating the analysis artifacts
 

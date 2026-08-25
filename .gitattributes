@@ -4,7 +4,13 @@
 * text=auto eol=lf
 
 # Binary formats must never be line-ending normalized.
-# Data and model files are gitignored; figures for the report are not.
 *.png binary
 *.jpg binary
 *.pdf binary
+*.joblib binary
+
+# The raw source file is versioned and must stay byte-identical on every
+# platform: its SHA-256 is the provenance recorded in `data/README.md`, and any
+# line-ending normalization would silently invalidate it. `binary` (implying
+# `-text`) disables that rewriting even though the file is plain CSV.
+data/raw/** binary
