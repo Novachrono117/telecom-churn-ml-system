@@ -1,0 +1,64 @@
+# Isolated environment for the Phase 11 serving boundary.
+#
+# WHY THIS FILE EXISTS AT ALL.
+# FastAPI and Uvicorn are not declared in the root project, and adding them there
+# is not an option: `pyproject.toml` and `uv.lock` are part of the Phase 9C
+# provenance. Their SHA-256 digests are recorded in `reports/decision_policy.json`
+# under `code_provenance.configuration_digests`, and
+# `uv run python scripts/freeze_model.py --verify` fails — correctly — the moment
+# either one moves. A web framework must not be able to invalidate a model freeze.
+#
+# So the serving dependencies live in their own project, which depends on the root
+# one as an editable path dependency. The root manifests stay byte-identical.
+#
+# WHY THE ML LIBRARIES ARE PINNED WITH `==`.
+# The frozen pipeline pickles its classes by reference: unpickling imports
+# whatever scikit-learn, numpy and pandas currently define, so a different
+# resolution here could change what the loaded object computes while every stored
+# fingerprint stayed identical. These four pins are exactly the versions recorded
+# in `reports/decision_policy.json` under `environment`, and the service re-checks
+# them at startup and refuses to serve on a mismatch. The pins are not a
+# preference; they are the freeze.
+[project]
+name = "churn-serving"
+version = "1.0.0"
+description = "Production inference boundary for the frozen telecom churn model."
+requires-python = "==3.12.*"
+authors = [{ name = "Vinicius Gomes", email = "vinicius08gomes@gmail.com" }]
+dependencies = [
+    "churn-ml-engineering",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    # Pinned to `reports/decision_policy.json` -> environment. Do not relax.
+    "scikit-learn==1.9.0",
+    "numpy==2.5.1",
+    "pandas==3.0.5",
+    "joblib==1.5.3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.6",
+    # Transport used by starlette.testclient, which the API tests drive the app
+    # with. httpx2 rather than httpx: starlette 1.6 deprecates the latter here.
+    "httpx2>=0.28",
+]
+
+[tool.uv]
+# A virtual project: it groups dependencies and tests, it is not itself packaged.
+package = false
+
+[tool.uv.sources]
+churn-ml-engineering = { path = "..", editable = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+src = ["../src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

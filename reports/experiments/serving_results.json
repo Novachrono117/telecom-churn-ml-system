@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "experiment": "phase11-production-inference-api",
+  "phase": 11,
+  "component": "PRODUCTION_INFERENCE_API",
+  "serving_version": "1.0.0",
+  "model_changed": false,
+  "fit_calls": 0,
+  "holdout_loaded": false,
+  "training_data_loaded": false,
+  "raw_dataset_loaded": false,
+  "frozen_model": {
+    "freeze_phase": "9C",
+    "freeze_commit": "9d1db4962769093a617f1db2db66354536acffb3",
+    "freeze_commit_short": "9d1db49",
+    "estimator": "LogisticRegression",
+    "model_fingerprint": "a57568e18ec0333e1c85b590f98e75da93ebbfafff063860ec5daf4e460d939f",
+    "pipeline_sha256": "574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8",
+    "decision_policy_sha256": "bd7aa800ae36ac04ecf951f7377ce71d16d084faeee771b01eb6c9655a4bc714",
+    "decision_policy_sha256_pinned_in_serving": "bd7aa800ae36ac04ecf951f7377ce71d16d084faeee771b01eb6c9655a4bc714",
+    "policy_digest_pinned": true,
+    "n_features": 19,
+    "n_transformed_features": 46
+  },
+  "decision_policy": {
+    "threshold": 0.3272694566222328,
+    "comparison": ">=",
+    "threshold_policy": "F1_MAXIMIZATION",
+    "threshold_source": "reports/decision_policy.json",
+    "calibration_policy": "NONE",
+    "calibration_source": "reports/decision_policy.json",
+    "calibrated": false,
+    "positive_class": 1,
+    "positive_class_column": 1,
+    "positive_class_resolved_from": "pipeline.classes_",
+    "positive_class_meaning": "Churn = Yes",
+    "boundary_note": "a customer whose probability equals the threshold exactly is predicted POSITIVE. The comparison is >=, not >"
+  },
+  "inference_chain": {
+    "prepare_features_required": true,
+    "prepare_features_entry_point": "churn.preprocessing.contracts.prepare_features",
+    "predict_proba_used": true,
+    "pipeline_predict_used": false,
+    "chain": [
+      "raw input",
+      "churn.preprocessing.contracts.prepare_features(...)",
+      "frozen sklearn pipeline (preprocessor -> classifier)",
+      "predict_proba(...)",
+      "positive-class probability (column resolved from classes_)",
+      "probability >= 0.3272694566222328"
+    ]
+  },
+  "feature_contract": {
+    "n_features": 19,
+    "feature_names": [
+      "tenure",
+      "MonthlyCharges",
+      "TotalCharges",
+      "gender",
+      "SeniorCitizen",
+      "Partner",
+      "Dependents",
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies",
+      "Contract",
+      "PaperlessBilling",
+      "PaymentMethod"
+    ],
+    "identifier_accepted": false,
+    "target_accepted": false,
+    "engineered_features_accepted": false,
+    "extra_fields": "forbid",
+    "categorical_enums_closed": false,
+    "numeric_range_constraints_declared": false,
+    "unseen_category_handling": "OneHotEncoder(handle_unknown='ignore'), unchanged from Phase 4",
+    "blank_policy": "blank, empty and whitespace-only values are rejected by the frozen feature contract",
+    "total_charges_rule": "blank with tenure == 0 is a structural zero and is accepted; blank with tenure > 0 and any unreadable value raise DataQualityError. The rule is the frozen preprocessing's, not re-implemented at the HTTP layer"
+  },
+  "api": {
+    "api_prefix": "/api/v1",
+    "single_endpoint": "/api/v1/predict",
+    "batch_endpoint": "/api/v1/predict/batch",
+    "metadata_endpoint": "/api/v1/model",
+    "health_endpoints": [
+      "/health/live",
+      "/health/ready"
+    ],
+    "openapi_endpoint": "/openapi.json",
+    "published_paths": [
+      "/api/v1/model",
+      "/api/v1/predict",
+      "/api/v1/predict/batch",
+      "/health/live",
+      "/health/ready"
+    ]
+  },
+  "operational_limits": {
+    "default_max_batch_size": 500,
+    "max_allowed_batch_size": 5000,
+    "configured_max_batch_size": 500,
+    "limit_changes_predictions": false,
+    "env_prefix": "CHURN_SERVING_",
+    "forbidden_env_vars": [
+      "CHURN_THRESHOLD",
+      "CHURN_SERVING_THRESHOLD",
+      "CHURN_DECISION_THRESHOLD",
+      "CHURN_SERVING_DECISION_THRESHOLD",
+      "CHURN_CALIBRATION",
+      "CHURN_SERVING_CALIBRATION",
+      "CHURN_CALIBRATION_POLICY",
+      "CHURN_SERVING_CALIBRATION_POLICY",
+      "CHURN_POSITIVE_CLASS",
+      "CHURN_SERVING_POSITIVE_CLASS",
+      "CHURN_SERVING_COMPARISON"
+    ]
+  },
+  "startup": {
+    "artifact_validation_on_startup": true,
+    "fail_closed": true,
+    "rebuilds_artefacts_on_failure": false,
+    "model_loaded_once_per_process": true,
+    "runtime_compatibility_checked": true,
+    "n_gates": 34,
+    "gates": [
+      "decision_policy_digest_matches",
+      "policy_is_the_phase9c_freeze",
+      "threshold_is_finite_and_a_probability",
+      "decision_comparison_is_greater_or_equal",
+      "threshold_policy_recognised",
+      "calibration_policy_recognised",
+      "calibration_policy_is_the_frozen_one",
+      "policy_classes_are_the_encoded_binary_target",
+      "policy_positive_class_is_unambiguous",
+      "inference_entry_point_is_prepare_features",
+      "feature_contract_matches_the_installed_contract",
+      "no_engineered_feature_in_the_contract",
+      "feature_names_digest_matches",
+      "prepare_features_source_unchanged",
+      "runtime_source_classification_covers_the_policy",
+      "runtime_source_churn_preprocessing_contracts_unchanged",
+      "runtime_source_churn_preprocessing_transformers_unchanged",
+      "runtime_source_churn_modeling_freeze_unchanged",
+      "runtime_source_churn_modeling_models_unchanged",
+      "runtime_source_churn_preprocessing_pipeline_unchanged",
+      "pipeline_file_digest_matches",
+      "pipeline_loads",
+      "pipeline_has_the_frozen_structure",
+      "model_fingerprint_matches",
+      "loaded_classes_match_the_policy",
+      "loaded_classifier_has_no_calibration_wrapper",
+      "positive_class_column_resolves_from_classes_",
+      "transformed_feature_names_match",
+      "preprocessor_step_present",
+      "runtime_python_matches",
+      "runtime_scikit_learn_matches",
+      "runtime_numpy_matches",
+      "runtime_pandas_matches",
+      "runtime_joblib_matches"
+    ]
+  },
+  "runtime": {
+    "recorded_by_freeze": {
+      "python": "3.12",
+      "scikit_learn": "1.9.0",
+      "numpy": "2.5.1",
+      "pandas": "3.0.5",
+      "joblib": "1.5.3"
+    },
+    "installed": {
+      "python": "3.12",
+      "scikit_learn": "1.9.0",
+      "numpy": "2.5.1",
+      "pandas": "3.0.5",
+      "joblib": "1.5.3"
+    },
+    "python_compared_at": "major.minor",
+    "libraries_compared_exactly": [
+      "scikit_learn",
+      "numpy",
+      "pandas",
+      "joblib"
+    ],
+    "python_key": "python"
+  },
+  "environment_isolation": {
+    "isolated_serving_environment_required": true,
+    "reason": "FastAPI and Uvicorn are absent from the root project, and the root pyproject.toml and uv.lock are part of the Phase 9C provenance: editing either would fail scripts/freeze_model.py --verify",
+    "serving_project": "serving/pyproject.toml",
+    "serving_lock": "serving/uv.lock",
+    "root_project_dependency": "editable path dependency on the repository root",
+    "root_manifests_modified": false,
+    "configs_base_toml_modified": false,
+    "ml_libraries_pinned_exactly": [
+      "scikit_learn",
+      "numpy",
+      "pandas",
+      "joblib"
+    ]
+  },
+  "privacy": {
+    "payloads_persisted": false,
+    "identifiers_persisted": false,
+    "predictions_persisted": false,
+    "payload_logged": false,
+    "probability_logged": false,
+    "customer_id_accepted": false,
+    "logged_fields": [
+      "method",
+      "path",
+      "status_code",
+      "latency_ms",
+      "batch_size"
+    ]
+  },
+  "security": {
+    "extra_fields_forbidden": true,
+    "batch_bounded": true,
+    "model_path_from_request": false,
+    "pickle_path_from_request": false,
+    "traceback_exposed": false,
+    "eval_or_exec_used": false,
+    "dynamic_import_from_request": false,
+    "error_codes": [
+      "BATCH_TOO_LARGE",
+      "INTERNAL_ERROR",
+      "INVALID_FEATURE_PAYLOAD",
+      "INVALID_FEATURE_VALUE",
+      "INVALID_REQUEST_SCHEMA",
+      "SERVICE_NOT_READY"
+    ]
+  },
+  "determinism": {
+    "response_fields_are_pure_functions_of_input_and_artefacts": true,
+    "timestamp_in_response": false,
+    "request_id_in_response": false,
+    "single_batch_decision_contract": "exact",
+    "single_batch_probability_contract": "exact",
+    "canonical_scoring_strategy": "row-wise",
+    "batch_shape_affects_probability": false,
+    "probability_rounded": false,
+    "superseded_implementation": {
+      "strategy": "vectorised N-row matrix",
+      "observed_max_ulps": 1,
+      "observed_max_absolute": 1.1102230246251565e-16,
+      "cause": "BLAS dispatches a 1x46 product (GEMV) to a different kernel than an Nx46 one (GEMM); the same 46 terms accumulate in a different order and floating-point addition is not associative",
+      "preprocessing_was_bit_identical": true,
+      "why_replaced": "a caller must not need to know how a request was batched in order to reproduce a probability"
+    }
+  },
+  "runtime_source_provenance": {
+    "runtime_source_provenance_validated": true,
+    "enforced_at": "startup",
+    "fail_closed": true,
+    "runtime_source_digest_mismatches": 0,
+    "digest_definition": "SHA-256 of the module source, newlines normalised to \n — the same function the freeze recorded them with",
+    "source_resolution": "sys.modules[<module>].__file__; no absolute repository path is assumed, stored or compared",
+    "recorded_source_files": [
+      "src/churn/features/pipeline.py",
+      "src/churn/modeling/freeze.py",
+      "src/churn/modeling/models.py",
+      "src/churn/modeling/tuning.py",
+      "src/churn/preprocessing/contracts.py",
+      "src/churn/preprocessing/pipeline.py",
+      "src/churn/preprocessing/target.py",
+      "src/churn/preprocessing/transformers.py"
+    ],
+    "runtime_effective_source_files": [
+      "src/churn/preprocessing/contracts.py",
+      "src/churn/preprocessing/transformers.py",
+      "src/churn/modeling/freeze.py",
+      "src/churn/modeling/models.py",
+      "src/churn/preprocessing/pipeline.py"
+    ],
+    "training_only_source_files": [
+      "src/churn/modeling/tuning.py",
+      "src/churn/features/pipeline.py",
+      "src/churn/preprocessing/target.py"
+    ],
+    "classification": [
+      {
+        "path": "src/churn/preprocessing/contracts.py",
+        "module": "churn.preprocessing.contracts",
+        "runtime_effective": true,
+        "evidence": "called: prepare_features, validate_feature_matrix and _blank_mask all execute on every request",
+        "reason": "(i) it IS the input side of the inference function. It decides which columns reach the model, in which order, and which values are rejected as blank. An edit here changes the matrix the pipeline is handed while every model fingerprint stays identical"
+      },
+      {
+        "path": "src/churn/preprocessing/transformers.py",
+        "module": "churn.preprocessing.transformers",
+        "runtime_effective": true,
+        "evidence": "called on every request, and the only module owning a class inside the unpickled pipeline (TotalChargesCleaner)",
+        "reason": "(ii) the canonical pickle-by-reference exposure. The stream stores the module path, not the code; unpickling binds whatever transform() currently is. Editing it changes what the loaded pipeline computes with pipeline_sha256 and model_fingerprint_sha256 both unmoved"
+      },
+      {
+        "path": "src/churn/modeling/freeze.py",
+        "module": "churn.modeling.freeze",
+        "runtime_effective": true,
+        "evidence": "called on every request (positive_probability, positive_class_column, apply_decision_rule) and throughout startup (load_pipeline, model_fingerprint, transformed_feature_names, file_digest)",
+        "reason": "(iii)(iv)(v) it implements the decision rule itself. Changing >= to > here moves every customer sitting on the threshold; changing the positive-column resolution inverts every decision; changing the fingerprint computation decides what the startup gates accept"
+      },
+      {
+        "path": "src/churn/modeling/models.py",
+        "module": "churn.modeling.models",
+        "runtime_effective": true,
+        "evidence": "not called, but CLASSIFIER_STEP and PREPROCESSOR_STEP are bound by churn.modeling.freeze and by churn.serving.artifacts",
+        "reason": "(iii) CLASSIFIER_STEP is dereferenced on the request path, inside positive_class_column: pipeline.named_steps[CLASSIFIER_STEP].classes_. A different value resolves a different step, so the probability column read would no longer be the one classes_ describes"
+      },
+      {
+        "path": "src/churn/preprocessing/pipeline.py",
+        "module": "churn.preprocessing.pipeline",
+        "runtime_effective": true,
+        "evidence": "not called, but CATEGORICAL_STEP, CLEANER_STEP, ENCODER_STEP and NUMERIC_STEP are bound by churn.modeling.freeze",
+        "reason": "(v) those constants select which sub-transformer model_state() and transformed_feature_names() read, and both run as startup gates. A changed value changes what the model fingerprint is computed over, so a model that is not the frozen one could pass verification"
+      },
+      {
+        "path": "src/churn/modeling/tuning.py",
+        "module": "churn.modeling.tuning",
+        "runtime_effective": false,
+        "evidence": "not called; build_modern_logistic_pipeline is bound by churn.modeling.freeze but is only ever invoked from fit_final_pipeline, which this process never reaches",
+        "reason": "it builds an UNFITTED estimator. The object being served was fitted in Phase 9C and is read from disk; no builder runs. Gating on it would refuse to start over an edit that cannot reach a prediction"
+      },
+      {
+        "path": "src/churn/features/pipeline.py",
+        "module": "churn.features.pipeline",
+        "runtime_effective": false,
+        "evidence": "not called, and not bound by any module the profile showed executing; reachable only through churn.modeling.tuning, which is itself never called",
+        "reason": "build_feature_preprocessor assembles a preprocessor at fit time. At serving the assembled object is unpickled, already configured, so the assembler never runs"
+      },
+      {
+        "path": "src/churn/preprocessing/target.py",
+        "module": "churn.preprocessing.target",
+        "runtime_effective": false,
+        "evidence": "not called, and not imported by any module the profile showed executing",
+        "reason": "encode_target maps 'Yes'/'No' onto 1/0 during training. Serving never sees a label: the positive class it acts on is read from the fitted classes_ and cross-checked against the policy, never recomputed from this module"
+      }
+    ],
+    "why_not_gate_everything": "three recorded files are never called and have none of their values read by this process; gating them would refuse startup over an edit that cannot reach a prediction",
+    "note": "pickle integrity protects serialized state; source provenance additionally protects the behavior of custom Python code resolved at runtime"
+  },
+  "out_of_scope": {
+    "monitoring_implemented": false,
+    "drift_metrics_implemented": false,
+    "frontend_implemented": false,
+    "containerisation_implemented": false,
+    "deferred_to": "Phase 12 for monitoring; later phases for deployment and any UI"
+  },
+  "verified_by": {
+    "model_changed": "serving/tests/test_artifacts.py::test_startup_loads_the_frozen_model_and_every_gate_passes",
+    "fit_calls": "serving/tests/test_isolation.py::test_serving_a_request_calls_no_fit_and_loads_no_dataset",
+    "holdout_loaded": "serving/tests/test_isolation.py::test_the_holdout_is_never_loaded",
+    "training_data_loaded": "serving/tests/test_isolation.py::test_serving_a_request_calls_no_fit_and_loads_no_dataset",
+    "prepare_features_required": "serving/tests/test_isolation.py::test_the_pipeline_only_ever_receives_prepared_features",
+    "predict_proba_used": "serving/tests/test_isolation.py::test_predict_proba_is_what_produces_the_answer",
+    "pipeline_predict_used": "serving/tests/test_static_audit.py::test_no_forbidden_call_is_written_in_the_serving_source",
+    "artifact_validation_on_startup": "serving/tests/test_artifacts.py::test_the_gate_names_cover_every_documented_failure_mode",
+    "fail_closed": "serving/tests/test_artifacts.py::test_a_tampered_pipeline_file_is_refused",
+    "payloads_persisted": "serving/tests/test_isolation.py::test_serving_writes_nothing_to_the_repository",
+    "identifiers_persisted": "serving/tests/test_api.py::test_the_identifier_and_the_target_are_rejected_not_ignored",
+    "threshold_source": "serving/tests/test_settings.py::test_a_frozen_decision_cannot_be_overridden_from_the_environment",
+    "single_batch_equivalence": "serving/tests/test_service.py::test_batch_and_single_are_exactly_equal_in_every_field",
+    "no_upstream_artefact_written": "serving/tests/test_isolation.py::test_serving_creates_no_file_anywhere_in_reports_or_artifacts",
+    "runtime_compatibility": "serving/tests/test_runtime.py::test_any_divergent_component_fails_closed",
+    "runtime_source_provenance_validated": "serving/tests/test_provenance.py::test_a_divergent_runtime_source_fails_the_startup",
+    "single_batch_probability_contract": "serving/tests/test_service.py::test_the_probability_is_bit_identical_at_every_batch_size",
+    "canonical_scoring_strategy": "serving/tests/test_service.py::test_position_inside_the_batch_does_not_move_a_probability",
+    "openapi_contract": "serving/tests/test_openapi.py::test_the_request_declares_exactly_the_nineteen_contracted_features"
+  },
+  "notes": [
+    "Phase 11 versions the SERVING APPLICATION. It does not version the model. The model is the object frozen in Phase 9C at commit 9d1db49, and nothing in this phase refits, reselects, recalibrates or rethresholds it. model_changed is false and is checked, not assumed.",
+    "FastAPI and Uvicorn are NOT declared in the root project, and were not added to it. pyproject.toml and uv.lock are part of the Phase 9C provenance: their digests are recorded in the decision policy and `scripts/freeze_model.py --verify` fails if either moves. The serving dependencies live in an isolated uv project under serving/, which depends on the root project as an editable path dependency. Both root manifests are byte-identical to commit 47d6dd3.",
+    "The startup gate pins the SHA-256 of reports/decision_policy.json itself. Without that pin the policy would be its own only authority, and a hand-edited threshold would pass every gate that asks whether the policy agrees with itself. The pinned digest is not invented here: Phases 9D, 9E and 10 each independently recorded the digest of the policy they read, and all three agree.",
+    "The runtime versions are checked at startup and a mismatch FAILS the startup rather than warning. A joblib artefact pickles its classes by reference, so a different scikit-learn, numpy or pandas can change what the loaded object computes while every stored fingerprint stays identical.",
+    "prepare_features runs BEFORE the persisted pipeline and is therefore outside everything the model's own fingerprints can see. Its source digest is checked at startup, and a test asserts the pipeline is never handed anything that did not pass through it.",
+    "The decision comes exclusively from probability >= threshold. pipeline.predict is never called: it would apply scikit-learn's own 0.5 cut, which is not the frozen policy. The positive-class column is resolved from classes_, never assumed to be column 1.",
+    "The batch limit is an operational bound on the REQUEST and changes no prediction. It is configured in the serving layer only; configs/base.toml was not touched, because it belongs to the frozen provenance.",
+    "There is no environment variable for the threshold, the calibration policy or the positive class, and setting one is REFUSED at startup rather than ignored. Ignoring it would leave an operator believing a decision boundary had moved when it had not.",
+    "Single and batch scoring share one code path: predict_one is predict_batch of length one. The decision for a record is therefore identical across the two endpoints. The PROBABILITY can differ in the final bit: the classifier's decision function is a matrix product, and BLAS dispatches a 1x46 product to a different kernel than an Nx46 one, summing the same 46 terms in a different order. Measured at most 1 ULP (1.11e-16 absolute); everything before the classifier is bit-identical. The probability is deliberately NOT rounded to hide this: Phase 9C stored the threshold unrounded because a value rounded in the sixth decimal can move customers across the boundary, and rounding the score would be that mistake mirrored.",
+    "The calibration policy is NONE, so the score is the model's raw output and is not a calibrated probability. The OpenAPI description says so explicitly rather than letting a reader assume otherwise.",
+    "No monitoring, drift metric, baseline distribution or alert rule is implemented here. That is Phase 12. The unseen-category test in this phase proves only that a new category is not BLOCKED; it says nothing about whether the resulting score should be trusted.",
+    "No Dockerfile and no frontend were produced. Containerisation and any visual interface belong to later phases; the local run command is documented instead."
+  ]
+}
