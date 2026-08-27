@@ -250,6 +250,15 @@ class HealthResponse(BaseModel):
 
     status: Literal["alive", "ready", "not_ready"]
     serving_version: str
+    monitoring: str | None = Field(
+        default=None,
+        description=(
+            "Collector health: HEALTHY, DEGRADED or DISABLED. Reported here for "
+            "convenience and deliberately NOT part of readiness: a drifting "
+            "population is not a corrupt artefact, so drift never makes this "
+            "process NOT READY."
+        ),
+    )
     model_fingerprint: str | None = Field(
         default=None,
         description="Present once the frozen model is loaded and verified.",
@@ -257,6 +266,97 @@ class HealthResponse(BaseModel):
     startup_gates_passed: int | None = Field(
         default=None,
         description="Number of startup integrity gates that passed.",
+    )
+
+
+class MonitoringResponse(BaseModel):
+    """Aggregate monitoring state of the current window.
+
+    Everything here is a count, a rate, a histogram or a status. There is no
+    payload, no feature value, no row-level score and no identifier: the collector
+    never retained one.
+
+    ``status`` answers "does this window still resemble the reference population",
+    and nothing else. It is **not** a statement about model performance — that would
+    need production labels, which this phase does not have, and
+    ``performance_degradation.evaluated`` is ``false`` for exactly that reason.
+
+    **Below ``minimum_window_size`` the distribution sections are ``null``.** A
+    per-feature breakdown of a window holding one record is that record: a level
+    count names their contract, a histogram bin places their tenure, a
+    predicted-positive rate of 1.0 is their decision. ``details_suppressed`` is then
+    ``true``, and what remains — the window size, the global operational counters and
+    the statuses — describes the deployment rather than a customer.
+    """
+
+    model_config = ConfigDict(frozen=True, protected_namespaces=())
+
+    monitoring_enabled: bool
+    status: str = Field(
+        description=(
+            "OK, WARNING, CRITICAL, or INSUFFICIENT_DATA when the window is too small "
+            "for any drift claim. Cutoffs are operational policy, not significance levels."
+        )
+    )
+    collector_health: str = Field(
+        description="HEALTHY, DEGRADED or DISABLED. About the collector, never about drift."
+    )
+    detail: str | None = None
+    n_records: int | None = None
+    minimum_window_size: int | None = None
+    window_has_verdict: bool | None = None
+    details_suppressed: bool | None = Field(
+        default=None,
+        description=(
+            "True when the window is below the operational minimum, in which case "
+            "feature_drift, prediction_drift and structural_consistency are null: over "
+            "a handful of records a per-feature breakdown identifies the records "
+            "themselves."
+        ),
+    )
+    collector_failures: int | None = None
+    reference_profile_sha256: str | None = Field(
+        default=None,
+        description="Digest of the reference profile actually loaded at startup.",
+    )
+    expected_reference_profile_sha256: str | None = Field(
+        default=None,
+        description=(
+            "The digest startup required. Pinned in source, independently of the file "
+            "checked; a mismatch prevents the process from coming up."
+        ),
+    )
+    reference_profile_sha256_source: str | None = Field(
+        default=None,
+        description="Where the expected digest comes from — the trust anchor.",
+    )
+    reference_population: str | None = None
+    reference_n: int | None = None
+    section_status: dict[str, str] | None = None
+    data_quality: dict[str, int] | None = None
+    feature_drift: dict[str, Any] | None = None
+    prediction_drift: dict[str, Any] | None = None
+    structural_consistency: dict[str, Any] | None = None
+    performance_degradation: dict[str, Any] | None = Field(
+        default=None,
+        description="Always {evaluated: false} in this phase: no production labels exist.",
+    )
+    interpretation: str | None = None
+    calibration: str | None = None
+    unseen_cardinality: str | None = Field(
+        default=None,
+        description=(
+            "How to read n_distinct_unseen_observed: exact below the tracking cap, a "
+            "lower bound at or above it. Present only when the distributions are."
+        ),
+    )
+    rejection_counting_note: str | None = None
+    small_window_note: str | None = Field(
+        default=None,
+        description=(
+            "Present when the window is below the operational minimum, explaining "
+            "which distributions are withheld and why."
+        ),
     )
 
 
@@ -295,6 +395,7 @@ __all__ = [
     "ErrorResponse",
     "HealthResponse",
     "ModelMetadataResponse",
+    "MonitoringResponse",
     "PredictionRequest",
     "PredictionResponse",
 ]

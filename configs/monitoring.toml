@@ -1,0 +1,97 @@
+# Operational monitoring policy — Phase 12.
+#
+# WHY THIS FILE IS SEPARATE FROM configs/base.toml.
+# `configs/base.toml` is part of the Phase 9C provenance: its SHA-256 is recorded
+# in `reports/decision_policy.json` and `scripts/freeze_model.py --verify` fails if
+# it moves. An alert cutoff has no business invalidating a model freeze. Nothing in
+# this file can reach the model: the decision threshold, the calibration policy,
+# the positive class and the feature contract are read from the decision policy and
+# from nowhere else.
+#
+# WHAT THESE NUMBERS ARE, AND ARE NOT.
+# Every cutoff below is an OPERATIONAL MONITORING POLICY: a heuristic about when a
+# human should look, chosen before any production data existed. None of them is a
+# statistical significance level, none was estimated from data, and none of them
+# tests a hypothesis. PSI and TVD are descriptive distances, not test statistics;
+# crossing a cutoff means "this window no longer resembles the reference population
+# by this much", never "the model has degraded" — that claim needs labels, which
+# this phase does not have.
+#
+# The 0.10 / 0.25 pair for PSI is the value most widely quoted in credit-scoring
+# practice. It is reproduced here because it is familiar to operators, NOT because
+# it has been validated for this dataset, this model, or this traffic. Treat it as
+# a starting point to be re-tuned once real production windows exist.
+
+[window]
+# A drift number computed from a handful of records is noise. Below this count the
+# window reports INSUFFICIENT_DATA: the counts are still recorded, but no drift
+# status is claimed. 100 is a deliberately modest floor — enough that a decile
+# histogram has roughly ten observations per bin on average, small enough that a
+# low-traffic deployment still produces a verdict within a reasonable period.
+minimum_window_size = 100
+
+[numeric]
+# Population Stability Index over the fixed reference bins.
+psi_warning = 0.10
+psi_critical = 0.25
+# Share of records falling outside [reference_min, reference_max] for the feature.
+out_of_range_warning = 0.01
+out_of_range_critical = 0.05
+
+[categorical]
+# Total Variation Distance over known levels plus the __UNSEEN__ bucket.
+tvd_warning = 0.10
+tvd_critical = 0.25
+# Share of records whose value for the feature was never seen in the reference.
+unseen_rate_warning = 0.01
+unseen_rate_critical = 0.05
+# Upper bound on how many DISTINCT unseen values are tracked per feature, per
+# window. This is a MEMORY SAFETY limit, not an alert cutoff and not a privacy
+# control -- the two privacy properties (values never retained, digests never
+# exposed) hold at any cap.
+#
+# WHY A BOUND IS REQUIRED. The serving contract deliberately accepts an unseen
+# category: the frozen encoder absorbs it and the record is still scored. Distinct
+# cardinality was tracked with an unbounded set, so a caller sending
+# value_000001 ... value_1000000 would grow that set without limit inside a
+# long-running process whose window has no automatic rotation and whose monitoring
+# endpoint is unauthenticated. An observability component must not be the thing
+# that exhausts the process it observes.
+#
+# WHAT THE CAP COSTS. unseen_count and unseen_rate stay EXACT at every cap -- they
+# are integers, not a set. Only the distinct-cardinality diagnostic saturates, and
+# when it does the report says so explicitly and labels the value a lower bound
+# rather than continuing to present it as the true cardinality. The alert status is
+# driven by unseen_rate and is therefore unaffected by saturation.
+#
+# WHAT THE CAP GUARANTEES. Each categorical feature retains at most 1024 unseen
+# digests per monitoring window. That is a bound on the NUMBER OF RETAINED ENTRIES,
+# which is the property that matters: collector state stops growing with traffic and
+# becomes a function of (features x cap) instead. Actual Python heap usage is
+# implementation-dependent and larger than the raw digest payload -- str objects,
+# the set's hash table, references and allocator behaviour all contribute -- and it
+# was NOT benchmarked in this phase. No figure for it is claimed anywhere.
+#
+# WHY 1024 RATHER THAN A SMALLER NUMBER. It is two orders of magnitude above any
+# plausible legitimate value: the widest reference feature has four known levels, so
+# a window carrying a thousand distinct new ones is already a finding on its own, and
+# at that point the exact cardinality has stopped being the actionable part. The
+# retained state stays small and bounded for a deployment of this size.
+max_distinct_unseen_tracked_per_feature = 1024
+
+[score]
+# PSI over the fixed reference bins of the model score.
+psi_warning = 0.10
+psi_critical = 0.25
+# Absolute change in the share of records scored at or above the frozen threshold.
+# This is a change in what the SYSTEM decides, not evidence about what customers do.
+positive_rate_delta_warning = 0.05
+positive_rate_delta_critical = 0.10
+
+[structural]
+# The seven product equivalences Phase 10 verified on the training pool hold there
+# exactly, so any violation at all is worth noticing. The cutoffs are low on
+# purpose: a violated equivalence is a data-quality signal, not a distribution
+# shift, and it usually means an upstream system changed.
+violation_rate_warning = 0.001
+violation_rate_critical = 0.01

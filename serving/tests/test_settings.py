@@ -58,11 +58,26 @@ def test_a_frozen_decision_cannot_be_overridden_from_the_environment(name: str) 
 
 
 def test_the_threshold_is_not_a_settings_field() -> None:
-    """There is no field to set, so there is nothing to forget to guard."""
+    """There is no field to set, so there is nothing to forget to guard.
+
+    The field list is pinned, not just filtered: a future field that happened to be
+    called something innocuous could still carry a model parameter, and an exact set
+    is what forces a reviewer to look at any addition. Phase 12 added two — both
+    purely operational: whether this process collects monitoring aggregates, and
+    where its reference profile lives. Neither can reach the model.
+    """
     fields = set(ServingSettings.model_fields)
 
     assert not fields & {"threshold", "calibration", "calibration_policy", "positive_class"}
-    assert fields == {"policy_path", "pipeline_path", "max_batch_size", "host", "port"}
+    assert fields == {
+        "policy_path",
+        "pipeline_path",
+        "max_batch_size",
+        "host",
+        "port",
+        "monitoring_enabled",
+        "reference_profile_path",
+    }
 
 
 def test_unknown_settings_fields_are_rejected(repo_root: Path) -> None:

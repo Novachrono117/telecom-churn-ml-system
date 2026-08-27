@@ -1,0 +1,556 @@
+{
+  "schema_version": 1,
+  "profile": "phase12-monitoring-reference-profile",
+  "built_in_phase": "12",
+  "provenance": {
+    "reference_population": "training_pool",
+    "n_reference": 5634,
+    "holdout_used": false,
+    "target_used": false,
+    "raw_sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+    "training_ids_sha256": "a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd",
+    "model_fingerprint_sha256": "a57568e18ec0333e1c85b590f98e75da93ebbfafff063860ec5daf4e460d939f",
+    "pipeline_sha256": "574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8",
+    "decision_policy_sha256": "bd7aa800ae36ac04ecf951f7377ce71d16d084faeee771b01eb6c9655a4bc714",
+    "freeze_commit": "9d1db4962769093a617f1db2db66354536acffb3",
+    "serving_commit": "71a7f3a785c13a052e4f8ab3a6780842de60110a",
+    "random_seed": 42
+  },
+  "configuration": {
+    "n_bins_requested": 10,
+    "binning_strategy": "reference quantiles, duplicates dropped",
+    "bin_interval_convention": "(-inf, e1], (e1, e2], ..., (e_last, +inf)",
+    "quantiles_recorded": [
+      0.01,
+      0.05,
+      0.25,
+      0.5,
+      0.75,
+      0.95,
+      0.99
+    ],
+    "unseen_level": "__UNSEEN__",
+    "numeric_features": [
+      "tenure",
+      "MonthlyCharges",
+      "TotalCharges"
+    ],
+    "categorical_features": [
+      "gender",
+      "SeniorCitizen",
+      "Partner",
+      "Dependents",
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies",
+      "Contract",
+      "PaperlessBilling",
+      "PaymentMethod"
+    ],
+    "psi_epsilon": 1e-06,
+    "numeric_drift_metric": "population_stability_index",
+    "categorical_drift_metric": "total_variation_distance",
+    "score_drift_metric": "population_stability_index"
+  },
+  "numeric": {
+    "tenure": {
+      "count": 5634,
+      "mean": 32.48509052183174,
+      "std": 24.56656301538815,
+      "min": 0.0,
+      "q01": 1.0,
+      "q05": 1.0,
+      "q25": 9.0,
+      "median": 29.0,
+      "q75": 55.0,
+      "q95": 72.0,
+      "q99": 72.0,
+      "max": 72.0,
+      "bin_edges": [
+        2.0,
+        6.0,
+        12.0,
+        20.0,
+        29.0,
+        40.0,
+        50.0,
+        61.0,
+        69.0
+      ],
+      "bin_counts": [
+        682,
+        488,
+        567,
+        560,
+        543,
+        585,
+        521,
+        606,
+        549,
+        533
+      ]
+    },
+    "MonthlyCharges": {
+      "count": 5634,
+      "mean": 64.92996095136671,
+      "std": 30.135430576006627,
+      "min": 18.4,
+      "q01": 19.2,
+      "q05": 19.65,
+      "q25": 35.6625,
+      "median": 70.5,
+      "q75": 90.0,
+      "q95": 107.36749999999996,
+      "q99": 114.9835,
+      "max": 118.75,
+      "bin_edges": [
+        20.05,
+        25.1,
+        45.8,
+        59.0,
+        70.5,
+        79.3,
+        85.65500000000003,
+        94.45,
+        103.05
+      ],
+      "bin_counts": [
+        569,
+        565,
+        558,
+        563,
+        567,
+        559,
+        563,
+        570,
+        558,
+        562
+      ]
+    },
+    "TotalCharges": {
+      "count": 5634,
+      "mean": 2299.33468228612,
+      "std": 2279.001996496138,
+      "min": 0.0,
+      "q01": 19.75,
+      "q05": 48.827500000000015,
+      "q25": 402.975,
+      "median": 1394.925,
+      "q75": 3835.8250000000003,
+      "q95": 6977.384999999997,
+      "q99": 8039.769,
+      "max": 8684.8,
+      "bin_edges": [
+        84.43,
+        268.38,
+        553.9850000000001,
+        939.9100000000001,
+        1394.925,
+        2083.07,
+        3187.65,
+        4510.02,
+        5993.934999999999
+      ],
+      "bin_counts": [
+        564,
+        563,
+        563,
+        564,
+        563,
+        563,
+        565,
+        562,
+        563,
+        564
+      ]
+    }
+  },
+  "categorical": {
+    "gender": {
+      "count": 5634,
+      "known_levels": [
+        "Female",
+        "Male"
+      ],
+      "count_by_level": {
+        "Female": 2801,
+        "Male": 2833,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "Female": 0.4971600993965211,
+        "Male": 0.5028399006034788,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "SeniorCitizen": {
+      "count": 5634,
+      "known_levels": [
+        "0",
+        "1"
+      ],
+      "count_by_level": {
+        "0": 4714,
+        "1": 920,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "0": 0.8367057152999645,
+        "1": 0.16329428470003549,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "Partner": {
+      "count": 5634,
+      "known_levels": [
+        "No",
+        "Yes"
+      ],
+      "count_by_level": {
+        "No": 2905,
+        "Yes": 2729,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "No": 0.5156194533191338,
+        "Yes": 0.48438054668086616,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "Dependents": {
+      "count": 5634,
+      "known_levels": [
+        "No",
+        "Yes"
+      ],
+      "count_by_level": {
+        "No": 3955,
+        "Yes": 1679,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "No": 0.7019879304224352,
+        "Yes": 0.29801206957756476,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "PhoneService": {
+      "count": 5634,
+      "known_levels": [
+        "No",
+        "Yes"
+      ],
+      "count_by_level": {
+        "No": 559,
+        "Yes": 5075,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "No": 0.09921902733404331,
+        "Yes": 0.9007809726659567,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "MultipleLines": {
+      "count": 5634,
+      "known_levels": [
+        "No",
+        "No phone service",
+        "Yes"
+      ],
+      "count_by_level": {
+        "No": 2685,
+        "No phone service": 559,
+        "Yes": 2390,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "No": 0.47657082002129925,
+        "No phone service": 0.09921902733404331,
+        "Yes": 0.42421015264465745,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "InternetService": {
+      "count": 5634,
+      "known_levels": [
+        "DSL",
+        "Fiber optic",
+        "No"
+      ],
+      "count_by_level": {
+        "DSL": 1937,
+        "Fiber optic": 2483,
+        "No": 1214,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "DSL": 0.3438054668086617,
+        "Fiber optic": 0.44071707490237844,
+        "No": 0.2154774582889599,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "OnlineSecurity": {
+      "count": 5634,
+      "known_levels": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "count_by_level": {
+        "No": 2797,
+        "No internet service": 1214,
+        "Yes": 1623,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "No": 0.4964501242456514,
+        "No internet service": 0.2154774582889599,
+        "Yes": 0.2880724174653887,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "OnlineBackup": {
+      "count": 5634,
+      "known_levels": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "count_by_level": {
+        "No": 2442,
+        "No internet service": 1214,
+        "Yes": 1978,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "No": 0.4334398296059638,
+        "No internet service": 0.2154774582889599,
+        "Yes": 0.3510827121050763,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "DeviceProtection": {
+      "count": 5634,
+      "known_levels": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "count_by_level": {
+        "No": 2472,
+        "No internet service": 1214,
+        "Yes": 1948,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "No": 0.4387646432374867,
+        "No internet service": 0.2154774582889599,
+        "Yes": 0.3457578984735534,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "TechSupport": {
+      "count": 5634,
+      "known_levels": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "count_by_level": {
+        "No": 2771,
+        "No internet service": 1214,
+        "Yes": 1649,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "No": 0.49183528576499824,
+        "No internet service": 0.2154774582889599,
+        "Yes": 0.2926872559460419,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "StreamingTV": {
+      "count": 5634,
+      "known_levels": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "count_by_level": {
+        "No": 2226,
+        "No internet service": 1214,
+        "Yes": 2194,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "No": 0.3951011714589989,
+        "No internet service": 0.2154774582889599,
+        "Yes": 0.38942137025204115,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "StreamingMovies": {
+      "count": 5634,
+      "known_levels": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "count_by_level": {
+        "No": 2217,
+        "No internet service": 1214,
+        "Yes": 2203,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "No": 0.3935037273695421,
+        "No internet service": 0.2154774582889599,
+        "Yes": 0.39101881434149804,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "Contract": {
+      "count": 5634,
+      "known_levels": [
+        "Month-to-month",
+        "One year",
+        "Two year"
+      ],
+      "count_by_level": {
+        "Month-to-month": 3102,
+        "One year": 1173,
+        "Two year": 1359,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "Month-to-month": 0.5505857294994675,
+        "One year": 0.20820021299254526,
+        "Two year": 0.24121405750798722,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "PaperlessBilling": {
+      "count": 5634,
+      "known_levels": [
+        "No",
+        "Yes"
+      ],
+      "count_by_level": {
+        "No": 2303,
+        "Yes": 3331,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "No": 0.40876819311324103,
+        "Yes": 0.5912318068867589,
+        "__UNSEEN__": 0.0
+      }
+    },
+    "PaymentMethod": {
+      "count": 5634,
+      "known_levels": [
+        "Bank transfer (automatic)",
+        "Credit card (automatic)",
+        "Electronic check",
+        "Mailed check"
+      ],
+      "count_by_level": {
+        "Bank transfer (automatic)": 1244,
+        "Credit card (automatic)": 1213,
+        "Electronic check": 1891,
+        "Mailed check": 1286,
+        "__UNSEEN__": 0
+      },
+      "frequency_by_level": {
+        "Bank transfer (automatic)": 0.2208022719204828,
+        "Credit card (automatic)": 0.21529996450124245,
+        "Electronic check": 0.33564075257365994,
+        "Mailed check": 0.22825701100461485,
+        "__UNSEEN__": 0.0
+      }
+    }
+  },
+  "score": {
+    "count": 5634,
+    "mean": 0.265436195241562,
+    "std": 0.2444071497963355,
+    "min": 0.0016536499588620521,
+    "q01": 0.002618732391140641,
+    "q05": 0.005883802845054607,
+    "q25": 0.04405831884358459,
+    "median": 0.18776855447962712,
+    "q75": 0.4577746213017951,
+    "q95": 0.7273599741050455,
+    "q99": 0.7927240565367144,
+    "max": 0.856160355709309,
+    "bin_edges": [
+      0.011654160722653352,
+      0.029622969916943007,
+      0.06299520211277328,
+      0.11641742333778794,
+      0.18776855447962712,
+      0.27375805115308743,
+      0.3922643125465278,
+      0.5368331630025978,
+      0.6587061372103387
+    ],
+    "bin_counts": [
+      564,
+      563,
+      563,
+      564,
+      563,
+      563,
+      564,
+      563,
+      563,
+      564
+    ],
+    "threshold": 0.3272694566222328,
+    "comparison": ">=",
+    "predicted_positive_count": 1982,
+    "predicted_positive_rate": 0.35179268725594603,
+    "calibration_policy": "NONE"
+  },
+  "structural": {
+    "rules": {
+      "InternetService=No<->OnlineSecurity=No internet service": "InternetService=No <-> OnlineSecurity=No internet service",
+      "InternetService=No<->OnlineBackup=No internet service": "InternetService=No <-> OnlineBackup=No internet service",
+      "InternetService=No<->DeviceProtection=No internet service": "InternetService=No <-> DeviceProtection=No internet service",
+      "InternetService=No<->TechSupport=No internet service": "InternetService=No <-> TechSupport=No internet service",
+      "InternetService=No<->StreamingTV=No internet service": "InternetService=No <-> StreamingTV=No internet service",
+      "InternetService=No<->StreamingMovies=No internet service": "InternetService=No <-> StreamingMovies=No internet service",
+      "PhoneService=No<->MultipleLines=No phone service": "PhoneService=No <-> MultipleLines=No phone service"
+    },
+    "violations_by_rule": {
+      "InternetService=No<->OnlineSecurity=No internet service": 0,
+      "InternetService=No<->OnlineBackup=No internet service": 0,
+      "InternetService=No<->DeviceProtection=No internet service": 0,
+      "InternetService=No<->TechSupport=No internet service": 0,
+      "InternetService=No<->StreamingTV=No internet service": 0,
+      "InternetService=No<->StreamingMovies=No internet service": 0,
+      "PhoneService=No<->MultipleLines=No phone service": 0
+    },
+    "records_with_any_violation": 0,
+    "violation_rate": 0.0
+  },
+  "notes": [
+    "This profile is a MONITORING REFERENCE DISTRIBUTION. It is not a performance estimate, and no metric in it was computed against a label. Comparing a production window with it can show that the population changed; it cannot show that the model got worse, which is a claim about outcomes that requires ground truth.",
+    "The reference population is the frozen training pool. The holdout was consumed by Phase 9D and is deliberately not used: an operational reference should describe the population the system was built for, and the training pool is both larger and the one the model actually saw.",
+    "The target was never read. target_used is false, and the build function has no parameter through which a label could be passed.",
+    "Bin edges are computed ONCE here, from the reference, and are stored. A window that recomputed its own bins would produce a number partly measuring the binning.",
+    "The bin partition is (-inf, e1], (e1, e2], ..., (e_last, +inf) — total, so no value can fall outside it and no mass is clipped. Whether a value lies outside the reference [min, max] is reported separately as out_of_reference_range_rate.",
+    "Duplicate quantile edges are dropped. A concentrated feature such as tenure yields repeated quantiles, and a zero-width bin can never receive a value while still contributing a term to a PSI sum.",
+    "The score comes from churn.modeling.freeze.positive_probability, the same frozen primitive the serving boundary uses, with the positive column resolved from classes_. pipeline.predict is not used.",
+    "calibration_policy is NONE, so the score is the model's raw output. Read the score distribution as a ranking distribution, not as a set of calibrated probabilities.",
+    "Every number here is an aggregate. No row of the training pool is stored, and none could be reconstructed from what is."
+  ]
+}

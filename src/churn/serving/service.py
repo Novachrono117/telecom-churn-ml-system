@@ -53,7 +53,9 @@ from __future__ import annotations
 import logging
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Protocol, runtime_checkable
+
+import pandas as pd
 
 from churn.preprocessing.exceptions import DataQualityError, FeatureContractError
 from churn.serving.artifacts import (
@@ -66,13 +68,37 @@ from churn.serving.artifacts import (
 from churn.serving.errors import BatchTooLargeError
 from churn.serving.inference import (
     Prediction,
-    canonical_probability,
+    canonical_features_and_probability,
     decide,
     decision_label,
 )
 from churn.serving.settings import DEFAULT_MAX_BATCH_SIZE, ServingSettings
 
 logger = logging.getLogger(__name__)
+
+
+@runtime_checkable
+class PredictionObserver(Protocol):
+    """Something that watches predictions without participating in them.
+
+    The contract is one-directional and deliberately tiny: an observer is handed
+    the canonical feature matrix, the scores and the decisions **after** they have
+    been produced, and whatever it returns is discarded. There is no way for an
+    implementation to influence a probability, because nothing it does is read.
+
+    Implementations are expected not to raise. The prediction path guards against
+    it anyway — see :meth:`ChurnInferenceService._observe` — because "expected not
+    to" is not a guarantee, and a monitoring bug must never cost a prediction.
+    """
+
+    def observe(
+        self,
+        features: pd.DataFrame,
+        probabilities: Sequence[float],
+        predictions: Sequence[int],
+    ) -> None:
+        """Fold already-scored records into whatever aggregates are being kept."""
+        ...
 
 
 @dataclass(frozen=True)
@@ -115,6 +141,7 @@ class ChurnInferenceService:
 
     artifacts: FrozenArtifacts
     max_batch_size: int = DEFAULT_MAX_BATCH_SIZE
+    observer: PredictionObserver | None = None
 
     @classmethod
     def from_settings(cls, settings: ServingSettings | None = None) -> ChurnInferenceService:
@@ -193,10 +220,14 @@ class ChurnInferenceService:
         Everything below the probability is metadata copied from the verified
         frozen artefacts, so two calls with the same record and the same process
         return equal values in every field.
+
+        The observer, when there is one, is called **after** the answer exists and
+        cannot alter it: the returned :class:`Prediction` is already fully
+        determined by the line above the call.
         """
-        probability = canonical_probability(self.artifacts.pipeline, record)
+        features, probability = canonical_features_and_probability(self.artifacts.pipeline, record)
         prediction = decide(probability, self.threshold)
-        return Prediction(
+        answer = Prediction(
             churn_probability=probability,
             prediction=prediction,
             decision=decision_label(prediction),
@@ -205,6 +236,37 @@ class ChurnInferenceService:
             calibration_policy=self.artifacts.calibration_policy,
             model_fingerprint=self.artifacts.model_fingerprint,
         )
+        self._observe(features, probability, prediction)
+        return answer
+
+    def _observe(self, features: pd.DataFrame, probability: float, prediction: int) -> None:
+        """Hand one scored record to the observer, and never let that cost a prediction.
+
+        The prediction path is authoritative. A monitoring failure is logged and
+        counted by the observer, and the request continues: the alternative —
+        failing a prediction because a histogram could not be updated — trades a
+        correct answer for an observation, which is backwards.
+
+        The failure is never swallowed silently: it is logged, and the monitoring
+        status the service reports degrades, so the loss of observability is visible
+        even though the prediction was not affected.
+
+        What is logged is an event name and the exception's **type** — never
+        ``str(error)`` and never a traceback. This guard runs holding ``features``
+        and ``probability``, so an exception raised beneath it can carry either into
+        its message; writing that message to a log would move the payload into the
+        one place nobody audits for it.
+        """
+        observer = self.observer
+        if observer is None:
+            return
+        try:
+            observer.observe(features, [probability], [prediction])
+        except Exception as error:  # noqa: BLE001 - monitoring must never break a prediction
+            logger.error(
+                "monitoring_observation_failure exception_type=%s; the prediction is unaffected.",
+                type(error).__name__,
+            )
 
     def identity(self) -> ModelIdentity:
         """Return the non-sensitive metadata of the frozen model."""
@@ -232,4 +294,4 @@ class ChurnInferenceService:
         )
 
 
-__all__ = ["ChurnInferenceService", "ModelIdentity"]
+__all__ = ["ChurnInferenceService", "ModelIdentity", "PredictionObserver"]

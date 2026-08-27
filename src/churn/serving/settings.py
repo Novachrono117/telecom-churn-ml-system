@@ -58,6 +58,19 @@ MAX_ALLOWED_BATCH_SIZE = 5_000
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8000
 
+#: Whether the process collects monitoring aggregates and publishes the monitoring
+#: endpoint. **Opt-in, and deliberately so.**
+#:
+#: Phase 11 published a serving contract and recorded its route list in
+#: `reports/experiments/serving_results.json`. Turning monitoring on adds a route,
+#: which changes that published surface. Making it opt-in means deploying Phase 12
+#: code cannot silently alter the Phase 11 API contract: an operator enables
+#: monitoring deliberately, and a later phase can flip this default just as
+#: deliberately, updating the serving record at the same time.
+#:
+#: It changes nothing predictive either way — see the ON/OFF equivalence test.
+DEFAULT_MONITORING_ENABLED = False
+
 #: Environment variables that would let a deployment override a frozen decision.
 #: None of them is read. All of them are refused, loudly.
 FORBIDDEN_ENV_VARS: tuple[str, ...] = (
@@ -95,6 +108,20 @@ class ServingSettings(BaseModel):
     max_batch_size: int = Field(default=DEFAULT_MAX_BATCH_SIZE, ge=1, le=MAX_ALLOWED_BATCH_SIZE)
     host: str = Field(default=DEFAULT_HOST, min_length=1)
     port: int = Field(default=DEFAULT_PORT, ge=1, le=65535)
+    monitoring_enabled: bool = Field(
+        default=DEFAULT_MONITORING_ENABLED,
+        description=(
+            "Collect monitoring aggregates and publish the monitoring endpoint. "
+            "Observational only: it cannot change a prediction."
+        ),
+    )
+    reference_profile_path: Path | None = Field(
+        default=None,
+        description=(
+            "Overrides the monitoring reference profile location. When None, the "
+            "repository's reports/monitoring/reference_profile.json is used."
+        ),
+    )
 
 
 def default_policy_path(root: Path | None = None) -> Path:
@@ -112,6 +139,21 @@ def _reject_frozen_overrides(env: Mapping[str, str]) -> None:
             "part of the frozen model contract and are read only from the decision "
             "policy. Unset them; a deployment cannot move a decision boundary."
         )
+
+
+def _read_bool(env: Mapping[str, str], name: str, default: bool) -> bool:
+    """Read a boolean operational flag. Anything unrecognised is an error, not a false."""
+    raw = env.get(name)
+    if raw is None:
+        return default
+    normalised = raw.strip().lower()
+    if normalised in {"1", "true", "yes", "on"}:
+        return True
+    if normalised in {"0", "false", "no", "off"}:
+        return False
+    raise ServingConfigurationError(
+        f"{name} must be a boolean (1/0, true/false, yes/no, on/off), got {raw!r}."
+    )
 
 
 def _read_int(env: Mapping[str, str], name: str, default: int) -> int:
@@ -160,12 +202,17 @@ def load_settings(
         ),
         host=environment.get(f"{ENV_PREFIX}HOST", DEFAULT_HOST),
         port=_read_int(environment, f"{ENV_PREFIX}PORT", DEFAULT_PORT),
+        monitoring_enabled=_read_bool(
+            environment, f"{ENV_PREFIX}MONITORING", DEFAULT_MONITORING_ENABLED
+        ),
+        reference_profile_path=_read_path(environment, f"{ENV_PREFIX}REFERENCE_PROFILE_PATH"),
     )
     # The paths are operational configuration and are logged; no request data is.
     logger.info(
-        "Serving settings: max_batch_size=%d host=%s port=%d",
+        "Serving settings: max_batch_size=%d host=%s port=%d monitoring=%s",
         settings.max_batch_size,
         settings.host,
         settings.port,
+        settings.monitoring_enabled,
     )
     return settings

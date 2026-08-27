@@ -199,7 +199,25 @@ def canonical_probability(pipeline: Pipeline, record: Mapping[str, Any]) -> floa
         DataQualityError: If a value is blank or unreadable where no rule
             justifies it.
     """
-    return float(churn_probabilities(pipeline, prepared_features([record]))[0])
+    return canonical_features_and_probability(pipeline, record)[1]
+
+
+def canonical_features_and_probability(
+    pipeline: Pipeline, record: Mapping[str, Any]
+) -> tuple[pd.DataFrame, float]:
+    """Score one record and return the matrix it was scored from, alongside the score.
+
+    The same arithmetic as :func:`canonical_probability` — that function delegates
+    here, so there is one implementation and no possibility of the two disagreeing.
+
+    The canonical feature matrix is returned because an observer needs it: the
+    monitoring collector summarises what the model was actually handed, in canonical
+    column order and after the frozen contract has validated it. Returning it costs
+    nothing (the frame already exists) and saves the caller from rebuilding it —
+    rebuilding would be a second, drift-prone path to the same values.
+    """
+    features = prepared_features([record])
+    return features, float(churn_probabilities(pipeline, features)[0])
 
 
 def decision_label(prediction: int) -> str:
@@ -222,6 +240,7 @@ __all__ = [
     "Prediction",
     "build_feature_frame",
     "churn_probabilities",
+    "canonical_features_and_probability",
     "canonical_probability",
     "decide",
     "decision_label",

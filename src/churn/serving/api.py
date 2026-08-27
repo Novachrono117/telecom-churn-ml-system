@@ -29,12 +29,14 @@ import logging
 import time
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
+from dataclasses import replace
 from typing import Annotated, Any
 
 from fastapi import Depends, FastAPI, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from churn.monitoring.settings import MONITORING_ENDPOINT
 from churn.preprocessing.exceptions import DataQualityError, FeatureContractError
 from churn.serving.artifacts import FREEZE_COMMIT_SHORT, SERVING_VERSION
 from churn.serving.errors import (
@@ -45,12 +47,14 @@ from churn.serving.errors import (
     ServiceNotReadyError,
     ServingRequestError,
 )
+from churn.serving.monitoring import HEALTH_DISABLED, ServingMonitor, disabled_response
 from churn.serving.schemas import (
     BatchPredictionRequest,
     BatchPredictionResponse,
     ErrorResponse,
     HealthResponse,
     ModelMetadataResponse,
+    MonitoringResponse,
     PredictionRequest,
     PredictionResponse,
 )
@@ -119,6 +123,15 @@ def _error(status_code: int, code: str, message: str, details: list[str] | None 
     return JSONResponse(status_code=status_code, content={"error": payload})
 
 
+def get_monitor(request: Request) -> ServingMonitor | None:
+    """Return the process-wide monitor, or ``None`` when monitoring is off.
+
+    Never raises and never blocks a request: monitoring is observational, so its
+    absence is a normal state rather than an error.
+    """
+    return getattr(request.app.state, "monitor", None)
+
+
 def get_service(request: Request) -> ChurnInferenceService:
     """Return the process-wide inference service.
 
@@ -142,30 +155,55 @@ def get_service(request: Request) -> ChurnInferenceService:
 #: of a mutable default position, and it is the idiom current FastAPI documents.
 ServiceDependency = Annotated[ChurnInferenceService, Depends(get_service)]
 
+#: The process-wide monitor, or None when monitoring is off. Observational: no
+#: endpoint's answer depends on it.
+MonitorDependency = Annotated["ServingMonitor | None", Depends(get_monitor)]
+
 
 def _build_lifespan(
     service: ChurnInferenceService | None,
-    settings: ServingSettings | None,
+    settings: ServingSettings,
 ) -> Callable[[FastAPI], Any]:
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        resolved = settings
         if service is not None:
             app.state.service = service
         else:
             # Fail-closed: any startup gate that fails raises here, and the
             # process does not come up. Nothing is rebuilt on the way.
-            app.state.service = ChurnInferenceService.from_settings(settings or load_settings())
+            app.state.service = ChurnInferenceService.from_settings(resolved)
+
+        if resolved.monitoring_enabled:
+            # Fail-closed too, and for the same reason: a drift number computed
+            # against an unverified baseline looks like a signal and is not one.
+            monitor = ServingMonitor.from_settings(resolved)
+            app.state.monitor = monitor
+            # The observer is attached by REPLACING the frozen service, not by
+            # mutating it. One shared, immutable instance stays the rule.
+            app.state.service = replace(app.state.service, observer=monitor)
+            logger.info("Monitoring enabled: reference=%s", monitor.reference_sha256[:16])
+
         logger.info(
-            "Serving ready: freeze_commit=%s serving_version=%s fingerprint=%s",
+            "Serving ready: freeze_commit=%s serving_version=%s fingerprint=%s monitoring=%s",
             FREEZE_COMMIT_SHORT,
             SERVING_VERSION,
             app.state.service.model_fingerprint[:16],
+            resolved.monitoring_enabled,
         )
         yield
         app.state.service = None
+        app.state.monitor = None
         logger.info("Serving stopped.")
 
     return lifespan
+
+
+def _count_rejection(request: Request, kind: str) -> None:
+    """Count a rejected record when monitoring is on. Never affects the response."""
+    monitor = getattr(request.app.state, "monitor", None)
+    if monitor is not None:
+        monitor.record_rejection(kind)
 
 
 def _register_exception_handlers(app: FastAPI) -> None:
@@ -174,17 +212,20 @@ def _register_exception_handlers(app: FastAPI) -> None:
         return _error(error.status, error.code, error.message)
 
     @app.exception_handler(FeatureContractError)
-    async def _contract_error(_: Request, error: FeatureContractError) -> Response:
+    async def _contract_error(request: Request, error: FeatureContractError) -> Response:
+        _count_rejection(request, "feature")
         return _error(
             status.HTTP_422_UNPROCESSABLE_CONTENT, CODE_INVALID_FEATURE_PAYLOAD, str(error)
         )
 
     @app.exception_handler(DataQualityError)
-    async def _quality_error(_: Request, error: DataQualityError) -> Response:
+    async def _quality_error(request: Request, error: DataQualityError) -> Response:
+        _count_rejection(request, "feature")
         return _error(status.HTTP_422_UNPROCESSABLE_CONTENT, CODE_INVALID_FEATURE_VALUE, str(error))
 
     @app.exception_handler(RequestValidationError)
-    async def _validation_error(_: Request, error: RequestValidationError) -> Response:
+    async def _validation_error(request: Request, error: RequestValidationError) -> Response:
+        _count_rejection(request, "schema")
         # Only `loc` and `msg` are echoed. Pydantic also reports the offending
         # `input`, which would put submitted feature values into the response and
         # from there into any client-side log.
@@ -238,11 +279,18 @@ def _register_routes(app: FastAPI) -> None:
                 ServiceNotReadyError.code,
                 "The frozen model is not loaded on this process.",
             )
+        monitor = getattr(request.app.state, "monitor", None)
         body = HealthResponse(
             status="ready",
             serving_version=SERVING_VERSION,
             model_fingerprint=service.model_fingerprint,
             startup_gates_passed=len(service.artifacts.checks),
+            # Reported, never gating. Readiness is a claim about the ARTEFACT — is
+            # the frozen model loaded and verified. Drift is a claim about the
+            # POPULATION, and a shifted population is not a corrupt model; letting
+            # it mark the process NOT READY would pull a healthy instance out of
+            # rotation because customers changed.
+            monitoring=HEALTH_DISABLED if monitor is None else monitor.health,
         )
         return JSONResponse(status_code=status.HTTP_200_OK, content=body.model_dump())
 
@@ -267,8 +315,11 @@ def _register_routes(app: FastAPI) -> None:
     async def predict(
         payload: PredictionRequest,
         service: ServiceDependency,
+        monitor: MonitorDependency,
     ) -> PredictionResponse:
         """Score one record through the frozen contract, pipeline and threshold."""
+        if monitor is not None:
+            monitor.record_request(1)
         prediction = service.predict_one(payload.to_record())
         return PredictionResponse(**vars(prediction))
 
@@ -282,14 +333,41 @@ def _register_routes(app: FastAPI) -> None:
     async def predict_batch(
         payload: BatchPredictionRequest,
         service: ServiceDependency,
+        monitor: MonitorDependency,
     ) -> BatchPredictionResponse:
         """Score a batch. Order is preserved and nothing is persisted."""
+        if monitor is not None:
+            monitor.record_request(len(payload.records))
         predictions = service.predict_batch([record.to_record() for record in payload.records])
         logger.info("Scored a batch of %d record(s).", len(predictions))
         return BatchPredictionResponse(
             count=len(predictions),
             predictions=[PredictionResponse(**vars(prediction)) for prediction in predictions],
         )
+
+
+def _register_monitoring_route(app: FastAPI) -> None:
+    @app.get(
+        MONITORING_ENDPOINT,
+        response_model=MonitoringResponse,
+        tags=["monitoring"],
+        summary="Aggregate drift and data-quality state of the current window",
+    )
+    async def monitoring(monitor: MonitorDependency) -> MonitoringResponse:
+        """Return aggregates only — never a payload, a score or an identifier.
+
+        Read-only. There is deliberately **no** HTTP reset: closing a window is an
+        administrative operation, this service has no authentication, and an
+        unauthenticated endpoint that erases the evidence a drift investigation
+        depends on is a worse trade than asking an operator to restart the process
+        or call the collector primitive directly.
+
+        ``status`` says whether this window still resembles the reference. It does
+        not say the model degraded — that needs labels, and this phase has none.
+        """
+        if monitor is None:
+            return MonitoringResponse(**disabled_response())
+        return MonitoringResponse(**monitor.as_response())
 
 
 def _register_access_log(app: FastAPI) -> None:
@@ -326,17 +404,21 @@ def create_app(
     Returns:
         A new :class:`fastapi.FastAPI` application with its own state.
     """
+    resolved = settings or load_settings()
     app = FastAPI(
         title="Churn Prediction API",
         version=SERVING_VERSION,
         description=DESCRIPTION,
-        lifespan=_build_lifespan(service, settings),
+        lifespan=_build_lifespan(service, resolved),
     )
     app.state.service = None
+    app.state.monitor = None
     _register_access_log(app)
     _register_exception_handlers(app)
     _register_routes(app)
+    if resolved.monitoring_enabled:
+        _register_monitoring_route(app)
     return app
 
 
-__all__ = ["API_PREFIX", "create_app", "get_service"]
+__all__ = ["API_PREFIX", "create_app", "get_monitor", "get_service"]
