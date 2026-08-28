@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Predição de Churn em Telecomunicações — Relatório Acadêmico</title>
+<style>
+@page { size: A4; margin: 18mm 16mm; }
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body {
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 10.5pt; line-height: 1.55; color: #1a1a1a; background: #fff;
+  max-width: 190mm; margin: 0 auto; padding: 0 2mm;
+}
+h1 {
+  font-size: 19pt; margin: 26px 0 12px; padding-bottom: 6px;
+  border-bottom: 2px solid #2c3e50; color: #16232e; page-break-after: avoid;
+}
+h1:first-of-type { margin-top: 0; }
+h2 { font-size: 14.5pt; margin: 20px 0 9px; color: #22303c; page-break-after: avoid; }
+h3 { font-size: 12pt; margin: 16px 0 7px; color: #2c3e50; page-break-after: avoid; }
+p { margin: 8px 0; text-align: justify; }
+ul, ol { margin: 8px 0 8px 22px; padding: 0; }
+li { margin: 3px 0; }
+a { color: #14507a; text-decoration: none; }
+code {
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+  font-size: 0.87em; background: #f2f4f6; padding: 1px 4px;
+  border-radius: 3px; border: 1px solid #e2e6ea;
+}
+pre {
+  background: #f7f9fa; border: 1px solid #dfe4e8; border-left: 3px solid #56718a;
+  border-radius: 4px; padding: 9px 12px; overflow-x: auto;
+  font-size: 8.6pt; line-height: 1.42; page-break-inside: avoid;
+}
+pre code { background: none; border: none; padding: 0; font-size: inherit; }
+blockquote {
+  margin: 11px 0; padding: 8px 14px; background: #f6f8fa;
+  border-left: 3px solid #7b8f9e; color: #33414d; page-break-inside: avoid;
+}
+blockquote p { margin: 4px 0; }
+table {
+  border-collapse: collapse; width: 100%; margin: 11px 0;
+  font-size: 9.2pt; page-break-inside: avoid;
+}
+th, td { border: 1px solid #cfd6dc; padding: 5px 8px; text-align: left; vertical-align: top; }
+th { background: #eef2f5; font-weight: 600; }
+tr:nth-child(even) td { background: #fafbfc; }
+img { max-width: 100%; height: auto; display: block; margin: 12px auto; page-break-inside: avoid; }
+hr { border: none; border-top: 1px solid #d7dde2; margin: 20px 0; }
+strong { font-weight: 650; color: #101a22; }
+.draft-banner {
+  background: #fff4e5; border: 2px solid #d98324; border-radius: 5px;
+  padding: 10px 14px; margin: 0 0 18px; font-weight: 600; color: #7a4708;
+}
+div[align="center"] { text-align: center; }
+div[align="center"] p { text-align: center; }
+</style>
+</head>
+<body>
+<div class="draft-banner">RASCUNHO — este documento contém campos de capa e links de entrega pendentes de ação humana. Não é a versão final de entrega.</div>
+<h1>Capa</h1>
+<blockquote><p><strong>AVISO DE ESTADO — DOCUMENTO EM RASCUNHO (DRAFT).</strong> Este relatório contém campos de capa e links de entrega que dependem de ação humana externa e ainda <strong>não</strong> foram preenchidos. Enquanto os marcadores <code>[[EXTERNAL_INPUT_REQUIRED: …]]</code> existirem neste arquivo, nenhuma renderização dele pode ser tratada como versão final de entrega.</p></blockquote>
+<hr>
+<div align="center">
+<h2>Predição de Churn em Telecomunicações</h2>
+<h3>Um sistema reprodutível de aprendizado supervisionado, do dado bruto ao monitoramento</h3>
+<p><strong>Instituição:</strong> <code>[[EXTERNAL_INPUT_REQUIRED: nome da instituição de ensino]]</code></p>
+<p><strong>Curso / Programa:</strong> <code>[[EXTERNAL_INPUT_REQUIRED: nome do curso de pós-graduação]]</code></p>
+<p><strong>Disciplina:</strong> <code>[[EXTERNAL_INPUT_REQUIRED: nome da disciplina]]</code></p>
+<p><strong>Professor(a) responsável:</strong> <code>[[EXTERNAL_INPUT_REQUIRED: nome do(a) docente]]</code></p>
+<p><strong>Autor:</strong> Vinicius Gomes</p>
+<p><strong>Cidade:</strong> <code>[[EXTERNAL_INPUT_REQUIRED: cidade]]</code></p>
+<p><strong>Data de entrega:</strong> <code>[[EXTERNAL_INPUT_REQUIRED: data da entrega]]</code></p>
+</div>
+<hr>
+<blockquote><p><strong>Nota sobre os campos pendentes.</strong> Os marcadores acima não são omissões de redação. Nenhum metadado acadêmico — instituição, curso, disciplina, docente, cidade ou data — consta em qualquer arquivo deste repositório, e este documento não inventa informação que não possa ser verificada. O único campo comprovado é a autoria, registrada em <code>pyproject.toml</code> e no histórico de commits.</p></blockquote>
+<hr>
+<h1>Introdução</h1>
+<p>Este trabalho constrói um sistema de predição de churn para uma operadora de telecomunicações. O objetivo declarado desde o início não foi treinar um classificador, e sim produzir algo que resista a inspeção:</p>
+<blockquote><p>um sistema reprodutível de predição de churn, validado sob um protocolo que protege o conjunto de teste, com limiar de decisão analisado, previsões explicadas exatamente, inferência empacotada e monitoramento desenhado.</p></blockquote>
+<p>A diferença entre esses dois objetivos aparece em cada decisão do relatório. Um notebook que atinge boa acurácia responde "o modelo acertou?". Um sistema de engenharia de ML precisa responder também "como sei que essa medida vale?", "o que o modelo usou para decidir?" e "como eu saberia que ele parou de funcionar?".</p>
+<p>O trabalho foi conduzido em quinze fases, cada uma encerrada em commit próprio, com resultados gravados em artefatos determinísticos e verificáveis. Todo número deste relatório provém de um experimento efetivamente executado pelo código do repositório e pode ser rastreado até um arquivo versionado — o mapeamento está na seção <em>Rastreabilidade</em>.</p>
+<h3>O que este relatório afirma, e o que não afirma</h3>
+<p><strong>Afirma:</strong> que o sistema identifica clientes em risco com qualidade de ordenação substancialmente superior ao acaso, sob um protocolo experimental que não foi contaminado pelo conjunto de teste.</p>
+<p><strong>Não afirma:</strong> que o sistema reduz churn. Essa é uma pergunta causal, e responder a ela exigiria um experimento de intervenção — campanha aleatorizada, grupo de controle, medição de <em>uplift</em> — que não foi conduzido. Predizer quem sairá e reduzir quantos saem são resultados diferentes, e este trabalho mede apenas o primeiro.</p>
+<hr>
+<h1>Descrição do problema</h1>
+<h3>O problema de negócio</h3>
+<p>Em telecomunicações a receita é recorrente: ela não vem da venda, vem da permanência. A aquisição de um cliente novo custa consistentemente mais do que a retenção de um existente, o que torna a pergunta operacional concreta e urgente:</p>
+<blockquote><p>quais clientes estão em risco de sair <strong>enquanto ainda é possível agir</strong>?</p></blockquote>
+<p>Uma lista de clientes perdidos tem valor analítico. Uma lista de clientes em risco tem valor operacional. O sistema precisa produzir a segunda.</p>
+<h3>O problema estatístico</h3>
+<p>Classificação binária supervisionada.</p>
+<table><thead><tr><th>Elemento</th><th>Definição</th></tr></thead><tbody><tr><td>Classe positiva</td><td><code>Churn = Yes</code> — o cliente encerrou o relacionamento</td></tr><tr><td>Classe negativa</td><td><code>Churn = No</code> — o cliente permaneceu</td></tr><tr><td>Saída primária</td><td>probabilidade de churn, contínua em <code>[0, 1]</code></td></tr><tr><td>Saída secundária</td><td>decisão binária, obtida aplicando um limiar justificado ao score</td></tr><tr><td>Unidade de análise</td><td>um cliente</td></tr></tbody></table>
+<p>A saída primária ser a <strong>probabilidade</strong>, e não a classe, é uma decisão de projeto. Uma operação de retenção não pergunta "quem vai sair?" — ela pergunta "com quem eu falo primeiro, dada a capacidade que tenho?". Priorizar exige ordenar, e ordenar exige um score contínuo. A conversão em decisão binária é uma segunda etapa, separada, analisada na seção <em>Resultados experimentais</em>.</p>
+<h3>Por que a acurácia não pode ser o critério</h3>
+<p>A base é desbalanceada: <strong>26,54 %</strong> dos clientes saíram. Um classificador trivial que responde "ninguém sai" para toda a carteira acerta <strong>73,46 %</strong> dos casos — e não encontra um único cliente em risco.</p>
+<p>Acurácia, isolada, não distingue esse modelo inútil de um modelo útil. O critério primário deste trabalho é, portanto, <strong>Average Precision</strong> (área sob a curva Precision-Recall), que mede qualidade de ordenação na classe minoritária, com <strong>ROC-AUC</strong> como métrica secundária. Acurácia é reportada, mas como métrica <strong>auxiliar</strong>, nunca como manchete.</p>
+<h3>As perguntas que o sistema precisa responder</h3>
+<ol><li>Quem está em risco?</li><li>Quais fatores estão associados à previsão, globalmente?</li><li>Por que <strong>esta</strong> previsão individual saiu como saiu?</li><li>Qual limiar de decisão é apropriado, e o que ele custa?</li><li>Como o modelo seria monitorado depois de implantado?</li></ol>
+<hr>
+<h1>Dataset utilizado</h1>
+<h3>Origem e versão</h3>
+<table><thead><tr><th>Campo</th><th>Valor</th></tr></thead><tbody><tr><td>Nome</td><td>Telco Customer Churn</td></tr><tr><td>Origem canônica</td><td>Kaggle — <code>blastchar/telco-customer-churn</code></td></tr><tr><td>Origem de reprodução pública</td><td>repositório GitHub da IBM, acessível por HTTPS sem autenticação</td></tr><tr><td>Natureza</td><td>dado de exemplo publicado pela IBM</td></tr><tr><td>Arquivo</td><td><code>WA_Fn-UseC_-Telco-Customer-Churn.csv</code></td></tr><tr><td>SHA-256 da representação canônica do projeto (<code>CRLF</code>)</td><td><code>88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a</code></td></tr><tr><td>SHA-256 dos bytes servidos pelo mirror público (<code>LF</code>)</td><td><code>16320c9c1ec72448db59aa0a26a0b95401046bef5d02fd3aeb906448e3055e91</code></td></tr><tr><td>Linhas</td><td>7043</td></tr><tr><td>Colunas</td><td>21</td></tr></tbody></table>
+<p>O arquivo bruto é <strong>versionado no repositório e nunca editado à mão</strong>. Toda transformação acontece em código, o que torna qualquer resultado reproduzível a partir dos bytes originais.</p>
+<h3>Duas identidades, e por que o relatório distingue as duas</h3>
+<p>A página do Kaggle exige autenticação, o que impediria a execução do notebook em um ambiente limpo sem credenciais. O notebook acadêmico usa por isso o repositório público da própria IBM.</p>
+<p>O mirror público <strong>não</strong> entrega os mesmos bytes que o projeto congelou, e o relatório não afirma que entrega. Ele distribui o mesmo dataset com representação <code>LF</code>, enquanto o arquivo congelado no projeto utiliza <code>CRLF</code>. O notebook registra o hash dos bytes baixados e, separadamente, normaliza <strong>exclusivamente</strong> a representação de quebras de linha antes de comparar com o SHA-256 congelado do projeto.</p>
+<table><thead><tr><th>Identidade</th><th>O que é</th><th>Valor</th></tr></thead><tbody><tr><td><code>downloaded_bytes_sha256</code></td><td>os bytes exatamente como servidos pelo mirror; propriedade do mirror, não do projeto</td><td><code>16320c9c…3055e91</code></td></tr><tr><td><code>canonicalized_dataset_sha256</code></td><td>o mesmo conteúdo reserializado na forma canônica do projeto</td><td><code>88be4b93…1d61358a</code></td></tr></tbody></table>
+<p>Apenas o segundo é comparado com a constante congelada, e é ele que precisa bater.</p>
+<p><strong>A regra de canonicalização, por extenso.</strong> O fluxo de bytes é dividido em linhas lógicas nos terminadores presentes (<code>CRLF</code>, <code>CR</code> isolado ou <code>LF</code> isolado) e reserializado com <code>CRLF</code>. Nada mais é tocado: sem remoção de espaços, sem reordenação de linhas ou colunas, sem conversão de valores, sem normalização de números, sem alteração de aspas e sem mudança semântica de codificação. A diferença de tamanho é de exatamente <strong>7 044 bytes — um por linha lógica</strong>.</p>
+<p><strong>Nenhuma diferença de dados está sendo escondida pela transformação.</strong> O notebook prova isso: removidos todos os terminadores de linha, os dois fluxos de bytes são idênticos, e a execução aborta se não forem. Uma segunda verificação, independente do hash, confirma 7 043 linhas e as 21 colunas esperadas na ordem esperada — de modo que "normalizar até o hash bater" seja distinguível de massagear outro dataset até que ele passasse na verificação.</p>
+<h3>Estrutura</h3>
+<p>Uma linha por cliente. Uma coluna identificadora (<code>customerID</code>, excluída da modelagem por não ser preditor), 19 preditores e a variável-alvo.</p>
+<table><thead><tr><th>Grupo</th><th>Quantidade</th><th>Colunas</th></tr></thead><tbody><tr><td>Numéricos</td><td>3</td><td><code>tenure</code>, <code>MonthlyCharges</code>, <code>TotalCharges</code></td></tr><tr><td>Categóricos</td><td>16</td><td>demografia, serviços contratados, contrato, faturamento, pagamento</td></tr><tr><td>Alvo</td><td>1</td><td><code>Churn</code> ∈ {<code>No</code>, <code>Yes</code>}</td></tr></tbody></table>
+<h3>Distribuição do alvo</h3>
+<table><thead><tr><th>Classe</th><th>Contagem</th><th>Proporção</th></tr></thead><tbody><tr><td><code>No</code> (permaneceu)</td><td>5 174</td><td>73,46 %</td></tr><tr><td><code>Yes</code> (saiu)</td><td>1 869</td><td>26,54 %</td></tr></tbody></table>
+<p><img src="../figures/eda/01_target_distribution.png" alt="Distribuição do alvo"></p>
+<p>Razão entre classes de 2,77 : 1. Desbalanceamento moderado — suficiente para inviabilizar a acurácia como critério, insuficiente para exigir reamostragem.</p>
+<h3>Qualidade dos dados</h3>
+<p>Verificações executadas sobre o arquivo bruto:</p>
+<table><thead><tr><th>Verificação</th><th>Resultado</th></tr></thead><tbody><tr><td>Linhas duplicadas</td><td>0</td></tr><tr><td>Identificadores duplicados</td><td>0</td></tr><tr><td>Valores nulos declarados</td><td>0</td></tr><tr><td>Domínio do alvo</td><td>exatamente <code>{No, Yes}</code></td></tr><tr><td>Cardinalidade das categóricas</td><td>2 a 4 níveis; nenhuma de alta cardinalidade</td></tr></tbody></table>
+<p>Há <strong>um</strong> problema real, e ele é instrutivo.</p>
+<h3>O caso de <code>TotalCharges</code></h3>
+<p><code>TotalCharges</code> chega tipada como <strong>texto</strong>, não como número, porque <strong>11 células contêm apenas espaço em branco</strong>. Um <code>read_csv</code> ingênuo produz uma coluna de objetos e qualquer operação numérica falha silenciosamente ou explode.</p>
+<p>Essas 11 linhas não são dados faltantes no sentido usual. <strong>Todas têm <code>tenure = 0</code></strong>: são clientes que ainda não completaram um ciclo de faturamento, de modo que o total acumulado ainda não existe. O valor correto é zero — e zero, aqui, é um fato sobre o cliente, não uma imputação.</p>
+<p>Daí a regra congelada do projeto:</p>
+<table><thead><tr><th>Situação</th><th>Tratamento</th><th>Justificativa</th></tr></thead><tbody><tr><td>Branco <strong>e</strong> <code>tenure = 0</code></td><td><strong>zero estrutural</strong></td><td>não houve faturamento; zero é o valor verdadeiro</td></tr><tr><td>Branco <strong>e</strong> <code>tenure &gt; 0</code></td><td><strong>erro — rejeita</strong></td><td>um cliente com histórico tem de ter total; imputar inventaria histórico</td></tr><tr><td>Texto não numérico</td><td><strong>erro — rejeita</strong></td><td>não é interpretável</td></tr></tbody></table>
+<p>A segunda linha é a metodologicamente importante. A regra <strong>não</strong> é "preencher branco com zero"; é "preencher com zero <strong>onde zero é justificável</strong>" e falhar alto onde não é. Esse mesmo transformador roda dentro da API de produção: uma imputação silenciosa ali esconderia corrupção de dados a montante.</p>
+<h3>Dependências estruturais</h3>
+<p>Sete relações mecânicas ligam colunas do dataset. Elas não são ruído de codificação — mudam a leitura de qualquer explicação e são tratadas explicitamente na seção <em>Explicabilidade do modelo</em>.</p>
+<pre><code>InternetService = No   ⟺   OnlineSecurity   = "No internet service"
+                           OnlineBackup     = "No internet service"
+                           DeviceProtection = "No internet service"
+                           TechSupport      = "No internet service"
+                           StreamingTV      = "No internet service"
+                           StreamingMovies  = "No internet service"
+
+PhoneService    = No   ⟺   MultipleLines    = "No phone service"</code></pre>
+<p>As equivalências foram verificadas nas 7043 linhas, em ambas as direções: 1 526 clientes sem internet e 682 sem telefone, sem uma única exceção.</p>
+<h3>Um sinal exploratório relevante</h3>
+<p><img src="../figures/eda/04_churn_rate_by_contract.png" alt="Taxa de churn por contrato"></p>
+<p>O tipo de contrato separa fortemente: contratos mensais churnam a taxa muito superior à de contratos anuais e bienais. Isso é <strong>associação</strong>, não causa — o tipo de contrato também é escolhido por clientes que já pretendem ficar pouco tempo. O modelo pode usar o sinal; o relatório não pode chamá-lo de causa.</p>
+<hr>
+<h1>Metodologia adotada</h1>
+<h3>Princípio organizador</h3>
+<p>O trabalho segue um protocolo experimental fixado <strong>antes</strong> dos resultados, e a disciplina central é uma só:</p>
+<blockquote><p>Nenhuma decisão pode ser tomada olhando para o conjunto de teste.</p></blockquote>
+<p>Isso não é formalidade acadêmica. Um conjunto de teste fornece estimativa não enviesada <strong>apenas enquanto</strong> nenhuma escolha tiver sido feita observando-o. Depois que alguém olha o resultado e volta para ajustar qualquer coisa, a estimativa deixa de valer — e nenhuma métrica denuncia isso.</p>
+<h3>A divisão, e o que ela protege</h3>
+<table><thead><tr><th>Parâmetro</th><th>Valor</th></tr></thead><tbody><tr><td><code>test_size</code></td><td><code>0.20</code></td></tr><tr><td><code>stratify</code></td><td>pela coluna <code>Churn</code></td></tr><tr><td><code>random_state</code></td><td><code>42</code></td></tr><tr><td>Pool de treino</td><td>5 634 linhas</td></tr><tr><td>Holdout</td><td>1 409 linhas</td></tr><tr><td>SHA-256 dos IDs de treino</td><td><code>a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd</code></td></tr><tr><td>SHA-256 dos IDs do holdout</td><td><code>1ad8aefb7e34776a78d76765d2465c630a41b3813b1d7d96d0d1b03d049776f6</code></td></tr></tbody></table>
+<p><strong>Estratificado</strong> porque a classe positiva é minoritária: uma partição aleatória simples poderia deslocar a prevalência entre os lados. <strong>Semente fixa</strong> porque a partição precisa ser idêntica em qualquer máquina, em qualquer execução.</p>
+<p>A partição é <strong>função pura</strong> dos bytes brutos mais a configuração, então é regenerada em vez de armazenada, e os digests dos identificadores provam que a regeneração produziu exatamente o mesmo conjunto de linhas.</p>
+<h3>Prevenção de vazamento</h3>
+<p>Todo passo com estado vive <strong>dentro</strong> de um <code>Pipeline</code> do scikit-learn, ajustado somente nos dados de treino de cada fold:</p>
+<table><thead><tr><th>Passo</th><th>Tem estado?</th><th>O que aprende</th></tr></thead><tbody><tr><td><code>TotalChargesCleaner</code></td><td>não</td><td>nada — a regra é determinística</td></tr><tr><td><code>StandardScaler</code></td><td>sim</td><td>média e desvio das 3 numéricas</td></tr><tr><td><code>OneHotEncoder</code></td><td>sim</td><td>os níveis das 16 categóricas</td></tr><tr><td><code>LogisticRegression</code></td><td>sim</td><td>46 coeficientes + intercepto</td></tr></tbody></table>
+<p>Como os três passos com estado estão no mesmo <code>Pipeline</code>, a validação cruzada reajusta <strong>todos</strong> eles a cada fold. A proteção é estrutural: não depende de o programador lembrar de fazer certo.</p>
+<h3>Protocolo de comparação</h3>
+<p><code>StratifiedKFold(n_splits=5, shuffle=True, random_state=42)</code>, sobre o pool de treino, <strong>compartilhada por todos os modelos</strong>. As diferenças são portanto <strong>pareadas</strong> — os modelos são avaliados nas mesmas linhas, nos mesmos folds.</p>
+<p>Toda regra de elegibilidade foi <strong>fixada antes de observar resultados</strong> e exige:</p>
+<ol><li>delta médio pareado positivo na métrica de decisão; <strong>e</strong></li><li>melhora em pelo menos <strong>4 dos 5 folds</strong>.</li></ol>
+<p>O critério de consistência existe para impedir uma armadilha específica: uma vantagem média grande produzida por um ganho enorme em um único fold, com perdas nos demais. Isso é variância, não superioridade.</p>
+<blockquote><p><strong>Nenhum teste de significância foi executado.</strong> Cinco folds não sustentam um, e as classificações usadas — PROMISSOR, INCONCLUSIVO, NÃO SUSTENTADO, ELEGÍVEL, NÃO ELEGÍVEL — são heurísticas de engenharia sobre direção e consistência, não inferência estatística. Nenhum p-valor é reportado neste trabalho.</p></blockquote>
+<h3>A ordem das decisões finais</h3>
+<p>A ordem importa e foi fixada:</p>
+<pre><code>calibração  →  limiar  →  congelamento  →  holdout  →  análise de erro</code></pre>
+<p>A calibração vem <strong>antes</strong> do limiar porque reescreve as probabilidades sobre as quais o limiar age. Um limiar escolhido primeiro pertenceria a um score que deixaria de existir. Ambas as decisões foram tomadas <strong>exclusivamente no pool de treino</strong>.</p>
+<hr>
+<h1>Pipeline de Machine Learning</h1>
+<h3>Arquitetura</h3>
+<pre><code>CSV bruto (7043 × 21)
+      │
+      ├─ verificação SHA-256 ──────────────► aborta se divergir
+      │
+      ▼
+divisão estratificada (seed 42)
+      │
+      ├──────────────────────────────► HOLDOUT (1409)  ░ lacrado até a avaliação final
+      ▼
+POOL DE TREINO (5634)
+      │
+      ▼
+┌─────────────────────────────────────────────────┐
+│ Pipeline                                        │
+│   1. TotalChargesCleaner   (sem estado)         │
+│   2. ColumnTransformer                          │
+│        ├─ StandardScaler    → 3 numéricas       │
+│        └─ OneHotEncoder     → 16 categóricas    │
+│           handle_unknown="ignore"               │
+│   3. LogisticRegression(C=1.0, lbfgs)           │
+└─────────────────────────────────────────────────┘
+      │  19 features de entrada → 46 colunas transformadas
+      ▼
+probabilidade de churn ∈ [0, 1]
+      │
+      ▼
+decisão:  probabilidade ≥ 0,3272694566222328  →  sinalizar</code></pre>
+<h3>Decisões de pré-processamento, e por quê</h3>
+<p><strong><code>StandardScaler</code> nas numéricas.</strong> A regressão logística com penalização L2 é sensível à escala: sem padronizar, a penalização atinge desigualmente coeficientes de features em unidades diferentes (meses, reais mensais, reais acumulados). A padronização torna a penalização comparável entre features.</p>
+<p><strong><code>OneHotEncoder(handle_unknown="ignore")</code> nas categóricas.</strong> O <code>ignore</code> é uma decisão operacional deliberada, não um padrão aceito por inércia. Uma categoria nunca vista em treino — um plano novo, um meio de pagamento novo — vira um bloco de zeros e contribui <strong>exatamente nada</strong>, em vez de derrubar a predição. O serviço continua respondendo, e o monitoramento conta o evento.</p>
+<p><strong><code>customerID</code> excluído.</strong> É identificador, não preditor. Mantê-lo permitiria ao modelo memorizar linhas individuais.</p>
+<h3>Engenharia de atributos</h3>
+<p>Esta seção precisa ser lida com precisão, porque é fácil interpretá-la errado.</p>
+<p><strong>Engenharia de atributos foi executada.</strong> Cinco grupos de features foram formulados a partir de hipóteses substantivas e avaliados sob o protocolo congelado, com deltas pareados por fold contra a linha de base. O que <strong>não</strong> aconteceu foi a <em>adoção</em> de qualquer um deles no modelo final.</p>
+<table><thead><tr><th></th><th>Grupo</th><th>Hipótese</th><th>Δ AP pareado</th><th>Folds melhores</th><th>Classificação</th></tr></thead><tbody><tr><td><strong>E1</strong></td><td><code>protective_services</code></td><td>a contagem de serviços de proteção carrega sinal que os dummies não expressam como inclinação</td><td>−0,0000</td><td>2/5</td><td><strong>NÃO SUSTENTADO</strong></td></tr><tr><td><strong>E2</strong></td><td><code>automatic_payment</code></td><td>o eixo manual/automático estima o sinal de pagamento mais estavelmente</td><td>+0,0001</td><td>3/5</td><td><strong>INCONCLUSIVO</strong></td></tr><tr><td><strong>E3</strong></td><td><code>contract_tenure</code></td><td>a interação contrato × tenure capta risco que nenhum dos dois isolado expressa</td><td>+0,0017</td><td>4/5</td><td><strong>PROMISSOR</strong></td></tr><tr><td><strong>E4</strong></td><td><code>historical_average_charge</code></td><td>cobrança média histórica separa cliente caro de cliente antigo</td><td>−0,0015</td><td>1/5</td><td><strong>NÃO SUSTENTADO</strong></td></tr><tr><td><strong>E5</strong></td><td><code>charge_intensity</code></td><td>cobrança relativa à mediana da faixa capta desalinhamento de preço</td><td>−0,0005</td><td>2/5</td><td><strong>NÃO SUSTENTADO</strong></td></tr></tbody></table>
+<p><strong>E1 é o caso mais instrutivo.</strong> A contagem de serviços protetores é uma <strong>soma determinística de indicadores que o modelo já recebe codificados</strong>. Ela não acrescenta informação — apenas uma parametrização mais grosseira de informação já presente. O resultado nulo é o resultado correto, e tê-lo <strong>medido</strong> é o que permite afirmá-lo em vez de supô-lo.</p>
+<p><strong>E3 foi promissor e mesmo assim não foi adotado.</strong> Melhorou em 4 de 5 folds, com ganho médio de +0,0017 de Average Precision — direção consistente, magnitude pequena. O custo é concreto: duas features a mais, 48 colunas em vez de 46, e uma interação a explicar em cada explicação individual. O ganho não paga esse custo. E3 foi mantido como <strong>análise de sensibilidade</strong> — carregado para a comparação de modelos como conjunto alternativo de features, para verificar que a escolha do modelo não dependia da representação — mas ficou fora do pipeline final.</p>
+<p>O critério, declarado antes dos experimentos:</p>
+<blockquote><p>a engenharia de atributos foi orientada por hipóteses, e a adoção exigia benefício demonstrado suficiente para justificar a complexidade adicionada.</p></blockquote>
+<p><strong>O modelo final usa, portanto, as 19 features originais.</strong></p>
+<hr>
+<h1>Resultados experimentais</h1>
+<h2>Baselines</h2>
+<p>Um baseline não é formalidade: ele separa o que é mérito do modelo do que é estrutura do problema.</p>
+<table><thead><tr><th>Modelo</th><th>Average Precision</th><th>ROC-AUC</th><th>F1</th><th>Recall</th><th>Precisão</th><th>Acurácia</th></tr></thead><tbody><tr><td>Classe majoritária (<code>DummyClassifier</code>)</td><td>0,2654</td><td>0,5000</td><td><strong>0,0000</strong></td><td>0,0000</td><td>0,0000</td><td>0,7346</td></tr><tr><td>Aleatório estratificado</td><td>0,2686</td><td>0,5065</td><td>0,2762</td><td>0,2776</td><td>0,2748</td><td>0,6139</td></tr><tr><td><strong>Regressão logística</strong></td><td><strong>0,6615</strong></td><td><strong>0,8461</strong></td><td>0,5924</td><td>0,5438</td><td>0,6521</td><td>0,8019</td></tr></tbody></table>
+<p><em>Validação cruzada 5-fold no pool de treino; limiar diagnóstico 0,5.</em></p>
+<p>O classificador de classe majoritária alcança <strong>73,46 % de acurácia com F1 igual a zero</strong>. É a demonstração empírica, e não retórica, de que acurácia isolada não mede utilidade neste problema.</p>
+<p>A logística eleva o Average Precision de <strong>0,2654</strong> (a prevalência, que é o AP de um classificador sem informação) para <strong>0,6615</strong>. Esse é o ganho real: capacidade de <strong>ordenar</strong> clientes por risco.</p>
+<h2>Comparação de modelos</h2>
+<p>Três famílias, cada uma com hipótese explícita — não uma varredura de dezenas de algoritmos.</p>
+<table><thead><tr><th></th><th>Família</th><th>Hipótese</th></tr></thead><tbody><tr><td><strong>M0</strong></td><td>Regressão logística</td><td>log-odds aditivo nas features codificadas; é a <strong>referência</strong>, não candidata</td></tr><tr><td><strong>M1</strong></td><td>Random forest</td><td>árvores profundas decorrelacionadas capturam interações e efeitos não monótonos que uma inclinação aditiva não expressa</td></tr><tr><td><strong>M2</strong></td><td>Histogram gradient boosting</td><td>árvores rasas ajustadas ao gradiente atacam os erros que um modelo linear deixa</td></tr></tbody></table>
+<table><thead><tr><th>Experimento</th><th>Average Precision (média ± dp)</th><th>ROC-AUC (média ± dp)</th></tr></thead><tbody><tr><td><strong>M0</strong> Regressão logística</td><td><strong>0,661493 ± 0,021661</strong></td><td><strong>0,846149 ± 0,014045</strong></td></tr><tr><td>M1 Random forest</td><td>0,606181 ± 0,029565</td><td>0,817956 ± 0,012940</td></tr><tr><td>M2 Histogram gradient boosting</td><td>0,647137 ± 0,023553</td><td>0,836448 ± 0,006090</td></tr></tbody></table>
+<p><img src="../figures/model_comparison/01_cv_average_precision_comparison.png" alt="Comparação de modelos"></p>
+<p>Nenhuma família baseada em árvores supera a logística na métrica primária. Isso é menos surpreendente do que parece: depois da codificação one-hot, a maior parte do sinal deste problema é aproximadamente <strong>aditiva em log-odds</strong> — tenure baixo, contrato mensal, fibra óptica, cheque eletrônico. Não há estrutura de interação rica que justifique capacidade extra, e capacidade sem sinal para explicar vira variância.</p>
+<h2>Ajuste de hiperparâmetros</h2>
+<p>Validação cruzada <strong>aninhada</strong>: laço externo de 5 folds estima o desempenho do <em>procedimento</em>; dentro de cada fold de treino, laço interno de 4 folds escolhe os hiperparâmetros. A escolha nunca observa as linhas em que é avaliada.</p>
+<table><thead><tr><th></th><th>Procedimento</th><th>AP externo (média ± dp)</th><th>Δ pareado vs. T0</th><th>Folds melhores</th></tr></thead><tbody><tr><td><strong>T0</strong></td><td>Logística congelada (<code>C = 1,0</code>, sem tuning)</td><td>0,661493 ± 0,021661</td><td>—</td><td>—</td></tr><tr><td>T1</td><td>Logística com <code>C</code> buscado</td><td>0,661298 ± 0,021128</td><td>−0,000195</td><td>2/5</td></tr><tr><td>T2</td><td>Histogram gradient boosting ajustado</td><td><strong>0,665335</strong> ± 0,027058</td><td><strong>+0,003842</strong></td><td>3/5</td></tr></tbody></table>
+<p><strong>T2 obteve o maior AP médio e mesmo assim não foi adotado.</strong> Ele vence em 3 folds e perde em 2 — a vantagem média vem de ganho grande em poucos folds, não de superioridade consistente. A regra de elegibilidade, fixada antes dos resultados, exigia 4 de 5.</p>
+<p>Adotá-lo seria escolher pelo maior número em vez de por evidência de que ele é de fato melhor. Aplica-se o padrão pré-registrado: <strong>mantém-se o modelo mais simples</strong>. Esta é, provavelmente, a decisão de engenharia mais importante do trabalho.</p>
+<h2>Política de calibração</h2>
+<p>Igualmente importante enunciar com precisão: <strong>calibração foi experimentada.</strong> Dois métodos foram testados contra o modelo não calibrado, com Brier score como métrica de decisão primária e log loss como secundária, sob a mesma validação cruzada.</p>
+<table><thead><tr><th></th><th>Método</th><th>Brier</th><th>Log loss</th><th>Δ AP</th><th>Folds em que o Brier melhora</th></tr></thead><tbody><tr><td><strong>C0</strong></td><td>Não calibrado</td><td><strong>0,135064</strong></td><td>0,416680</td><td>—</td><td>referência</td></tr><tr><td>C1</td><td>Sigmoid (Platt)</td><td>0,135081</td><td><strong>0,416597</strong></td><td>+0,00000</td><td><strong>1/5</strong></td></tr><tr><td>C2</td><td>Isotônica</td><td>0,135388</td><td>0,428612</td><td>−0,015135</td><td>2/5</td></tr></tbody></table>
+<p><img src="../figures/calibration/01_reliability_diagram.png" alt="Diagrama de confiabilidade"></p>
+<p>Nenhum método cumpriu o protocolo de adoção. O sigmoid praticamente não altera nada — coerente com o fato de que a regressão logística já produz probabilidades razoavelmente calibradas por construção. A isotônica piora tudo, inclusive a ordenação (AP cai em <strong>5 de 5 folds</strong>), sinal clássico de sobreajuste com esta quantidade de dados.</p>
+<p><strong>Resultado: <code>calibration_policy = NONE</code>.</strong></p>
+<p>A consequência precisa ser dita: os scores são <strong>posições de ordenação</strong>, não frequências calibradas. Uma probabilidade de 0,42 não deve ser lida como "42 % destes clientes sairão".</p>
+<h2>Limiar de decisão</h2>
+<p><code>predict()</code> usa 0,5 por padrão. Esse número vem da implementação, não do problema. Em um problema desbalanceado com custos assimétricos, aceitá-lo sem exame é aceitar uma decisão que ninguém tomou.</p>
+<p>A assimetria é concreta:</p>
+<ul><li>um <strong>falso negativo</strong> é um cliente em risco que a operação nunca contatou — a oportunidade de retenção foi perdida;</li><li>um <strong>falso positivo</strong> é um cliente estável que recebeu contato — custa esforço e, eventualmente, um desconto desnecessário.</li></ul>
+<p><strong>Política adotada: maximização de F1</strong>, aplicada às probabilidades <em>out-of-fold</em> do pool de treino. O procedimento foi validado de forma aninhada — em cada fold externo o limiar era escolhido apenas nos dados de treino daquele fold e avaliado nos de validação.</p>
+<table><thead><tr><th>Critério de elegibilidade</th><th>Resultado</th></tr></thead><tbody><tr><td>Δ médio pareado de F1 contra o padrão 0,5</td><td><strong>+0,040905</strong></td></tr><tr><td>Folds com melhora estrita</td><td><strong>5 / 5</strong></td></tr><tr><td>Situação</td><td><strong>ELEGÍVEL</strong></td></tr></tbody></table>
+<p>Aplicado uma última vez ao pool de treino inteiro, fixa-se:</p>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><strong>Limiar final</strong></td><td><strong><code>0,3272694566222328</code></strong></td></tr><tr><td><strong>Política</strong></td><td><code>F1_MAXIMIZATION</code></td></tr><tr><td><strong>Regra de decisão</strong></td><td><code>probabilidade ≥ limiar</code></td></tr></tbody></table>
+<p><img src="../figures/threshold/01_precision_recall_vs_threshold.png" alt="Trade-off de limiar"></p>
+<h3>O que a mudança de limiar realmente faz</h3>
+<table><thead><tr><th></th><th>Padrão 0,5</th><th>Congelado 0,327</th></tr></thead><tbody><tr><td>Recall</td><td>0,5438</td><td><strong>0,7431</strong></td></tr><tr><td>Precisão</td><td>0,6521</td><td><strong>0,5591</strong></td></tr><tr><td>F1</td><td>0,5924</td><td><strong>0,6381</strong></td></tr><tr><td>Taxa de clientes sinalizados</td><td>~22 %</td><td><strong>~35 %</strong></td></tr></tbody></table>
+<p><em>Métricas out-of-fold no pool de treino — são as métricas que <strong>selecionaram</strong> o limiar, portanto otimistas, e <strong>não</strong> são desempenho final.</em></p>
+<p>O modelo passa a encontrar cerca de três quartos dos clientes que sairão, em vez de pouco mais da metade. O preço é que quase metade dos sinalizados não iria sair, e a operação precisa de capacidade para contatar 35 % da carteira em vez de 22 %.</p>
+<blockquote><p><strong>Este não é "o limiar ótimo para o negócio".</strong> É o limiar que a política declarada seleciona com os dados disponíveis. A decisão correta dependeria do custo de uma campanha de retenção, do valor de um cliente retido e da capacidade operacional — três números que este trabalho <strong>não possui</strong>. Nenhum deles foi inventado para produzir uma justificativa mais elegante.</p></blockquote>
+<h2>Avaliação final no holdout</h2>
+<p>O holdout foi aberto <strong>exatamente uma vez</strong>, depois de todas as decisões estarem congeladas.</p>
+<pre><code>evaluations_performed   = 1
+selection_after_holdout = False
+holdout_reopened        = False</code></pre>
+<table><thead><tr><th>Métrica</th><th>Valor</th><th>IC 95 %</th><th>Referência sem informação</th></tr></thead><tbody><tr><td><strong>Average Precision</strong></td><td><strong>0,6337</strong></td><td>[0,5777 – 0,6864]</td><td>0,2654</td></tr><tr><td><strong>ROC-AUC</strong></td><td><strong>0,8420</strong></td><td>[0,8183 – 0,8633]</td><td>0,5000</td></tr><tr><td><strong>Recall</strong></td><td><strong>0,7219</strong></td><td>[0,6760 – 0,7652]</td><td>—</td></tr><tr><td><strong>Precisão</strong></td><td><strong>0,5378</strong></td><td>[0,4937 – 0,5791]</td><td>—</td></tr><tr><td><strong>F1</strong></td><td><strong>0,6164</strong></td><td>[0,5762 – 0,6534]</td><td>—</td></tr><tr><td>Acurácia <em>(auxiliar)</em></td><td>0,7615</td><td>—</td><td>0,7346</td></tr><tr><td>Especificidade <em>(auxiliar)</em></td><td>0,7758</td><td>—</td><td>—</td></tr><tr><td>Acurácia balanceada <em>(auxiliar)</em></td><td>0,7489</td><td>—</td><td>—</td></tr></tbody></table>
+<p><em>Holdout: 1 409 clientes — 374 saíram, 1 035 permaneceram (prevalência 0,2654). Intervalos por bootstrap percentil, 2 000 reamostragens, semente 42.</em></p>
+<p><img src="../figures/holdout/01_precision_recall_curve.png" alt="Curva Precision-Recall no holdout"></p>
+<h3>Matriz de confusão</h3>
+<table><thead><tr><th></th><th>Previsto: permanece</th><th>Previsto: sai</th></tr></thead><tbody><tr><td><strong>Real: permaneceu</strong></td><td>803</td><td>232</td></tr><tr><td><strong>Real: saiu</strong></td><td>104</td><td><strong>270</strong></td></tr></tbody></table>
+<p><img src="../figures/holdout/03_confusion_matrix.png" alt="Matriz de confusão"></p>
+<p>Dos 374 clientes que efetivamente saíram, <strong>270 foram identificados</strong> e 104 passaram despercebidos. Dos 502 clientes sinalizados, 270 de fato saíram.</p>
+<hr>
+<h1>Análise das métricas</h1>
+<h3>Como ler cada número</h3>
+<p><strong>Average Precision = 0,6337.</strong> Precisão média ao longo de toda a curva Precision-Recall. A referência sem informação é a prevalência, 0,2654 — o modelo alcança <strong>2,4 vezes</strong> esse valor. É a comparação que mais importa neste trabalho.</p>
+<p><strong>ROC-AUC = 0,8420.</strong> Probabilidade de o modelo ordenar um cliente que saiu acima de um que permaneceu, tomados ao acaso.</p>
+<blockquote><p><strong>Isto não é "84 % de acerto".</strong> Confundir ROC-AUC com acurácia é o erro de leitura mais comum em relatórios de churn, e este relatório não o comete.</p></blockquote>
+<p><strong>Recall = 0,7219.</strong> O modelo encontra 72 % dos clientes que efetivamente saíram. É a métrica mais próxima do valor operacional: cada ponto de recall é um cliente em risco que entra na lista de contato.</p>
+<p><strong>Precisão = 0,5378.</strong> Pouco mais da metade dos sinalizados de fato saiu. É a métrica que a operação sente como custo: quase metade dos contatos vai para quem ficaria de qualquer forma.</p>
+<p><strong>F1 = 0,6164.</strong> Média harmônica de precisão e recall no ponto de operação congelado. É a métrica que a política de limiar maximizou — logo, é o número que o procedimento foi projetado para otimizar, e deve ser lido com essa consciência.</p>
+<p><strong>Acurácia = 0,7615 — e por que ela quase não informa.</strong> A classe majoritária entrega 0,7346 de graça. O ganho de 2,7 pontos percentuais descreve mal um modelo que identifica 72 % dos churners. Por isso a acurácia é reportada como <strong>auxiliar</strong>, nunca como manchete.</p>
+<h3>Intervalos de confiança</h3>
+<p>Bootstrap percentil com 2 000 reamostragens do holdout (semente 42). O modelo <strong>não</strong> é reajustado a cada reamostragem, e o limiar <strong>não</strong> é reescolhido: os intervalos descrevem a incerteza da estimativa sobre esta população, não a variabilidade de todo o procedimento de modelagem. Essa distinção é importante — o intervalo é mais estreito do que seria se todo o pipeline fosse reexecutado.</p>
+<h3>Generalização: desenvolvimento contra holdout</h3>
+<table><thead><tr><th>Métrica</th><th>Desenvolvimento (CV)</th><th>Holdout</th><th>Diferença</th></tr></thead><tbody><tr><td>Average Precision</td><td>0,661493</td><td>0,633702</td><td><strong>−0,027791</strong></td></tr><tr><td>ROC-AUC</td><td>0,846149</td><td>0,842034</td><td><strong>−0,004115</strong></td></tr></tbody></table>
+<p>A queda é pequena e na direção esperada. Estimativas de validação cruzada no pool que participou de todas as escolhas tendem a ser levemente otimistas; ver o holdout ligeiramente abaixo é o comportamento normal de um procedimento que não sobreajustou.</p>
+<blockquote><p>Isto é uma <strong>descrição</strong>, não um teste. Nenhuma hipótese foi formulada sobre essa diferença, nenhum p-valor foi calculado e nenhum limite de aprovação foi definido antes de observá-la.</p></blockquote>
+<h3>A limitação que não pode ser omitida — exposição do analista</h3>
+<p>O holdout foi protegido corretamente <strong>a partir do momento da divisão</strong>: nenhum ajuste, seleção, busca de hiperparâmetro ou escolha de limiar o tocou. O pipeline garante isso estruturalmente.</p>
+<p>Mas a análise exploratória inicial deste projeto foi conduzida sobre as <strong>7043 linhas completas</strong>, antes de o holdout ser formalmente separado. As hipóteses que orientaram o trabalho — que contrato importa, que tenure domina, que fibra se associa a mais churn — foram formadas observando dados que incluíam as linhas que depois se tornaram o conjunto de teste.</p>
+<p>Portanto:</p>
+<blockquote><p><strong>A estimativa final pode carregar um viés otimista que não é quantificável aqui.</strong></p></blockquote>
+<p>Não há como medir esse viés com os dados existentes: seria preciso um segundo conjunto de teste, coletado posteriormente e nunca observado. Ele não existe.</p>
+<p>O que se pode afirmar com precisão:</p>
+<ul><li><strong>vazamento algorítmico não ocorreu</strong> — nenhuma estatística foi ajustada no holdout;</li><li><strong>vazamento de conhecimento do analista ocorreu</strong>, em grau desconhecido;</li><li>o efeito é provavelmente pequeno — as hipóteses exploratórias eram sobre estrutura geral do problema, não sobre linhas individuais — mas "provavelmente pequeno" é uma avaliação, não uma medida.</li></ul>
+<p>Registrar isso custa precisão aparente e devolve confiabilidade. Um relatório que omite essa limitação afirma mais do que possui.</p>
+<hr>
+<h1>Explicabilidade do modelo</h1>
+<h2>Estratégia: por que não SHAP</h2>
+<p>SHAP, LIME e importância por permutação existem para sondar modelos cuja superfície de resposta é <strong>desconhecida</strong>. Este modelo é conhecido em forma fechada:</p>
+<pre><code>logit(P) = β₀ + Σ contribuição_f          (f = 1 … 19 features brutas)
+P        = σ(logit)</code></pre>
+<p>Cada contribuição é o termo aditivo daquela feature bruta no preditor linear — a soma dos coeficientes das colunas one-hot que ela ocupa, multiplicados pelos valores transformados. A decomposição é <strong>exata</strong>, não uma aproximação.</p>
+<p>Usar um estimador por amostragem aqui adicionaria uma dependência, uma semente aleatória e um erro de aproximação em troca de uma resposta <strong>pior</strong> a uma pergunta já respondida exatamente. Não usar SHAP não é limitação deste trabalho — é a escolha correta para esta classe de modelo.</p>
+<p>A identidade é verificada, não assumida: sobre as 5 634 linhas do pool de treino, o erro máximo de reconstrução do logit é <strong>0,0</strong> e o erro máximo de probabilidade é <strong>1,1 × 10⁻¹⁶</strong>, contra tolerância de 1 × 10⁻¹².</p>
+<h2>Explicabilidade global</h2>
+<p>O ranking abaixo ordena as features pela <strong>dispersão empírica da contribuição</strong> no pool de treino: o desvio-padrão do termo que aquela feature adiciona ao logit ao longo dos 5 634 clientes.</p>
+<table><thead><tr><th>#</th><th>Feature</th><th>Tipo</th><th>Dispersão (log-odds)</th><th>IQR</th></tr></thead><tbody><tr><td>1</td><td><code>tenure</code></td><td>numérica</td><td><strong>1,2552</strong></td><td>2,3503</td></tr><tr><td>2</td><td><code>MonthlyCharges</code></td><td>numérica</td><td>0,6012</td><td>1,0840</td></tr><tr><td>3</td><td><code>InternetService</code></td><td>categórica</td><td>0,5882</td><td>1,2917</td></tr><tr><td>4</td><td><code>Contract</code></td><td>categórica</td><td>0,5636</td><td>0,7012</td></tr><tr><td>5</td><td><code>TotalCharges</code></td><td>numérica</td><td>0,5326</td><td>0,8022</td></tr><tr><td>6</td><td><code>StreamingMovies</code></td><td>categórica</td><td>0,2220</td><td>0,4202</td></tr><tr><td>7</td><td><code>StreamingTV</code></td><td>categórica</td><td>0,2215</td><td>0,4195</td></tr><tr><td>8</td><td><code>OnlineSecurity</code></td><td>categórica</td><td>0,1971</td><td>0,3267</td></tr><tr><td>9</td><td><code>PaperlessBilling</code></td><td>categórica</td><td>0,1833</td><td>0,3729</td></tr><tr><td>10</td><td><code>MultipleLines</code></td><td>categórica</td><td>0,1827</td><td>0,3848</td></tr><tr><td>…</td><td>…</td><td>…</td><td>…</td><td>…</td></tr><tr><td>17</td><td><code>gender</code></td><td>categórica</td><td>0,0109</td><td>0,0219</td></tr><tr><td>18</td><td><code>Partner</code></td><td>categórica</td><td>0,0107</td><td>0,0215</td></tr><tr><td>19</td><td><code>PhoneService</code></td><td>categórica</td><td>0,0082</td><td>0,0000</td></tr></tbody></table>
+<p><img src="../figures/interpretability/03_raw_feature_contribution_dispersion.png" alt="Dispersão da contribuição por feature"></p>
+<p><strong><code>tenure</code> domina</strong> com folga — dispersão cerca de duas vezes a da segunda colocada. É a única feature que varia continuamente de 0 a 72 meses e cujo coeficiente é grande, de modo que move o score ao longo de toda a carteira.</p>
+<p><strong><code>MonthlyCharges</code>, <code>InternetService</code>, <code>Contract</code> e <code>TotalCharges</code></strong> formam o segundo bloco. <code>InternetService</code> e <code>Contract</code> aparecem alto apesar de terem apenas três níveis cada: poucos níveis com coeficientes distantes produzem muita dispersão.</p>
+<p><strong><code>gender</code>, <code>Partner</code> e <code>PhoneService</code> são praticamente inertes</strong> — dispersão abaixo de 0,012 log-odds. O modelo aprendeu que essas features quase não movem o score.</p>
+<h3>O que esse ranking não é</h3>
+<table><thead><tr><th>Não é</th><th>Por quê</th></tr></thead><tbody><tr><td>Importância <strong>causal</strong></td><td>nada aqui identifica um efeito; não há intervenção nem contrafactual</td></tr><tr><td>Importância de <strong>negócio</strong></td><td>nada aqui pondera valor de cliente ou custo de ação</td></tr><tr><td>Propriedade <strong>estável</strong> do problema</td><td>depende dos coeficientes ajustados, do pré-processamento ajustado, da composição do pool de treino e da correlação entre features</td></tr></tbody></table>
+<blockquote><p><strong>Advertência de parametrização.</strong> A codificação one-hot é redundante com o intercepto: existem infinitas combinações (intercepto, coeficientes) que produzem exatamente as mesmas probabilidades. O coeficiente de um <em>nível individual</em> é portanto propriedade do ajuste, não quantidade estável. A contribuição <strong>agregada por feature bruta</strong> — o que este ranking usa — é bem mais robusta, mas ainda depende da representação escolhida.</p></blockquote>
+<h2>Dependências estruturais: sete colunas, um único fato</h2>
+<p>Quando um cliente não tem internet, <strong>seis colunas mudam juntas, mecanicamente</strong>. E <code>PhoneService = No</code> implica <code>MultipleLines = "No phone service"</code>.</p>
+<p>Essas não são sete evidências independentes sobre o cliente. São <strong>um fato</strong> — "este cliente não tem internet" — codificado em sete colunas.</p>
+<p><strong>Por que isso importa.</strong> Uma explicação local que liste sete linhas separadas, cada uma com sua contribuição, sugere sete razões distintas quando existe uma. O leitor conclui que o modelo considerou muitos aspectos, quando considerou um aspecto sete vezes.</p>
+<p><strong>Tratamento adotado:</strong> as features acopladas são apresentadas como <strong>um bloco agregado</strong>, cujo valor é a <strong>soma exata</strong> das contribuições de seus membros. Somar é legítimo precisamente porque as contribuições são termos aditivos do mesmo logit — o bloco continua particionando o logit exatamente, sem resíduo.</p>
+<p>Este é um diferencial técnico do trabalho: a maior parte das análises deste dataset trata as sete colunas como sinais independentes.</p>
+<h2>Explicabilidade local</h2>
+<p>A explicação individual usa a mesma identidade, aplicada a uma linha. O exemplo é <strong>sintético e declarado antes de qualquer previsão</strong> — escolher retrospectivamente um cliente do holdout cuja explicação ficasse convincente seria selecionar um resultado depois de observá-lo, exatamente o que o protocolo evita em todas as outras etapas.</p>
+<p><strong>Perfil sintético A</strong> — cliente novo, fibra óptica, contrato mensal, cheque eletrônico, <code>tenure = 2</code>, <code>MonthlyCharges = 84,50</code>:</p>
+<pre><code>probabilidade de churn : alta, acima do limiar congelado
+limiar                 : 0,3272694566222328   (regra: probabilidade ≥ limiar)
+decisão                : SINALIZAR
+
+identidade verificada  : intercepto + Σ contribuições = logit
+erro no logit          : ≤ 1 × 10⁻¹²</code></pre>
+<p>As maiores contribuições concentram-se em <code>tenure</code> (curto), <code>Contract</code> (<code>Month-to-month</code>), <code>InternetService</code> (<code>Fiber optic</code>) e <code>PaymentMethod</code> (<code>Electronic check</code>).</p>
+<p><strong>Perfil sintético B</strong> — cliente antigo, sem internet, contrato bienal, débito automático, <code>tenure = 58</code>. Aqui o bloco estrutural aparece: as sete colunas ligadas a "sem internet" são agregadas em <strong>uma única linha</strong>, com valor igual à soma exata das contribuições individuais.</p>
+<h3>O que uma contribuição é — e o que não é</h3>
+<p>Uma contribuição é o termo aditivo daquela feature no preditor linear: quantos log-odds o valor daquela feature somou ao score, <strong>nesta parametrização ajustada</strong> e <strong>para este cliente</strong>.</p>
+<p>Ela <strong>não</strong> é:</p>
+<ul><li>um <strong>efeito causal</strong> — nada diz que mudar a feature mudaria o comportamento;</li><li>um <strong>contrafactual</strong> — não é "se o contrato fosse anual, a probabilidade seria X";</li><li>uma <strong>recomendação</strong> — "ofereça contrato anual" não segue de "contrato mensal contribuiu +0,7 log-odds".</li></ul>
+<p>A formulação que o sistema exibe, e que este relatório repete:</p>
+<blockquote><p>As contribuições explicam o <strong>cálculo do modelo</strong> para esta entrada. Não são efeitos causais nem recomendações de mudança de comportamento do cliente.</p></blockquote>
+<hr>
+<h1>Estratégia de monitoramento</h1>
+<p>Um modelo congelado não se degrada sozinho — <strong>o mundo em volta dele muda</strong>. O desenho cobre oito frentes, do que é detectável imediatamente ao que só é detectável com rótulos.</p>
+<h2>1. Qualidade de dados e esquema</h2>
+<p>Contadores por janela: requisições, registros, registros bem-sucedidos, esquema inválido, valor de feature inválido, categoria não vista, violação estrutural.</p>
+<p>O contrato de features é verificado a cada requisição. Ausência de coluna, tipo inesperado ou valor em branco onde nenhuma regra permite são <strong>rejeitados</strong>, não imputados silenciosamente. A regra de <code>TotalCharges</code> vive aqui: branco com <code>tenure &gt; 0</code> é erro, e permanece erro em produção.</p>
+<h2>2. Categorias não vistas</h2>
+<p>O encoder foi ajustado com <code>handle_unknown="ignore"</code>, então uma categoria nova <strong>não derruba a predição</strong> — vira um bloco de zeros e contribui nada.</p>
+<p>Mas contribuir nada é uma decisão silenciosa: o modelo está pontuando um cliente usando <em>menos informação do que aparenta</em>. A taxa de categorias não vistas é portanto monitorada explicitamente, com rastreamento de valores distintos <strong>limitado a 1 024 por feature</strong> para que a memória não cresça sem limite.</p>
+<h2>3. Consistência estrutural</h2>
+<p>As <strong>sete regras</strong> são verificadas a cada requisição. Um registro com <code>InternetService = No</code> mas <code>OnlineSecurity = No</code> (em vez de <code>No internet service</code>) é estruturalmente inconsistente: algum sistema a montante mudou.</p>
+<p>As regras são <strong>observadas, não impostas</strong> — o registro ainda é pontuado. Impor transformaria um sinal de monitoramento em uma falha de predição.</p>
+<h2>4. Drift das features</h2>
+<table><thead><tr><th>Tipo</th><th>Métrica</th><th>Aviso</th><th>Crítico</th></tr></thead><tbody><tr><td>Numérica</td><td><strong>PSI</strong> — Population Stability Index</td><td>0,10</td><td>0,25</td></tr><tr><td>Categórica</td><td><strong>TVD</strong> — Total Variation Distance</td><td>0,10</td><td>0,25</td></tr><tr><td>Fora da faixa de referência</td><td>proporção</td><td>0,01</td><td>0,05</td></tr><tr><td>Taxa de categoria não vista</td><td>proporção</td><td>0,01</td><td>0,05</td></tr></tbody></table>
+<pre><code>PSI = Σᵢ (aᵢ − eᵢ) · ln(aᵢ / eᵢ)          TVD = ½ · Σ_c |p_a(c) − p_e(c)|</code></pre>
+<p>O perfil de referência foi construído <strong>do pool de treino</strong>, nunca do holdout, e está versionado com digest fixado em código.</p>
+<h2>5. Drift de predição</h2>
+<p>PSI sobre a distribuição de scores, mais a <strong>taxa de positivos previstos</strong> e sua variação (aviso 0,05; crítico 0,10). Este é frequentemente o sinal que se move primeiro: mudanças em várias features podem se compensar individualmente e ainda assim deslocar o score agregado.</p>
+<h2>6. O ponto metodológico que não pode ser omitido</h2>
+<blockquote><p><strong>PSI e TVD não são testes estatísticos.</strong> São <strong>distâncias descritivas</strong> entre distribuições. Nenhum p-valor é calculado; nenhuma hipótese é testada.</p><p>Os limiares 0,10 / 0,25 constituem uma <strong>política operacional de monitoramento</strong> (<code>OPERATIONAL_MONITORING_POLICY</code>), escolhida heuristicamente <strong>antes de existir qualquer dado de produção</strong>. Não são níveis de significância, não foram estimados dos dados, e <strong>cruzar um deles não é evidência de degradação do modelo</strong>. É um pedido de investigação.</p></blockquote>
+<p>Cuidado adicional: janelas com menos de <strong>100 registros</strong> não emitem veredito. Uma distância calculada sobre poucas observações é ruído com aparência de sinal.</p>
+<h2>7. Desempenho — apenas quando os rótulos chegam</h2>
+<p>Nenhuma métrica de desempenho (acurácia, recall, precisão, F1, ROC-AUC, AP, matriz de confusão) é computada em produção nesta fase, <strong>porque não existe verdade de campo em produção</strong>. Churn só é observável após uma janela de confirmação — tipicamente semanas ou meses.</p>
+<p>Calcular "acurácia em produção" sem rótulos exigiria inventá-los. O desenho <strong>declara essa ausência</strong> em vez de mascará-la. Quando os rótulos chegarem, as mesmas métricas do holdout passam a ser calculáveis sobre coortes datadas.</p>
+<h2>8. Privacidade</h2>
+<p>O monitoramento agrega. Nenhum payload de requisição é persistido, nenhum identificador de cliente é armazenado, e os contadores são por janela. O objetivo é observar a <strong>distribuição</strong>, não os indivíduos.</p>
+<h2>Critérios de investigação e retreinamento</h2>
+<p><strong>Este trabalho deliberadamente não prescreve "retreinar todo mês".</strong> Uma cadência fixa sem evidência é ritual: retreina quando nada mudou e não retreina quando algo muda na semana errada.</p>
+<p><strong>Não implementa retreinamento automático.</strong> Um sistema que se retreina sozinho pode absorver corrupção de dados a montante como se fosse aprendizado, e substituir um modelo validado por um não validado sem que ninguém decida.</p>
+<p>A escada de decisão:</p>
+<pre><code>drift detectado (PSI/TVD acima do limiar)
+        │
+        ▼
+INVESTIGAÇÃO — o dado mudou, ou o mundo mudou?
+               bug a montante? campanha? mudança de mix?
+        │
+        ├──► causa técnica ─────► corrigir a origem. NÃO retreinar.
+        │
+        ▼
+rótulos disponíveis para a coorte afetada
+        │
+        ▼
+DIAGNÓSTICO — o desempenho caiu de fato, medido com rótulos reais?
+        │
+        ├──► não corroborado ───► continuar observando. NÃO retreinar.
+        │
+        ▼
+degradação persistente e relevante
+        │
+        ▼
+CANDIDATO A RETREINAMENTO
+        │
+        ▼
+PROTOCOLO COMPLETO DE VALIDAÇÃO
+  novo split · nova comparação · nova política de calibração
+  novo limiar · novo holdout intocado · novo congelamento
+        │
+        ▼
+promoção somente se o candidato passar</code></pre>
+<p><strong>Drift sozinho nunca justifica retreinamento.</strong> Justifica uma <em>investigação</em>. A distinção separa um sistema que responde a evidência de um que responde a alarmes.</p>
+<p>E o passo final não é negociável: um modelo candidato passa pelo <strong>mesmo protocolo inteiro</strong>, incluindo um holdout novo e intocado. Um modelo promovido sem isso não tem estimativa de desempenho válida, por melhor que pareça.</p>
+<hr>
+<h1>Demonstração da solução</h1>
+<p>O repositório inclui um produto funcional que embala o modelo congelado.</p>
+<table><thead><tr><th>Recurso</th><th>Função</th></tr></thead><tbody><tr><td><code>POST /api/v1/predict</code></td><td>pontua um cliente; devolve probabilidade, decisão, limiar</td></tr><tr><td><code>POST /api/v1/predict/batch</code></td><td>pontuação em lote, com limite de tamanho</td></tr><tr><td><code>POST /api/v1/explain</code></td><td>pontua <strong>e</strong> decompõe exatamente, com as contribuições</td></tr><tr><td><code>GET /api/v1/model</code></td><td>metadados do modelo congelado e do contrato de features</td></tr><tr><td><code>GET /api/v1/portfolio</code></td><td>métricas do holdout versionadas, com o caveat de exposição junto</td></tr><tr><td><code>GET /api/v1/monitoring</code></td><td>estado agregado de qualidade e drift da janela</td></tr><tr><td><code>/demo</code></td><td>página com formulário das 19 features, score, decisão, explicação local</td></tr></tbody></table>
+<p>A demonstração é <strong>opt-in</strong>: desligada por padrão, para que uma implantação que queira apenas a API permaneça idêntica à que foi validada. As métricas exibidas são derivadas offline dos artefatos versionados e verificadas por digest fixado em código; metadados adulterados impedem o serviço de subir, em vez de exibir números não rastreáveis.</p>
+<blockquote><p><strong>O que a interface é, e o que não é.</strong> Ela demonstra que o modelo foi empacotado e é servível. Ela <strong>não é evidência de que o modelo está correto</strong>. Essa evidência vem inteiramente do protocolo experimental — da partição protegida, da comparação pareada, do limiar escolhido sem tocar no teste e da única avaliação do holdout. Uma tela bem construída com um modelo mal validado continua sendo um modelo mal validado.</p></blockquote>
+<hr>
+<h1>Limitações</h1>
+<p><strong>1. Exposição do analista.</strong> A análise exploratória precedeu a proteção formal do holdout. A estimativa final pode carregar viés otimista não quantificável.</p>
+<p><strong>2. Probabilidades não calibradas.</strong> <code>calibration_policy = NONE</code>. Os scores são posições de ordenação, não frequências. "0,42" não significa "42 % de chance".</p>
+<p><strong>3. Nenhum custo real de negócio.</strong> O limiar vem de uma política declarada, não de otimização de custo esperado. Sem custo de campanha, valor de cliente e capacidade operacional, o limiar ótimo de negócio não pode ser calculado — e não foi inventado.</p>
+<p><strong>4. Nenhuma evidência causal.</strong> Todo resultado é associativo. Contribuições explicam o cálculo do modelo, não o comportamento do cliente.</p>
+<p><strong>5. Nenhuma evidência de que o sistema reduz churn.</strong> Isso exigiria um experimento de intervenção com grupo de controle e medição de uplift. Não foi conduzido.</p>
+<p><strong>6. Um único dataset, um único recorte temporal.</strong> O Telco Customer Churn é um retrato estático, sem dimensão temporal explícita. Não há validação temporal, e nada garante que os padrões se sustentem em outra operadora ou em outro período.</p>
+<p><strong>7. Suposição de distribuição fixa.</strong> Todo o trabalho assume que a população de produção se parece com a de treino — exatamente a suposição que o monitoramento existe para vigiar.</p>
+<hr>
+<h1>Reprodutibilidade</h1>
+<h3>Âncoras verificáveis</h3>
+<table><thead><tr><th>Item</th><th>Valor</th></tr></thead><tbody><tr><td>SHA-256 do dataset bruto, na representação canônica do projeto</td><td><code>88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a</code></td></tr><tr><td>SHA-256 dos IDs de treino</td><td><code>a553196dd46b672f6344867707144fbf56a8abe14b338a225662c7208a1450dd</code></td></tr><tr><td>SHA-256 dos IDs do holdout</td><td><code>1ad8aefb7e34776a78d76765d2465c630a41b3813b1d7d96d0d1b03d049776f6</code></td></tr><tr><td>SHA-256 do pipeline persistido</td><td><code>574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8</code></td></tr><tr><td>Impressão digital do modelo</td><td><code>a57568e18ec0333e1c85b590f98e75da93ebbfafff063860ec5daf4e460d939f</code></td></tr><tr><td>Commit de congelamento</td><td><code>9d1db4962769093a617f1db2db66354536acffb3</code></td></tr><tr><td>Semente global</td><td><code>42</code></td></tr><tr><td>Python</td><td><code>3.12</code></td></tr></tbody></table>
+<h3>Como reproduzir</h3>
+<p><strong>No repositório:</strong></p>
+<pre><code>uv sync
+uv run python scripts/build_split.py --verify
+uv run python scripts/freeze_model.py --verify
+uv run python scripts/evaluate_holdout.py --verify
+uv run pytest</code></pre>
+<p>Cada script <code>--verify</code> reconstrói seu artefato em memória e o compara <strong>byte a byte</strong> com o arquivo versionado. Todos devem retornar código de saída 0.</p>
+<p><strong>No Google Colab:</strong> abrir <code>notebooks/02_academic_delivery.ipynb</code> e executar <em>Runtime → Run all</em>. O notebook é auto-contido: baixa os dados de fonte pública sem credenciais, verifica o SHA-256, reproduz a partição, o pré-processamento, os baselines, a comparação de modelos, o limiar e a avaliação do holdout — comparando cada número com o artefato versionado correspondente.</p>
+<h3>Sobre a fonte dos dados no notebook</h3>
+<p>Repositório público da IBM no GitHub, acessível por HTTPS <strong>sem autenticação</strong> (HTTP 200, sem cabeçalho de autorização). O notebook calcula o digest dos bytes recebidos, reserializa apenas as quebras de linha, calcula o digest canônico e só então compara com a constante congelada. Divergência aborta a execução.</p>
+<h3>Fronteira entre repositório e notebook</h3>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><strong>Repositório de engenharia</strong></td><td>fonte da verdade de produção: pipeline persistido, API, suíte de testes, monitoramento, registros determinísticos</td></tr><tr><td><strong>Notebook acadêmico</strong></td><td>reprodução auto-contida do protocolo congelado, sem dependência do checkout local</td></tr></tbody></table>
+<p>Ambos produzem os mesmos números.</p>
+<hr>
+<h1>Rastreabilidade</h1>
+<p>Cada afirmação quantitativa deste relatório provém de um artefato versionado.</p>
+<table><thead><tr><th>Afirmação</th><th>Artefato de origem</th><th>Caminho no JSON</th></tr></thead><tbody><tr><td>7043 linhas, 21 colunas</td><td><code>reports/data_understanding.md</code></td><td>seção de estrutura</td></tr><tr><td>Prevalência 0,2654</td><td><code>reports/split_manifest.json</code></td><td>derivado de <code>n_rows_*</code></td></tr><tr><td>11 células em branco em <code>TotalCharges</code></td><td><code>reports/data_understanding.md</code></td><td>seção de qualidade</td></tr><tr><td>Divisão 5634 / 1409</td><td><code>reports/split_manifest.json</code></td><td><code>n_rows_training</code>, <code>n_rows_holdout</code></td></tr><tr><td>Digests dos identificadores</td><td><code>reports/split_manifest.json</code></td><td><code>training_ids_sha256</code>, <code>holdout_ids_sha256</code></td></tr><tr><td>Métricas dos baselines</td><td><code>reports/experiments/baseline_results.json</code></td><td><code>models[].mean</code></td></tr><tr><td>Comparação de modelos</td><td><code>reports/experiments/model_comparison_results.json</code></td><td><code>main_comparison[].mean</code></td></tr><tr><td>Engenharia de atributos</td><td><code>reports/experiments/feature_engineering_results.json</code></td><td><code>experiments[].classification</code>, <code>rationale</code></td></tr><tr><td>Tuning aninhado</td><td><code>reports/experiments/tuning_results.json</code></td><td><code>procedures[].mean</code>, <code>eligibility</code>, <code>selection</code></td></tr><tr><td>Calibração</td><td><code>reports/experiments/calibration_results.json</code></td><td><code>policies[].mean</code>, <code>eligibility</code>, <code>selection</code></td></tr><tr><td>Limiar e trade-off</td><td><code>reports/experiments/threshold_results.json</code></td><td><code>selection</code>, <code>eligibility</code></td></tr><tr><td>Política de decisão congelada</td><td><code>reports/decision_policy.json</code></td><td><code>threshold</code>, <code>calibration</code>, <code>decision_rule</code></td></tr><tr><td>Métricas do holdout</td><td><code>reports/experiments/holdout_results.json</code></td><td><code>metrics</code>, <code>confusion_matrix</code></td></tr><tr><td>Intervalos de confiança</td><td><code>reports/experiments/holdout_results.json</code></td><td><code>confidence_intervals</code>, <code>bootstrap</code></td></tr><tr><td>Comparação CV → holdout</td><td><code>reports/experiments/holdout_results.json</code></td><td><code>comparison_with_development.checks</code></td></tr><tr><td>Ranking de dispersão</td><td><code>reports/experiments/model_interpretation_results.json</code></td><td><code>contribution_dispersion.ranking</code></td></tr><tr><td>Intercepto e reconstrução</td><td><code>reports/experiments/model_interpretation_results.json</code></td><td><code>model.intercept</code>, <code>reconstruction</code></td></tr><tr><td>Regras estruturais</td><td><code>reports/experiments/monitoring_results.json</code></td><td><code>monitoring_scope.structural_rules</code></td></tr><tr><td>Métricas e limiares de drift</td><td><code>reports/experiments/monitoring_results.json</code></td><td><code>metrics</code>, <code>alert_policy</code></td></tr><tr><td>Rotas e contrato da API</td><td><code>reports/experiments/serving_results.json</code></td><td><code>inference_chain</code>, <code>feature_contract</code></td></tr><tr><td>Metadados do produto</td><td><code>reports/portfolio/portfolio_metadata.json</code></td><td><code>evaluation</code>, <code>policy</code></td></tr></tbody></table>
+<h3>Figuras reutilizadas</h3>
+<p>As figuras deste relatório são <strong>referenciadas diretamente</strong> dos diretórios versionados, sem cópia — não há duplicação de bytes e nenhuma imagem foi alterada.</p>
+<table><thead><tr><th>Figura</th><th>Caminho</th><th>SHA-256</th></tr></thead><tbody><tr><td>Distribuição do alvo</td><td><code>reports/figures/eda/01_target_distribution.png</code></td><td><code>6601d8c6…d1d54384</code></td></tr><tr><td>Churn por contrato</td><td><code>reports/figures/eda/04_churn_rate_by_contract.png</code></td><td><code>b959c5e8…1a8461e26c</code></td></tr><tr><td>Comparação de modelos</td><td><code>reports/figures/model_comparison/01_cv_average_precision_comparison.png</code></td><td><code>b7f52111…18291cb524</code></td></tr><tr><td>Trade-off de limiar</td><td><code>reports/figures/threshold/01_precision_recall_vs_threshold.png</code></td><td><code>3e5b3164…3daa42b0ea</code></td></tr><tr><td>Precision-Recall (holdout)</td><td><code>reports/figures/holdout/01_precision_recall_curve.png</code></td><td><code>3f4a023f…ec1c599968</code></td></tr><tr><td>Matriz de confusão</td><td><code>reports/figures/holdout/03_confusion_matrix.png</code></td><td><code>6fce46d0…eecb761ed6</code></td></tr><tr><td>Dispersão da contribuição</td><td><code>reports/figures/interpretability/03_raw_feature_contribution_dispersion.png</code></td><td><code>6e91c0e7…d43bef9a</code></td></tr><tr><td>Diagrama de confiabilidade</td><td><code>reports/figures/calibration/01_reliability_diagram.png</code></td><td><code>1b3e1139…4da46a2216f</code></td></tr></tbody></table>
+<hr>
+<h1>Conclusão</h1>
+<h3>O modelo final</h3>
+<p><strong>Regressão logística</strong> (<code>C = 1,0</code>, <code>solver = lbfgs</code>, sem <code>class_weight</code>) sobre as <strong>19 features originais</strong>, com <code>StandardScaler</code> nas 3 numéricas e <code>OneHotEncoder</code> nas 16 categóricas — 46 colunas transformadas —, <strong>sem calibração</strong>, com limiar de decisão <strong>0,3272694566222328</strong> e regra <code>probabilidade ≥ limiar</code>.</p>
+<h3>Por que este modelo foi escolhido</h3>
+<p>Ele <strong>venceu na métrica primária</strong> (Average Precision) contra random forest e histogram gradient boosting sob validação cruzada pareada. Nenhum procedimento de tuning cumpriu a regra de elegibilidade fixada antes dos resultados. Nenhum método de calibração melhorou o Brier score de forma consistente.</p>
+<p>Quando nenhum candidato justifica a substituição, o padrão pré-registrado é <strong>manter o modelo mais simples</strong> — não adotar o de maior pontuação. O boosting ajustado teve AP médio superior e mesmo assim não foi promovido, porque vencia em apenas 3 de 5 folds.</p>
+<p>Há um benefício adicional que a simplicidade compra: a decisão da logística é <strong>decomponível exatamente</strong>. Cada previsão vem acompanhada da identidade <code>intercepto + Σ contribuições = logit</code>, verificada a 10⁻¹² em toda explicação servida.</p>
+<h3>Principais métricas</h3>
+<p>No holdout de <strong>1 409 clientes</strong>, aberto <strong>uma única vez</strong>:</p>
+<table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><strong>Average Precision</strong></td><td><strong>0,6337</strong> (IC 95 % 0,578 – 0,686) — contra 0,2654 sem informação</td></tr><tr><td><strong>ROC-AUC</strong></td><td><strong>0,8420</strong> (IC 95 % 0,818 – 0,863)</td></tr><tr><td><strong>Recall</strong></td><td><strong>0,7219</strong></td></tr><tr><td><strong>Precisão</strong></td><td><strong>0,5378</strong></td></tr><tr><td><strong>F1</strong></td><td><strong>0,6164</strong></td></tr><tr><td>Acurácia <em>(auxiliar)</em></td><td>0,7615 — classe majoritária entrega 0,7346</td></tr></tbody></table>
+<h3>O efeito do limiar</h3>
+<p>Baixar de 0,50 para 0,327 eleva o recall de ~0,54 para <strong>~0,74</strong> e reduz a precisão de ~0,65 para <strong>~0,56</strong>, sinalizando ~35 % da carteira em vez de ~22 %. É uma troca deliberada: mais clientes em risco encontrados, ao custo de mais contatos desnecessários e mais capacidade operacional exigida.</p>
+<h3>O que a explicabilidade mostrou</h3>
+<p><code>tenure</code> domina a variação do score, seguido de <code>MonthlyCharges</code>, <code>InternetService</code>, <code>Contract</code> e <code>TotalCharges</code>. <code>gender</code>, <code>Partner</code> e <code>PhoneService</code> são praticamente inertes. As sete dependências estruturais foram identificadas e agregadas, de modo que "este cliente não tem internet" apareça como <strong>um fato</strong>, e não como sete evidências independentes.</p>
+<h3>Como a solução seria operada</h3>
+<p>Monitoramento de qualidade de dados, categorias não vistas, consistência estrutural, drift de features (PSI/TVD) e drift de predição, com desempenho medido <strong>apenas quando rótulos chegarem</strong>. Drift dispara <strong>investigação</strong>, nunca retreinamento automático; um modelo candidato repete o protocolo completo antes de qualquer promoção.</p>
+<h3>A afirmação final</h3>
+<p><strong>Este trabalho demonstra:</strong> um sistema reprodutível de predição de churn, validado sob um protocolo que protege o conjunto de teste, com limiar analisado, previsões explicadas exatamente, inferência empacotada e monitoramento desenhado.</p>
+<p><strong>Este trabalho não demonstra:</strong> que o sistema reduz churn. Essa é uma pergunta causal que exigiria um experimento de intervenção. O que foi demonstrado é capacidade de <strong>identificar</strong> clientes em risco — o que a operação fizer com essa lista mediria outro resultado, e exigiria outro estudo.</p>
+<hr>
+<h1>Links da entrega</h1>
+<blockquote><p><strong>Estado: pendente de ação humana externa.</strong> Nenhum link abaixo pode ser preenchido por geração automática. Os campos permanecem explicitamente vazios até que o autor execute as ações correspondentes e forneça as URLs reais.</p></blockquote>
+<table><thead><tr><th>Item</th><th>Estado</th><th>Valor</th></tr></thead><tbody><tr><td>Notebook executado no Google Colab</td><td><strong>PENDENTE</strong></td><td><code>[[EXTERNAL_INPUT_REQUIRED: link compartilhado do Colab]]</code></td></tr><tr><td>PDF do notebook executado (exportado do Colab)</td><td><strong>PENDENTE</strong></td><td><code>[[EXTERNAL_INPUT_REQUIRED: arquivo exportado]]</code></td></tr><tr><td>Vídeo de apresentação</td><td><strong>PENDENTE</strong></td><td><code>[[EXTERNAL_INPUT_REQUIRED: link do vídeo em plataforma de livre acesso]]</code></td></tr><tr><td>Repositório do projeto</td><td><strong>NÃO PÚBLICO</strong></td><td>o remoto configurado (<code>Novachrono117/ML-Crunch</code>) responde HTTP 404 sem autenticação, e o commit atual não está publicado nele. <code>[[EXTERNAL_INPUT_REQUIRED: tornar público e publicar, ou informar outra URL]]</code></td></tr></tbody></table>
+<p>O procedimento exato para produzir cada um está em <code>academic/colab_instructions.md</code> e <code>reports/academic/submission_checklist.md</code>.</p>
+</body>
+</html>
