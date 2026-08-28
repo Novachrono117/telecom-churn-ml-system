@@ -71,6 +71,21 @@ DEFAULT_PORT = 8000
 #: It changes nothing predictive either way — see the ON/OFF equivalence test.
 DEFAULT_MONITORING_ENABLED = False
 
+#: Whether the process serves the Phase 13 portfolio demo — the HTML page, its two
+#: static assets, and the two read-only endpoints it consumes. **Opt-in, for exactly
+#: the reason monitoring is.**
+#:
+#: The Phase 11 route list is recorded in `reports/experiments/serving_results.json`
+#: and verified byte for byte. A demo adds routes, so enabling it by default would
+#: silently change a published contract; making it deliberate keeps a deployment that
+#: wants only the API identical to the one Phase 11 shipped. It is also the right
+#: default for a second reason: an HTML page and a static mount are surface area, and
+#: a service that exists to answer `POST /predict` should not carry them unasked.
+#:
+#: Like monitoring, it changes nothing predictive. The demo calls the same endpoints
+#: any other client would.
+DEFAULT_PORTFOLIO_UI_ENABLED = False
+
 #: Environment variables that would let a deployment override a frozen decision.
 #: None of them is read. All of them are refused, loudly.
 FORBIDDEN_ENV_VARS: tuple[str, ...] = (
@@ -120,6 +135,28 @@ class ServingSettings(BaseModel):
         description=(
             "Overrides the monitoring reference profile location. When None, the "
             "repository's reports/monitoring/reference_profile.json is used."
+        ),
+    )
+    portfolio_ui_enabled: bool = Field(
+        default=DEFAULT_PORTFOLIO_UI_ENABLED,
+        description=(
+            "Serve the portfolio demo page and its two read-only endpoints. "
+            "Presentational only: it consumes the same API any client would."
+        ),
+    )
+    portfolio_static_path: Path | None = Field(
+        default=None,
+        description=(
+            "Overrides the demo's static asset directory. When None, the "
+            "repository's portfolio/ directory is used. Operator configuration only: "
+            "no request can influence which directory is served."
+        ),
+    )
+    portfolio_metadata_path: Path | None = Field(
+        default=None,
+        description=(
+            "Overrides the versioned portfolio metadata location. When None, the "
+            "repository's reports/portfolio/portfolio_metadata.json is used."
         ),
     )
 
@@ -206,13 +243,19 @@ def load_settings(
             environment, f"{ENV_PREFIX}MONITORING", DEFAULT_MONITORING_ENABLED
         ),
         reference_profile_path=_read_path(environment, f"{ENV_PREFIX}REFERENCE_PROFILE_PATH"),
+        portfolio_ui_enabled=_read_bool(
+            environment, f"{ENV_PREFIX}PORTFOLIO_UI", DEFAULT_PORTFOLIO_UI_ENABLED
+        ),
+        portfolio_static_path=_read_path(environment, f"{ENV_PREFIX}PORTFOLIO_STATIC_PATH"),
+        portfolio_metadata_path=_read_path(environment, f"{ENV_PREFIX}PORTFOLIO_METADATA_PATH"),
     )
     # The paths are operational configuration and are logged; no request data is.
     logger.info(
-        "Serving settings: max_batch_size=%d host=%s port=%d monitoring=%s",
+        "Serving settings: max_batch_size=%d host=%s port=%d monitoring=%s portfolio_ui=%s",
         settings.max_batch_size,
         settings.host,
         settings.port,
         settings.monitoring_enabled,
+        settings.portfolio_ui_enabled,
     )
     return settings

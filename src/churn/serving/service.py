@@ -214,16 +214,28 @@ class ChurnInferenceService:
         """
         return self._score(record)
 
-    def _score(self, record: Mapping[str, Any]) -> Prediction:
-        """The single scoring path. Both endpoints go through here, per record.
+    def score_with_features(self, record: Mapping[str, Any]) -> tuple[Prediction, pd.DataFrame]:
+        """Score one record and return the canonical matrix it was scored from.
 
-        Everything below the probability is metadata copied from the verified
-        frozen artefacts, so two calls with the same record and the same process
-        return equal values in every field.
+        **The single scoring path.** Every endpoint that produces a probability goes
+        through here, per record: single, batch, and the Phase 13 explanation. That
+        is what makes them numerically identical rather than merely consistent, and
+        it is also what makes them equally observable — the monitoring observer fires
+        here, so a scored record is counted whichever endpoint asked for it.
+
+        Everything below the probability is metadata copied from the verified frozen
+        artefacts, so two calls with the same record and the same process return equal
+        values in every field.
+
+        The canonical feature matrix is returned because a caller may need to describe
+        the row the model actually saw — the monitoring collector does, and so does
+        the local decomposition. Returning it costs nothing (the frame already exists)
+        and saves the caller from rebuilding it, which would be a second, drift-prone
+        preparation of the same payload.
 
         The observer, when there is one, is called **after** the answer exists and
-        cannot alter it: the returned :class:`Prediction` is already fully
-        determined by the line above the call.
+        cannot alter it: the returned :class:`Prediction` is already fully determined
+        by the line above the call.
         """
         features, probability = canonical_features_and_probability(self.artifacts.pipeline, record)
         prediction = decide(probability, self.threshold)
@@ -237,7 +249,11 @@ class ChurnInferenceService:
             model_fingerprint=self.artifacts.model_fingerprint,
         )
         self._observe(features, probability, prediction)
-        return answer
+        return answer, features
+
+    def _score(self, record: Mapping[str, Any]) -> Prediction:
+        """Score one record, discarding the matrix. The prediction endpoints' view."""
+        return self.score_with_features(record)[0]
 
     def _observe(self, features: pd.DataFrame, probability: float, prediction: int) -> None:
         """Hand one scored record to the observer, and never let that cost a prediction.

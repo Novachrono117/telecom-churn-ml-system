@@ -360,6 +360,147 @@ class MonitoringResponse(BaseModel):
     )
 
 
+class ContributionItem(BaseModel):
+    """One raw feature's term in the linear predictor, for one request.
+
+    ``contribution_log_odds`` is a term of a sum, not a causal effect and not a
+    counterfactual. The one-hot parameterisation is redundant with the intercept, so
+    an individual level's coefficient is a property of this fitted parameterisation
+    rather than a transferable quantity.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    feature: str
+    kind: Literal["numeric", "categorical"]
+    value_display: str = Field(description="The value as the model received it.")
+    active_level: str | None = Field(
+        default=None,
+        description="The encoder level that was active, or null for a numeric feature.",
+    )
+    is_unseen_level: bool = Field(
+        description=(
+            "True when the category was not in the training contract. The frozen "
+            "encoder ignores it, so the contribution is exactly zero."
+        )
+    )
+    contribution_log_odds: float
+    direction: Literal["increases", "decreases", "neutral"] = Field(
+        description="Whether this term pushed the model score higher or lower."
+    )
+
+
+class GroupedContributionItem(BaseModel):
+    """Structurally coupled features, presented as one row.
+
+    A customer without internet produces seven correct terms that are one fact about
+    the product's encoding, not seven independent reasons. The value is the **exact
+    sum** of the members' contributions, so grouping changes the layout and never the
+    arithmetic.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    name: str
+    label: str
+    value_display: str
+    members: list[str]
+    n_members: int
+    contribution_log_odds: float
+    direction: Literal["increases", "decreases", "neutral"]
+    description: str
+
+
+class ReconstructionReport(BaseModel):
+    """Evidence that the decomposition reproduces the prediction it explains."""
+
+    model_config = ConfigDict(frozen=True)
+
+    logit_error: float
+    probability_error: float
+    tolerance: float
+    within_tolerance: bool = Field(
+        description="Always true in a returned explanation; a failure raises instead."
+    )
+
+
+class ExplanationResponse(BaseModel):
+    """One scored customer, decomposed exactly.
+
+    The predictive fields are **the same values** ``/api/v1/predict`` returns for the
+    same payload — copied from the one canonical scoring path, not recomputed — so the
+    two endpoints cannot disagree about a probability or a decision.
+
+    ``model_logit`` is the decomposition's own sum, which makes
+    ``intercept + sum(contributions) == model_logit`` exact rather than approximate.
+    """
+
+    model_config = ConfigDict(frozen=True, protected_namespaces=())
+
+    churn_probability: float = Field(ge=0.0, le=1.0)
+    prediction: Literal[0, 1]
+    decision: Literal["retained", "churn"] = Field(
+        description="The same label PredictionResponse carries for this payload."
+    )
+    threshold: float
+    comparison: Literal[">="]
+    calibration_policy: str
+    explanation_method: Literal["EXACT_LOGISTIC_DECOMPOSITION"]
+    intercept: float
+    model_logit: float
+    threshold_logit: float = Field(
+        description="The threshold expressed in log-odds, so the margin is readable."
+    )
+    margin_log_odds: float
+    contributions: list[ContributionItem] = Field(
+        description="All 19 raw features. Ordering is local to this request."
+    )
+    grouped_contributions: list[GroupedContributionItem]
+    ungrouped_features: list[str]
+    reconstruction: ReconstructionReport
+    causal_note: str
+    calibration_note: str
+
+
+class PortfolioMetadataResponse(BaseModel):
+    """Versioned metadata the demo displays. Nothing here is computed per request.
+
+    The evaluation numbers are copied from Phase 9D's committed artefact by an offline
+    build step. The holdout is not reopened by this process and no metric is
+    recomputed — both facts are asserted in ``provenance``.
+
+    They are also the *pinned* numbers: the summary's digest was compared at startup
+    against a constant in source, and a mismatch would have stopped the process rather
+    than produced this response. ``integrity`` reports that comparison.
+    """
+
+    model_config = ConfigDict(frozen=True, protected_namespaces=())
+
+    schema_version: int
+    built_in_phase: str
+    integrity: dict[str, Any] = Field(
+        description=(
+            "Which summary was served and what it was checked against: the digest "
+            "computed at startup, the expectation pinned in source, and the name of "
+            "the constant holding it. Startup fails on a mismatch, so a client that "
+            "receives this block is reading numbers that matched their pin."
+        )
+    )
+    policy: dict[str, Any]
+    evaluation: dict[str, Any] = Field(
+        description="The single frozen holdout evaluation, with its analyst-exposure caveat."
+    )
+    known_levels: dict[str, list[str]] = Field(
+        description=(
+            "Levels the frozen encoder learned, per categorical feature. A UI "
+            "convenience only: the API still accepts any non-blank category."
+        )
+    )
+    numeric_features: list[str]
+    categorical_features: list[str]
+    provenance: dict[str, Any]
+
+
 class ErrorDetail(BaseModel):
     """A stable code and a message safe to show a client."""
 
@@ -395,7 +536,12 @@ __all__ = [
     "ErrorResponse",
     "HealthResponse",
     "ModelMetadataResponse",
+    "ContributionItem",
+    "ExplanationResponse",
+    "GroupedContributionItem",
     "MonitoringResponse",
+    "PortfolioMetadataResponse",
     "PredictionRequest",
     "PredictionResponse",
+    "ReconstructionReport",
 ]

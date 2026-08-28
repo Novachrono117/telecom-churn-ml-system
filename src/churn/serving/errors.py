@@ -30,7 +30,10 @@ CODE_INVALID_FEATURE_VALUE = "INVALID_FEATURE_VALUE"
 CODE_BATCH_TOO_LARGE = "BATCH_TOO_LARGE"
 CODE_INTERNAL_ERROR = "INTERNAL_ERROR"
 
-#: Every code the API can emit. Used by the tests to keep the set closed.
+#: Every code the **Phase 11 API** can emit. Used by the tests to keep the set closed,
+#: and recorded in `reports/experiments/serving_results.json`, which is why a later
+#: phase must not extend it: adding a member here would change a published contract
+#: that verifies byte for byte.
 ERROR_CODES: frozenset[str] = frozenset(
     {
         CODE_SERVICE_NOT_READY,
@@ -41,6 +44,20 @@ ERROR_CODES: frozenset[str] = frozenset(
         CODE_INTERNAL_ERROR,
     }
 )
+
+#: Phase 13. The local decomposition did not reproduce the probability that was
+#: served, so no explanation is returned. Distinct from INTERNAL_ERROR because it is
+#: specific and actionable: only the explanation failed, and the prediction endpoints
+#: are unaffected.
+#:
+#: Deliberately **not** a member of :data:`ERROR_CODES`. It belongs to a route that
+#: exists only when the portfolio demo is enabled, so on a Phase 11 deployment it
+#: genuinely cannot be emitted and the recorded set stays exactly true.
+CODE_EXPLANATION_UNAVAILABLE = "EXPLANATION_UNAVAILABLE"
+
+#: The Phase 11 codes plus the ones the optional demo adds.
+PORTFOLIO_ERROR_CODES: frozenset[str] = frozenset({CODE_EXPLANATION_UNAVAILABLE})
+ALL_ERROR_CODES: frozenset[str] = ERROR_CODES | PORTFOLIO_ERROR_CODES
 
 
 class ServingStartupError(RuntimeError):

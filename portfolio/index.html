@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Churn Risk Console — Telecom Customer Churn</title>
+<link rel="stylesheet" href="/demo/static/css/app.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <div class="brand">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span class="brand__text">
+        <strong>Churn Risk Console</strong>
+        <span class="brand__sub">Telecom customer churn &middot; frozen logistic regression</span>
+      </span>
+    </div>
+    <dl class="statusbar" id="status-bar" aria-live="polite">
+      <div class="statusbar__item">
+        <dt>API</dt>
+        <dd><span class="pill pill--idle" id="status-api">checking</span></dd>
+      </div>
+      <div class="statusbar__item">
+        <dt>Model artifact</dt>
+        <dd><span class="pill pill--idle" id="status-artifact">checking</span></dd>
+      </div>
+      <div class="statusbar__item">
+        <dt>Monitoring</dt>
+        <dd><span class="pill pill--idle" id="status-monitoring">checking</span></dd>
+      </div>
+    </dl>
+  </div>
+</header>
+
+<main id="main" class="layout">
+
+  <section class="intro" aria-labelledby="intro-heading">
+    <h1 id="intro-heading">Estimate churn risk for a customer</h1>
+    <p class="intro__lede">
+      Estimate the model&rsquo;s churn score for a customer and inspect the factors contributing
+      to that score. The score is compared against a decision threshold that was selected before
+      the model was frozen &mdash; not against a default of 0.5.
+    </p>
+    <p class="intro__note">
+      This is a production-style inference boundary over a model that is closed: nothing on this
+      page trains, tunes or recalibrates anything, and every number shown comes from the frozen
+      artifacts or from the request you submit.
+    </p>
+  </section>
+
+  <div class="grid">
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Input                                                              -->
+    <!-- ------------------------------------------------------------------ -->
+    <section class="panel panel--form" aria-labelledby="form-heading">
+      <div class="panel__head">
+        <h2 id="form-heading">Customer</h2>
+        <div class="panel__actions">
+          <button type="button" class="btn btn--ghost" id="load-a">Synthetic example A</button>
+          <button type="button" class="btn btn--ghost" id="load-b">Synthetic example B</button>
+          <button type="button" class="btn btn--ghost" id="clear-form">Clear</button>
+        </div>
+      </div>
+      <p class="panel__hint">
+        The 19 contracted features. Values are sent as typed; no customer identifier is accepted
+        and none is stored. The synthetic examples are invented for demonstration and are not rows
+        from any dataset.
+      </p>
+
+      <form id="customer-form" novalidate>
+
+        <fieldset class="fieldset">
+          <legend>Account</legend>
+          <div class="fields">
+            <div class="field">
+              <label for="tenure">tenure <span class="field__unit">months</span></label>
+              <input type="number" id="tenure" name="tenure" min="0" step="1" inputmode="numeric"
+                     autocomplete="off" required>
+              <p class="field__help" id="tenure-help">Months the customer has been with the company.</p>
+            </div>
+            <div class="field">
+              <label for="MonthlyCharges">MonthlyCharges</label>
+              <input type="number" id="MonthlyCharges" name="MonthlyCharges" step="0.01"
+                     inputmode="decimal" autocomplete="off" required>
+              <p class="field__help">Amount charged this month.</p>
+            </div>
+            <div class="field">
+              <label for="TotalCharges">TotalCharges</label>
+              <input type="text" id="TotalCharges" name="TotalCharges" inputmode="decimal"
+                     autocomplete="off" aria-describedby="totalcharges-help">
+              <p class="field__help" id="totalcharges-help">
+                May be left blank only when tenure is 0 &mdash; a customer who has not completed a
+                billing cycle. The frozen preprocessing treats that blank as a structural zero.
+                At positive tenure a blank is rejected by the API, which is the authority on this
+                rule.
+              </p>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Demographics</legend>
+          <div class="fields" id="group-demographics"></div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Phone</legend>
+          <div class="fields" id="group-phone"></div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Internet &amp; add-ons</legend>
+          <p class="fieldset__hint" id="internet-hint">
+            When <code>InternetService</code> is <code>No</code>, the six add-ons are set to
+            <code>No internet service</code> automatically &mdash; that is how the product encodes
+            them. You can still override any of them to send a combination the API accepts;
+            monitoring counts it as a structural inconsistency.
+          </p>
+          <div class="fields" id="group-internet"></div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend>Contract &amp; billing</legend>
+          <div class="fields" id="group-contract"></div>
+        </fieldset>
+
+        <div class="form__submit">
+          <button type="submit" class="btn btn--primary" id="submit-btn">
+            <span class="btn__label">Score customer</span>
+            <span class="btn__spinner" aria-hidden="true"></span>
+          </button>
+          <p class="form__submit-note">Sends one request to <code>POST /api/v1/explain</code>.</p>
+        </div>
+      </form>
+    </section>
+
+    <!-- ------------------------------------------------------------------ -->
+    <!-- Result                                                             -->
+    <!-- ------------------------------------------------------------------ -->
+    <div class="column">
+
+      <div id="alert" class="alert" role="alert" aria-live="assertive" hidden></div>
+
+      <section class="panel panel--result" id="result-panel" aria-labelledby="result-heading" hidden>
+        <div class="panel__head">
+          <h2 id="result-heading">Result</h2>
+          <span class="panel__tag" id="result-decision-tag"></span>
+        </div>
+
+        <div class="result" aria-live="polite">
+          <div class="result__score">
+            <p class="result__label">Model churn score</p>
+            <p class="result__value" id="score-display">&ndash;</p>
+            <p class="result__exact">
+              full precision <code id="score-exact">&ndash;</code>
+            </p>
+          </div>
+          <dl class="result__meta">
+            <div>
+              <dt>Decision</dt>
+              <dd id="decision-value">&ndash;</dd>
+            </div>
+            <div>
+              <dt>Frozen decision threshold</dt>
+              <dd><code id="threshold-value">&ndash;</code></dd>
+            </div>
+            <div>
+              <dt>Rule</dt>
+              <dd><code id="rule-value">&ndash;</code></dd>
+            </div>
+            <div>
+              <dt>Calibration</dt>
+              <dd id="calibration-value">&ndash;</dd>
+            </div>
+          </dl>
+        </div>
+
+        <figure class="scale">
+          <figcaption class="scale__caption">Score against the frozen threshold</figcaption>
+          <svg id="scale-svg" class="scale__svg" viewBox="0 0 100 24" preserveAspectRatio="none"
+               role="img" aria-labelledby="scale-desc">
+            <title id="scale-title">Score position relative to the decision threshold</title>
+            <desc id="scale-desc">A horizontal axis from 0 to 1 showing where this customer's
+              score falls relative to the frozen decision threshold.</desc>
+            <rect class="scale__track scale__track--low" x="0" y="9" width="100" height="6"></rect>
+            <rect class="scale__track scale__track--high" id="scale-high" x="0" y="9" width="0" height="6"></rect>
+            <line class="scale__threshold" id="scale-threshold" x1="0" y1="4" x2="0" y2="20"></line>
+            <circle class="scale__marker" id="scale-marker" cx="0" cy="12" r="3.4"></circle>
+          </svg>
+          <div class="scale__legend">
+            <span><i class="swatch swatch--low"></i>Below threshold &mdash; retained side</span>
+            <span><i class="swatch swatch--high"></i>At/above threshold &mdash; churn side</span>
+            <span><i class="swatch swatch--mark"></i>This customer</span>
+          </div>
+          <p class="scale__axis"><span>0</span><span>1</span></p>
+        </figure>
+
+        <p class="note note--calibration" id="calibration-note"></p>
+      </section>
+
+      <section class="panel" id="factors-panel" aria-labelledby="factors-heading" hidden>
+        <div class="panel__head">
+          <h2 id="factors-heading">Contributing factors</h2>
+          <span class="panel__tag panel__tag--quiet">this request only</span>
+        </div>
+        <p class="panel__hint">
+          The model is a logistic regression, so its score decomposes exactly:
+          <code>intercept + sum of the terms below = model logit</code>. These are the terms of
+          that sum for the customer you submitted, ordered by size <em>for this request</em>. That
+          ordering is local; it is not global feature importance.
+        </p>
+
+        <div class="factors">
+          <div class="factors__col">
+            <h3 class="factors__title factors__title--up">Pushes the model score higher</h3>
+            <ul class="factor-list" id="factors-up"></ul>
+          </div>
+          <div class="factors__col">
+            <h3 class="factors__title factors__title--down">Pushes the model score lower</h3>
+            <ul class="factor-list" id="factors-down"></ul>
+          </div>
+        </div>
+
+        <details class="maths">
+          <summary>Reconstruction</summary>
+          <dl class="maths__grid">
+            <div><dt>Intercept</dt><dd><code id="maths-intercept">&ndash;</code></dd></div>
+            <div><dt>Sum of contributions</dt><dd><code id="maths-sum">&ndash;</code></dd></div>
+            <div><dt>Model logit</dt><dd><code id="maths-logit">&ndash;</code></dd></div>
+            <div><dt>Threshold logit</dt><dd><code id="maths-threshold-logit">&ndash;</code></dd></div>
+            <div><dt>Margin</dt><dd><code id="maths-margin">&ndash;</code></dd></div>
+            <div><dt>Max reconstruction error</dt><dd><code id="maths-error">&ndash;</code></dd></div>
+          </dl>
+          <p class="note">
+            The explanation is returned only if this reconstruction closes within tolerance. A
+            decomposition that does not reproduce the served prediction is withheld rather than
+            shown with a caveat.
+          </p>
+        </details>
+
+        <p class="note note--causal" id="causal-note"></p>
+      </section>
+
+      <section class="panel" aria-labelledby="model-heading">
+        <div class="panel__head">
+          <h2 id="model-heading">Model details</h2>
+        </div>
+        <dl class="kv" id="model-card">
+          <div><dt>Estimator</dt><dd id="mc-estimator">&ndash;</dd></div>
+          <div><dt>Frozen model</dt><dd><code id="mc-freeze">&ndash;</code></dd></div>
+          <div><dt>Model fingerprint</dt><dd><code id="mc-fingerprint">&ndash;</code></dd></div>
+          <div><dt>Input features</dt><dd id="mc-features">&ndash;</dd></div>
+          <div><dt>Transformed features</dt><dd id="mc-transformed">&ndash;</dd></div>
+          <div><dt>Calibration</dt><dd id="mc-calibration">&ndash;</dd></div>
+          <div><dt>Threshold policy</dt><dd id="mc-threshold-policy">&ndash;</dd></div>
+          <div><dt>Threshold</dt><dd><code id="mc-threshold">&ndash;</code></dd></div>
+          <div><dt>Positive class</dt><dd id="mc-positive">&ndash;</dd></div>
+          <div><dt>Serving version</dt><dd id="mc-serving">&ndash;</dd></div>
+        </dl>
+      </section>
+
+      <section class="panel" aria-labelledby="perf-heading">
+        <div class="panel__head">
+          <h2 id="perf-heading">Held-out evaluation</h2>
+          <span class="panel__tag panel__tag--quiet" id="perf-n">&ndash;</span>
+        </div>
+        <ul class="metrics" id="metrics-headline"></ul>
+        <dl class="kv kv--tight" id="metrics-auxiliary"></dl>
+        <p class="note" id="metric-reading-note"></p>
+        <p class="note note--caveat" id="analyst-caveat"></p>
+      </section>
+
+      <section class="panel" aria-labelledby="monitoring-heading">
+        <div class="panel__head">
+          <h2 id="monitoring-heading">Monitoring</h2>
+          <span class="panel__tag panel__tag--quiet" id="monitoring-tag">&ndash;</span>
+        </div>
+        <div id="monitoring-body">
+          <p class="note">Loading&hellip;</p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>
+      Prediction and explanation only. This console does not recommend retention actions: the
+      dataset carries no costs, no capacity and no treatment effects. Its output can support
+      retention prioritisation when combined with business costs and operational capacity.
+    </p>
+    <p class="footer__meta">
+      No analytics, no third-party requests, no browser storage. Submitted values are sent to this
+      API, scored, and discarded.
+    </p>
+  </footer>
+
+</main>
+
+<script src="/demo/static/js/app.js"></script>
+</body>
+</html>

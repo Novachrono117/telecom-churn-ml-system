@@ -37,9 +37,11 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from churn.monitoring.settings import MONITORING_ENDPOINT
+from churn.portfolio.explanation import ExplanationError
 from churn.preprocessing.exceptions import DataQualityError, FeatureContractError
 from churn.serving.artifacts import FREEZE_COMMIT_SHORT, SERVING_VERSION
 from churn.serving.errors import (
+    CODE_EXPLANATION_UNAVAILABLE,
     CODE_INTERNAL_ERROR,
     CODE_INVALID_FEATURE_PAYLOAD,
     CODE_INVALID_FEATURE_VALUE,
@@ -48,13 +50,21 @@ from churn.serving.errors import (
     ServingRequestError,
 )
 from churn.serving.monitoring import HEALTH_DISABLED, ServingMonitor, disabled_response
+from churn.serving.portfolio import (
+    DEMO_ROUTE,
+    STATIC_MOUNT,
+    PortfolioService,
+    default_static_path,
+)
 from churn.serving.schemas import (
     BatchPredictionRequest,
     BatchPredictionResponse,
     ErrorResponse,
+    ExplanationResponse,
     HealthResponse,
     ModelMetadataResponse,
     MonitoringResponse,
+    PortfolioMetadataResponse,
     PredictionRequest,
     PredictionResponse,
 )
@@ -123,6 +133,18 @@ def _error(status_code: int, code: str, message: str, details: list[str] | None 
     return JSONResponse(status_code=status_code, content={"error": payload})
 
 
+def get_portfolio(request: Request) -> PortfolioService:
+    """Return the process-wide portfolio service, or refuse the request.
+
+    Only reachable on a process where the demo is enabled, because the routes that
+    depend on it are not registered otherwise.
+    """
+    portfolio = getattr(request.app.state, "portfolio", None)
+    if portfolio is None:
+        raise ServiceNotReadyError("The portfolio demo is not available on this process.")
+    return portfolio
+
+
 def get_monitor(request: Request) -> ServingMonitor | None:
     """Return the process-wide monitor, or ``None`` when monitoring is off.
 
@@ -159,6 +181,9 @@ ServiceDependency = Annotated[ChurnInferenceService, Depends(get_service)]
 #: endpoint's answer depends on it.
 MonitorDependency = Annotated["ServingMonitor | None", Depends(get_monitor)]
 
+#: The process-wide portfolio service. Presentational: no prediction depends on it.
+PortfolioDependency = Annotated["PortfolioService", Depends(get_portfolio)]
+
 
 def _build_lifespan(
     service: ChurnInferenceService | None,
@@ -184,6 +209,11 @@ def _build_lifespan(
             app.state.service = replace(app.state.service, observer=monitor)
             logger.info("Monitoring enabled: reference=%s", monitor.reference_sha256[:16])
 
+        if resolved.portfolio_ui_enabled:
+            # Fail-closed as well: a demo that cannot verify its own decomposition,
+            # or whose metrics nobody validated, should not come up at all.
+            app.state.portfolio = PortfolioService.from_service(app.state.service, resolved)
+
         logger.info(
             "Serving ready: freeze_commit=%s serving_version=%s fingerprint=%s monitoring=%s",
             FREEZE_COMMIT_SHORT,
@@ -191,9 +221,12 @@ def _build_lifespan(
             app.state.service.model_fingerprint[:16],
             resolved.monitoring_enabled,
         )
+        if resolved.portfolio_ui_enabled:
+            logger.info("Portfolio demo published at %s", DEMO_ROUTE)
         yield
         app.state.service = None
         app.state.monitor = None
+        app.state.portfolio = None
         logger.info("Serving stopped.")
 
     return lifespan
@@ -210,6 +243,19 @@ def _register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(ServingRequestError)
     async def _serving_error(_: Request, error: ServingRequestError) -> Response:
         return _error(error.status, error.code, error.message)
+
+    @app.exception_handler(ExplanationError)
+    async def _explanation_error(_: Request, error: ExplanationError) -> Response:
+        # A decomposition that does not reproduce the model is not an explanation of
+        # it, so nothing is returned rather than something plausible. Only this
+        # endpoint fails; the prediction path is authoritative and unaffected.
+        logger.error("explanation_reconstruction_failure exception_type=%s", type(error).__name__)
+        return _error(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            CODE_EXPLANATION_UNAVAILABLE,
+            "The local explanation could not be verified against the served "
+            "prediction and was withheld. The prediction endpoints are unaffected.",
+        )
 
     @app.exception_handler(FeatureContractError)
     async def _contract_error(request: Request, error: FeatureContractError) -> Response:
@@ -346,6 +392,76 @@ def _register_routes(app: FastAPI) -> None:
         )
 
 
+def _register_portfolio_routes(app: FastAPI) -> None:
+    """Publish the demo: two read-only endpoints, one page, one static mount.
+
+    Registered only when the demo is enabled, which is what keeps the Phase 11 route
+    list byte-identical on a deployment that wants only the API.
+    """
+    from fastapi.responses import FileResponse
+    from fastapi.staticfiles import StaticFiles
+
+    static_root = (
+        app.state.portfolio_static_path
+        if getattr(app.state, "portfolio_static_path", None) is not None
+        else None
+    )
+
+    @app.post(
+        f"{API_PREFIX}/explain",
+        response_model=ExplanationResponse,
+        tags=["explanation"],
+        responses=_ERROR_RESPONSES,
+        summary="Score one customer and decompose that score exactly",
+    )
+    async def explain(
+        payload: PredictionRequest,
+        service: ServiceDependency,
+        portfolio: PortfolioDependency,
+        monitor: MonitorDependency,
+    ) -> ExplanationResponse:
+        """Return the same prediction ``/predict`` returns, plus its exact decomposition.
+
+        The predictive fields are copied from the one canonical scoring path, so this
+        endpoint cannot report a probability the prediction endpoint would not.
+
+        The decomposition is an algebraic identity, not an approximation: no SHAP, no
+        LIME, no sampling, no seed. If it fails to reproduce the served probability,
+        this endpoint fails — the prediction endpoints are unaffected and remain
+        authoritative.
+        """
+        if monitor is not None:
+            monitor.record_request(1)
+        explanation = portfolio.explain(service, payload.to_record())
+        return ExplanationResponse(**explanation.as_record())
+
+    @app.get(
+        f"{API_PREFIX}/portfolio",
+        response_model=PortfolioMetadataResponse,
+        tags=["portfolio"],
+        responses={status.HTTP_503_SERVICE_UNAVAILABLE: _ERROR_RESPONSES[503]},
+        summary="Versioned metadata the demo displays",
+    )
+    async def portfolio_metadata(portfolio: PortfolioDependency) -> PortfolioMetadataResponse:
+        """Already-versioned metadata. Nothing is computed and no dataset is read."""
+        return PortfolioMetadataResponse(**portfolio.metadata_response())
+
+    @app.get(
+        DEMO_ROUTE,
+        response_class=FileResponse,
+        include_in_schema=False,
+        tags=["portfolio"],
+    )
+    async def demo(portfolio: PortfolioDependency) -> FileResponse:
+        """Serve the demo page from the configured directory. No parameter, no path."""
+        return FileResponse(portfolio.static_path / "index.html", media_type="text/html")
+
+    if static_root is not None:
+        # Mounted from a directory resolved at startup. StaticFiles refuses to serve
+        # anything outside its root, and no route here accepts a filename.
+        app.mount(STATIC_MOUNT, StaticFiles(directory=static_root), name="portfolio-static")
+
+
 def _register_monitoring_route(app: FastAPI) -> None:
     @app.get(
         MONITORING_ENDPOINT,
@@ -413,12 +529,21 @@ def create_app(
     )
     app.state.service = None
     app.state.monitor = None
+    app.state.portfolio = None
+    app.state.portfolio_static_path = None
     _register_access_log(app)
     _register_exception_handlers(app)
     _register_routes(app)
     if resolved.monitoring_enabled:
         _register_monitoring_route(app)
+    if resolved.portfolio_ui_enabled:
+        # Resolved here rather than inside the route so the mount is created once,
+        # from operator configuration, and never from anything a request carries.
+        app.state.portfolio_static_path = (
+            resolved.portfolio_static_path or default_static_path()
+        ).resolve()
+        _register_portfolio_routes(app)
     return app
 
 
-__all__ = ["API_PREFIX", "create_app", "get_monitor", "get_service"]
+__all__ = ["API_PREFIX", "create_app", "get_monitor", "get_portfolio", "get_service"]

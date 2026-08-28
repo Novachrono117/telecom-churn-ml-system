@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "metadata": "phase13-portfolio-metadata",
+  "built_in_phase": "13",
+  "provenance": {
+    "holdout_results_path": "reports/experiments/holdout_results.json",
+    "holdout_results_sha256": "de174fe94dd49206ca0d33d734030edf150dd1dae415c9faf37f481d6d895043",
+    "decision_policy_path": "reports/decision_policy.json",
+    "decision_policy_sha256": "bd7aa800ae36ac04ecf951f7377ce71d16d084faeee771b01eb6c9655a4bc714",
+    "pipeline_sha256": "574fde36c6e2e991de7c3dfdab21981dc41eae2810d003ecbfb179dd504dc3d8",
+    "model_fingerprint_sha256": "a57568e18ec0333e1c85b590f98e75da93ebbfafff063860ec5daf4e460d939f",
+    "freeze_commit": "9d1db4962769093a617f1db2db66354536acffb3",
+    "holdout_reopened": false,
+    "metrics_recomputed": false
+  },
+  "policy": {
+    "estimator": "LogisticRegression",
+    "calibration_policy": "NONE",
+    "threshold_policy": "F1_MAXIMIZATION",
+    "threshold": 0.3272694566222328,
+    "comparison": ">=",
+    "n_features": 19,
+    "n_transformed_features": 46,
+    "positive_class_meaning": "Churn = Yes"
+  },
+  "evaluation": {
+    "source": "reports/experiments/holdout_results.json",
+    "evaluation_type": "FINAL_HOLDOUT",
+    "evaluations_performed": 1,
+    "n_samples": 1409,
+    "n_positive": 374,
+    "n_negative": 1035,
+    "prevalence": 0.265436,
+    "headline": [
+      {
+        "key": "average_precision",
+        "label": "Average precision",
+        "value": 0.633702,
+        "ci_lower": 0.577681,
+        "ci_upper": 0.686356,
+        "confidence_level": 0.95
+      },
+      {
+        "key": "roc_auc",
+        "label": "ROC-AUC",
+        "value": 0.842034,
+        "ci_lower": 0.818325,
+        "ci_upper": 0.863266,
+        "confidence_level": 0.95
+      },
+      {
+        "key": "recall",
+        "label": "Recall",
+        "value": 0.721925,
+        "ci_lower": 0.675974,
+        "ci_upper": 0.765196,
+        "confidence_level": 0.95
+      },
+      {
+        "key": "precision",
+        "label": "Precision",
+        "value": 0.537849,
+        "ci_lower": 0.493714,
+        "ci_upper": 0.579059,
+        "confidence_level": 0.95
+      },
+      {
+        "key": "f1",
+        "label": "F1",
+        "value": 0.616438,
+        "ci_lower": 0.576228,
+        "ci_upper": 0.653423,
+        "confidence_level": 0.95
+      }
+    ],
+    "auxiliary": [
+      {
+        "key": "accuracy",
+        "label": "Accuracy",
+        "value": 0.761533,
+        "ci_lower": null,
+        "ci_upper": null,
+        "confidence_level": null
+      },
+      {
+        "key": "specificity",
+        "label": "Specificity",
+        "value": 0.775845,
+        "ci_lower": 0.749505,
+        "ci_upper": 0.800756,
+        "confidence_level": 0.95
+      },
+      {
+        "key": "balanced_accuracy",
+        "label": "Balanced accuracy",
+        "value": 0.748885,
+        "ci_lower": null,
+        "ci_upper": null,
+        "confidence_level": null
+      }
+    ],
+    "confusion_matrix": {
+      "true_negatives": 803,
+      "false_positives": 232,
+      "false_negatives": 104,
+      "true_positives": 270
+    },
+    "no_skill_average_precision": 0.265436,
+    "no_skill_roc_auc": 0.5,
+    "majority_class_accuracy": 0.734564,
+    "bootstrap_method": "bootstrap_percentile",
+    "bootstrap_replications": 2000,
+    "caveat": "The final evaluation used the frozen holdout protocol. Earlier exploratory analysis had already exposed the analyst to all rows, so the estimate may carry optimistic bias that cannot be quantified here.",
+    "metric_reading_note": "Average precision and ROC-AUC are ranking quality, not accuracy and not certainty. Precision, recall and F1 describe the single frozen operating point. Accuracy is reported for completeness only: on a population where 73.5 % of customers do not churn, a model that predicts nobody churns would score close to it while finding no one."
+  }
+}

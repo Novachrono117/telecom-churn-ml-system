@@ -62,9 +62,11 @@ def test_the_threshold_is_not_a_settings_field() -> None:
 
     The field list is pinned, not just filtered: a future field that happened to be
     called something innocuous could still carry a model parameter, and an exact set
-    is what forces a reviewer to look at any addition. Phase 12 added two — both
-    purely operational: whether this process collects monitoring aggregates, and
-    where its reference profile lives. Neither can reach the model.
+    is what forces a reviewer to look at any addition. Phase 12 added two — whether
+    this process collects monitoring aggregates and where its reference profile
+    lives. Phase 13 added three — whether the demo is served, and where its assets
+    and its versioned metadata live. All five are operational; none can reach the
+    model.
     """
     fields = set(ServingSettings.model_fields)
 
@@ -77,6 +79,9 @@ def test_the_threshold_is_not_a_settings_field() -> None:
         "port",
         "monitoring_enabled",
         "reference_profile_path",
+        "portfolio_ui_enabled",
+        "portfolio_static_path",
+        "portfolio_metadata_path",
     }
 
 
