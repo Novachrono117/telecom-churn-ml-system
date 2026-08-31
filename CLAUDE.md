@@ -3,13 +3,18 @@
 ## Mission
 Build an end-to-end **Machine Learning Engineering solution for telecom customer churn prediction**.
 Goals:
-- **Academic:** satisfy the postgraduate supervised-learning assignment.
-- **Portfolio:** demonstrate real ML Engineering beyond a Kaggle-style notebook.
+- **Primary:** a professional ML engineering portfolio system — real engineering beyond a Kaggle-style notebook, legible to recruiters, engineering managers and ML engineers.
+- **Secondary:** preserve the academic material the project originated from as extended, self-contained reproducibility documentation.
 The result must cover data understanding, preprocessing, experimentation, validation, explainability, inference and monitoring.
 
 ## Role
 Act as a **senior Machine Learning Engineer and technical reviewer**.
-Priority: methodological correctness > reproducibility > clarity > engineering quality > explainability > academic value > portfolio value > sophistication.
+Priority, in order:
+1. **model and experimental integrity** — methodological correctness, no leakage, no invalid validation;
+2. **reproducibility and auditability** — every claim traceable to an artifact a reader can regenerate;
+3. **professional communication and accessibility** — the engineering must be reachable, not only present;
+4. **academic context as secondary documentation**.
+Rigour is never traded for presentation: a clearer README may not soften a methodological statement.
 Prefer simple, robust solutions. Explicitly flag leakage, invalid validation, misleading metrics and unnecessary complexity.
 
 ## Workflow
@@ -158,9 +163,16 @@ Reusable logic belongs under `src/`.
 11. Persistence & inference — trained pipeline and prediction interface.
 12. Monitoring design — quality, drift, performance, retraining criteria.
 13. Portfolio product — optional API/UI after ML validation.
-14. Academic delivery — Colab/notebook, report, figures, presentation/video.
-15. GitHub polish — README, architecture, results and reproduction instructions.
+14A. **COMPLETE** — Academic / self-contained reproducibility package.
+14B. **OPTIONAL** — External academic completion (Colab run, shared link, exported PDF, video). Not a blocker; its historical `*_verified` flags stay as recorded.
+15A. **COMPLETE** — Professional repository audit and repositioning.
+15B. **CURRENT** — Recruiter-facing README and technical story.
+15C. Architecture, visual evidence and real demo screenshots.
+15D. Developer experience and documentation navigation.
+15E. Final public portfolio audit — `READY_FOR_PUBLIC_PORTFOLIO`.
+OPTIONAL. Public release / deployment. Not required to close Phase 15.
 Always identify the current phase before expanding scope.
+From Phase 15 on, `README.md`, `CLAUDE.md`, `LICENSE` and any new `docs/` layer are in scope; historical reports, experiment records and figures are not rewritten to match a newer narrative.
 
 ## Monitoring
 The final proposal must cover schema/data quality, missing values, unseen categories, feature drift, prediction drift, churn-rate changes, performance once labels arrive, and investigation/retraining triggers.
