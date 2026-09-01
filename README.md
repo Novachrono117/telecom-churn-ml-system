@@ -8,7 +8,9 @@ integrity-gated inference API and label-free drift monitoring.
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-1.9-F7931E)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-<!-- 15C: hero screenshot -->
+![Churn Risk Console running against the frozen model: the API ready, the model artifact verified
+and monitoring healthy, the 19-feature request form, and a model card carrying the frozen threshold
+next to the held-out metrics.](docs/screenshots/churn-risk-console.png)
 
 ## What this is
 
@@ -56,22 +58,24 @@ nothing.
 > 7,043 rows. The estimate may therefore carry an optimistic bias that cannot be
 > quantified from inside the study; it is recorded in the artifact rather than omitted.
 
+The protocol behind that single number — which partition was allowed to influence what:
+
+![Experimental protocol: every decision, from the baselines to the frozen threshold, is made on the
+5,634-row training pool while the 1,409-row holdout stays locked; after the freeze the holdout is
+evaluated once and leads only to a post-hoc error analysis, while the global interpretation
+branches off the freeze over the training distribution without loading the holdout, and no arrow
+returns to the decisions.](docs/diagrams/experimental-protocol.svg)
+
 ## System at a glance
 
-<!-- 15C: architecture diagram -->
+![System architecture: API consumers post to the prediction endpoints and the Portfolio UI sends
+exactly one explanation request per submission, both through the same canonical scoring call; the
+request crosses the feature contract, then the frozen pipeline, which emits one probability feeding
+the frozen decision policy and the exact log-odds decomposition, while the monitoring observer sits
+off the causal path behind a read-only endpoint.](docs/diagrams/system-architecture.svg)
 
-```text
-raw record
-  -> feature contract    19 validated features, canonical order, nothing imputed
-  -> frozen pipeline     scaler + one-hot -> logistic regression (46 columns)
-  -> probability         positive-class column resolved from classes_
-  -> frozen threshold    probability >= 0.3272694566222328
-  -> decision            churn / retained, plus an exact log-odds decomposition
-```
-
-The pipeline is loaded once per process behind an HTTP boundary that verifies the
-artifact, the policy and the library versions before agreeing to serve. Monitoring
-observes those requests without ever seeing a label; the demo UI is just another client.
+The three boundaries are the point: what the contract guarantees before the model sees anything,
+what the freeze closes, and what the serving process may add around it without touching either.
 
 ## Why Logistic Regression?
 
@@ -83,6 +87,10 @@ it. Families compared under identical 5-fold cross-validation on the training po
 | **Logistic regression** | **0.6615** |
 | HistGradientBoosting | 0.6471 |
 | Random forest | 0.6062 |
+
+![Paired per-fold Average Precision deltas against the logistic baseline: every one of the five
+folds is negative for random forest and for histogram gradient boosting, so neither family beat the
+logistic regression on a single fold.](reports/figures/model_comparison/02_paired_ap_deltas.png)
 
 Random forest was clearly worse. HistGradientBoosting was competitive, so it went to
 nested hyperparameter tuning alongside the logistic regression — under an adoption
@@ -136,7 +144,18 @@ This is **not** a business-optimal threshold. No retention cost, contact capacit
 customer value was available, so none was assumed. Choosing an operating point against
 real costs remains open work.
 
-<!-- 15C: threshold figure -->
+![Out-of-fold F1 across the whole range of decision thresholds, peaking at 0.6381 on the frozen
+threshold 0.3273 and falling away well before the 0.500 default, which is marked separately.](reports/figures/threshold/02_f1_vs_threshold.png)
+
+A real customer scored through the live API, on the band where the default and the policy disagree:
+
+![Result panel from the running console: a churn score of 34.0%, full precision
+0.34000536953235566, decision "churn", against the frozen threshold 0.3273 under the rule
+score &gt;= 0.3273.](docs/screenshots/decision-threshold.png)
+
+At 34.0% the 0.5 default would have called this customer retained and never contacted them; the
+frozen policy calls them churn. An illustrative public training-pool record chosen to show where
+the boundary sits — not a typical customer, not evidence of performance, never from the holdout.
 
 Deep dive: [calibration gate](reports/calibration_report.md) ·
 [threshold policy](reports/threshold_report.md) · [frozen policy](reports/decision_policy.json)
@@ -166,7 +185,12 @@ property re-encoded up to seven times, which a naive per-column ranking would co
 that many times — so the interpretation groups them instead. And they are associations:
 no coefficient here licenses a claim about what *would* happen if a contract changed.
 
-<!-- 15C: local explanation screenshot -->
+The same customer, explained by the live endpoint:
+
+![Contributing factors for the scored customer: Contract Month-to-month +0.5860 and MonthlyCharges
++0.3138 pushing the score up against InternetService DSL −0.6436 pushing it down, the two phone
+columns grouped as one property, and a reconstruction closing to a maximum error of
+1.11e-16.](docs/screenshots/local-explanation.png)
 
 Deep dive: [model interpretation](reports/model_interpretation_report.md)
 
@@ -192,6 +216,21 @@ records report `INSUFFICIENT_DATA` rather than a number, and aggregation is
 privacy-aware: raw category values are never retained, only bounded digests, never
 exposed. PSI and TVD are descriptive distances, not tests — crossing a cutoff means
 "this window no longer resembles the reference", never "the model degraded".
+
+![Monitoring panel of the running console: status WARNING, 101 window records against a minimum
+window size of 100, data drift WARNING, prediction drift WARNING, structural consistency
+OK.](docs/screenshots/monitoring-status.png)
+
+**Demonstration window.** The first 101 scored observations of the frozen training pool, taken
+deterministically in frozen order — the reference population itself. It reports `WARNING`: PSI
+0.155 on `tenure` and 0.152 on the model score against a heuristic 0.10 cutoff, while the mean of
+`tenure` moved −0.10 reference standard deviations and the predicted-positive rate moved −0.015 and
+stayed `OK`. What this demonstrates is that the operational cutoff can fire on a small window drawn
+from the reference population. It is **not** evidence of production drift, and **not** evidence of
+performance degradation — which nothing here can measure, because there are no labels. The window
+is published as captured rather than replaced with a greener one: the cutoffs are heuristics fixed
+before any traffic existed, and this is exactly the kind of window that says they need re-tuning
+once real ones exist.
 
 Deep dive: [monitoring](reports/monitoring_report.md) ·
 [policy and cutoffs](configs/monitoring.toml)
@@ -230,9 +269,8 @@ Deep dive: [freeze report](reports/model_freeze_report.md) ·
 threshold, inspect the exact per-feature contributions behind it. Vanilla HTML, modern
 CSS and ES6 with inline SVG over the FastAPI backend: no frontend framework, no build
 step, no CDN, no web fonts. It runs offline, is served by the API process itself, and is
-off by default behind an environment flag.
-
-<!-- 15C: demo screenshots -->
+off by default behind an environment flag. It is pictured at the top of this page, and the result
+and explanation panels above are screenshots of it running against the frozen artifact.
 
 ## Running locally
 

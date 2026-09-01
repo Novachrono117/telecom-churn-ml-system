@@ -166,8 +166,8 @@ Reusable logic belongs under `src/`.
 14A. **COMPLETE** — Academic / self-contained reproducibility package.
 14B. **OPTIONAL** — External academic completion (Colab run, shared link, exported PDF, video). Not a blocker; its historical `*_verified` flags stay as recorded.
 15A. **COMPLETE** — Professional repository audit and repositioning.
-15B. **CURRENT** — Recruiter-facing README and technical story.
-15C. Architecture, visual evidence and real demo screenshots.
+15B. **COMPLETE** — Recruiter-facing README and technical story.
+15C. **CURRENT** — Architecture, visual evidence and real demo screenshots.
 15D. Developer experience and documentation navigation.
 15E. Final public portfolio audit — `READY_FOR_PUBLIC_PORTFOLIO`.
 OPTIONAL. Public release / deployment. Not required to close Phase 15.

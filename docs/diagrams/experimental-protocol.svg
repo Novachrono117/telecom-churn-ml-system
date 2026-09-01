@@ -1,0 +1,260 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 1150" width="1240" height="1150"
+     font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+     role="img" aria-labelledby="title desc">
+  <title id="title">Experimental protocol and leakage boundary</title>
+  <desc id="desc">The 7,043-row dataset is split once, with a fixed seed and stratification, into a
+    training pool of 5,634 rows and a holdout of 1,409 rows. Every decision — baselines,
+    preprocessing, feature experiments, model comparison, nested tuning, the calibration gate, the
+    threshold and the final freeze — is made on the training pool alone. The holdout is locked
+    while those decisions are made and is evaluated once, after the freeze. The holdout evaluation
+    leads only to a post-hoc error analysis. The global interpretation of the frozen model is a
+    separate branch off the freeze, computed over the training distribution without loading the
+    holdout, without refitting and without reopening any selection. Both branches feed the
+    reporting, and nothing on them returns to the decisions above.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+            orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1240" height="1150" fill="#ffffff"/>
+
+  <text x="48" y="46" font-size="15" font-weight="700" fill="#0f172a">
+    EXPERIMENTAL PROTOCOL — what each partition was allowed to influence
+  </text>
+
+  <!-- === source and split -->
+  <rect x="470" y="70" width="300" height="54" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="620" y="92" font-size="13" font-weight="600" fill="#0f172a" text-anchor="middle">
+    Telco dataset — 7,043 rows
+  </text>
+  <text x="620" y="110" font-size="11" fill="#475569" text-anchor="middle">
+    public benchmark · raw SHA-256 pinned
+  </text>
+
+  <path d="M620 124 V152" fill="none" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <rect x="420" y="156" width="400" height="60" rx="8" fill="#f1f5f9" stroke="#334155"
+        stroke-width="2"/>
+  <text x="620" y="180" font-size="13" font-weight="700" fill="#0f172a" text-anchor="middle">
+    Frozen stratified split — seed 42
+  </text>
+  <text x="620" y="200" font-size="11" fill="#475569" text-anchor="middle">
+    regenerated from the raw file, never stored; digests in split_manifest.json
+  </text>
+
+  <path d="M620 216 V244" fill="none" stroke="#475569" stroke-width="1.8"/>
+  <path d="M620 244 H340 V266" fill="none" stroke="#475569" stroke-width="1.8"
+        marker-end="url(#arrow)"/>
+  <path d="M620 244 H920 V266" fill="none" stroke="#475569" stroke-width="1.8"
+        marker-end="url(#arrow)"/>
+
+  <!-- === training pool -->
+  <rect x="100" y="270" width="480" height="58" rx="8" fill="#f1f5f9" stroke="#334155"
+        stroke-width="1.8"/>
+  <text x="120" y="294" font-size="13.5" font-weight="700" fill="#0f172a">
+    Training pool — 5,634 rows
+  </text>
+  <text x="120" y="314" font-size="11" fill="#475569">
+    every decision below was made here, and only here
+  </text>
+
+  <path d="M140 328 V656" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <g font-size="11.5" fill="#0f172a">
+    <rect x="170" y="346" width="410" height="40" rx="6" fill="#ffffff" stroke="#cbd5e1"/>
+    <path d="M140 366 H164" fill="none" stroke="#475569" stroke-width="1.4"
+          marker-end="url(#arrow)"/>
+    <text x="186" y="371">Baselines — DummyClassifier, then logistic regression</text>
+
+    <rect x="170" y="394" width="410" height="40" rx="6" fill="#ffffff" stroke="#cbd5e1"/>
+    <path d="M140 414 H164" fill="none" stroke="#475569" stroke-width="1.4"
+          marker-end="url(#arrow)"/>
+    <text x="186" y="419">Preprocessing — fitted inside each fold, never before the split</text>
+
+    <rect x="170" y="442" width="410" height="40" rx="6" fill="#ffffff" stroke="#cbd5e1"/>
+    <path d="M140 462 H164" fill="none" stroke="#475569" stroke-width="1.4"
+          marker-end="url(#arrow)"/>
+    <text x="186" y="467">Feature experiments — 5 hypotheses, paired ablations, none adopted</text>
+
+    <rect x="170" y="490" width="410" height="40" rx="6" fill="#ffffff" stroke="#cbd5e1"/>
+    <path d="M140 510 H164" fill="none" stroke="#475569" stroke-width="1.4"
+          marker-end="url(#arrow)"/>
+    <text x="186" y="515">Model comparison — LR vs HGB vs RF under identical 5-fold CV</text>
+
+    <rect x="170" y="538" width="410" height="40" rx="6" fill="#ffffff" stroke="#cbd5e1"/>
+    <path d="M140 558 H164" fill="none" stroke="#475569" stroke-width="1.4"
+          marker-end="url(#arrow)"/>
+    <text x="186" y="563">Nested tuning — adoption rule fixed before any tuned result existed</text>
+
+    <rect x="170" y="586" width="410" height="40" rx="6" fill="#ffffff" stroke="#cbd5e1"/>
+    <path d="M140 606 H164" fill="none" stroke="#475569" stroke-width="1.4"
+          marker-end="url(#arrow)"/>
+    <text x="186" y="611">Calibration gate — sigmoid and isotonic rejected; policy NONE</text>
+
+    <rect x="170" y="634" width="410" height="40" rx="6" fill="#ffffff" stroke="#cbd5e1"/>
+    <path d="M140 654 H164" fill="none" stroke="#475569" stroke-width="1.4"
+          marker-end="url(#arrow)"/>
+    <text x="186" y="659">Threshold selection — F1_MAXIMIZATION, evaluated nested</text>
+  </g>
+
+  <path d="M140 656 V690 H340 V702" fill="none" stroke="#475569" stroke-width="1.8"
+        marker-end="url(#arrow)"/>
+
+  <rect x="100" y="704" width="480" height="70" rx="8" fill="#f1f5f9" stroke="#334155"
+        stroke-width="2.2"/>
+  <text x="120" y="730" font-size="13.5" font-weight="700" fill="#0f172a">
+    FROZEN CONFIGURATION
+  </text>
+  <text x="120" y="750" font-size="11" fill="#475569">
+    estimator · hyperparameters · calibration NONE · threshold · pipeline fingerprint
+  </text>
+  <text x="120" y="763" font-size="10.5" fill="#64748b">
+    from this line on, nothing about the model may be chosen again
+  </text>
+
+  <!-- === holdout -->
+  <rect x="700" y="270" width="440" height="58" rx="8" fill="#f8fafc" stroke="#64748b"
+        stroke-width="1.8"/>
+  <text x="720" y="294" font-size="13.5" font-weight="700" fill="#0f172a">
+    Holdout — 1,409 rows
+  </text>
+  <text x="720" y="314" font-size="11" fill="#475569">
+    374 churners · prevalence 0.2654
+  </text>
+
+  <path d="M920 328 V342" fill="none" stroke="#64748b" stroke-width="1.5"/>
+
+  <rect x="700" y="346" width="440" height="328" rx="8" fill="#f8fafc" stroke="#64748b"
+        stroke-width="1.8" stroke-dasharray="8 5"/>
+  <text x="720" y="374" font-size="12.5" font-weight="700" fill="#0f172a">
+    LOCKED WHILE EVERY DECISION ON THE LEFT WAS MADE
+  </text>
+  <g font-size="11.5" fill="#475569">
+    <text x="720" y="404">not fitted on</text>
+    <text x="720" y="426">not used for model or feature selection</text>
+    <text x="720" y="448">not used for hyperparameter tuning</text>
+    <text x="720" y="470">not used for the calibration gate</text>
+    <text x="720" y="492">not used to choose the decision threshold</text>
+  </g>
+  <g fill="#475569">
+    <rect x="712" y="396" width="4" height="4" fill="#64748b"/>
+    <rect x="712" y="418" width="4" height="4" fill="#64748b"/>
+    <rect x="712" y="440" width="4" height="4" fill="#64748b"/>
+    <rect x="712" y="462" width="4" height="4" fill="#64748b"/>
+    <rect x="712" y="484" width="4" height="4" fill="#64748b"/>
+  </g>
+  <line x1="720" y1="516" x2="1120" y2="516" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="720" y="542" font-size="11.5" fill="#334155">
+    No holdout row was loaded, transformed, predicted
+  </text>
+  <text x="720" y="560" font-size="11.5" fill="#334155">
+    or counted at any point above this line.
+  </text>
+  <text x="720" y="592" font-size="11.5" fill="#334155">
+    No holdout statistic existed anywhere in the
+  </text>
+  <text x="720" y="610" font-size="11.5" fill="#334155">
+    repository until the configuration was frozen.
+  </text>
+  <text x="720" y="644" font-size="10.5" fill="#64748b">
+    Protected from fitting, selection and tuning after
+  </text>
+  <text x="720" y="658" font-size="10.5" fill="#64748b">
+    the split — see the exposure note below.
+  </text>
+
+  <path d="M580 737 H696" fill="none" stroke="#475569" stroke-width="2"
+        marker-end="url(#arrow)"/>
+  <text x="638" y="727" font-size="11" font-weight="600" fill="#334155" text-anchor="middle">
+    only after the freeze
+  </text>
+
+  <rect x="700" y="704" width="440" height="70" rx="8" fill="#ffffff" stroke="#334155"
+        stroke-width="1.8"/>
+  <text x="720" y="730" font-size="13.5" font-weight="700" fill="#0f172a">
+    Final holdout evaluation — run once
+  </text>
+  <text x="720" y="750" font-size="11" fill="#475569">
+    one configuration, one pass; it gated nothing and could change nothing
+  </text>
+
+  <path d="M340 774 V808" fill="none" stroke="#475569" stroke-width="1.8"
+        marker-end="url(#arrow)"/>
+  <path d="M920 774 V808" fill="none" stroke="#475569" stroke-width="1.8"
+        marker-end="url(#arrow)"/>
+
+  <rect x="100" y="812" width="480" height="88" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="120" y="836" font-size="12.5" font-weight="600" fill="#0f172a">
+    Frozen-model interpretation
+  </text>
+  <text x="120" y="856" font-size="11" fill="#475569">
+    global coefficients and grouped contributions, computed over the
+  </text>
+  <text x="120" y="872" font-size="11" fill="#475569">
+    training distribution: no holdout row is loaded, nothing is refitted,
+  </text>
+  <text x="120" y="888" font-size="11" fill="#475569">
+    no selection is reopened
+  </text>
+
+  <rect x="700" y="812" width="440" height="88" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="720" y="836" font-size="12.5" font-weight="600" fill="#0f172a">
+    Post-hoc error analysis
+  </text>
+  <text x="720" y="856" font-size="11" fill="#475569">
+    where the frozen rule failed on the holdout it had just
+  </text>
+  <text x="720" y="872" font-size="11" fill="#475569">
+    been evaluated on — described after the fact, changing
+  </text>
+  <text x="720" y="888" font-size="11" fill="#475569">
+    nothing and able to change nothing
+  </text>
+
+  <path d="M920 900 V934" fill="none" stroke="#475569" stroke-width="1.8"
+        marker-end="url(#arrow)"/>
+  <path d="M340 900 V918 H860 V934" fill="none" stroke="#475569" stroke-width="1.8"
+        marker-end="url(#arrow)"/>
+
+  <rect x="700" y="938" width="440" height="76" rx="8" fill="#f1f5f9" stroke="#334155"
+        stroke-width="1.5"/>
+  <text x="720" y="962" font-size="12.5" font-weight="700" fill="#0f172a">Reporting</text>
+  <text x="720" y="982" font-size="11" fill="#475569">
+    reports, figures and machine-readable records, each one
+  </text>
+  <text x="720" y="998" font-size="11" fill="#475569">
+    traceable to the run that produced it
+  </text>
+
+  <rect x="100" y="938" width="480" height="76" rx="8" fill="#f8fafc" stroke="#334155"
+        stroke-width="1.5"/>
+  <text x="120" y="964" font-size="13" font-weight="700" fill="#0f172a"
+        font-family="ui-monospace, Consolas, monospace">
+    selection_after_holdout = false
+  </text>
+  <text x="120" y="986" font-size="11" fill="#475569">
+    Nothing on these two rows changed anything in the column of
+  </text>
+  <text x="120" y="1002" font-size="11" fill="#475569">
+    decisions above. No arrow returns.
+  </text>
+
+  <!-- === analyst exposure -->
+  <rect x="100" y="1048" width="1040" height="74" rx="8" fill="#fffbeb" stroke="#b45309"
+        stroke-width="1.2"/>
+  <rect x="100" y="1048" width="6" height="74" rx="3" fill="#b45309"/>
+  <text x="124" y="1072" font-size="12.5" font-weight="700" fill="#7c2d12">
+    Analyst exposure — read the holdout estimate with this caveat attached
+  </text>
+  <text x="124" y="1092" font-size="11.5" fill="#7c2d12">
+    Initial EDA exposed the analyst to the full dataset before formal holdout protection was in
+    place. The holdout is therefore protected from fitting
+  </text>
+  <text x="124" y="1110" font-size="11.5" fill="#7c2d12">
+    and tuning after the split, not untouched, and the final estimate may carry an optimistic
+    bias that cannot be quantified from inside this study.
+  </text>
+</svg>

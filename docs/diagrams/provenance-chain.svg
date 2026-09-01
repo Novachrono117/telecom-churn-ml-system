@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 900" width="1050" height="900"
+     font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+     role="img" aria-labelledby="title desc">
+  <title id="title">Provenance chain of the frozen churn model</title>
+  <desc id="desc">The raw dataset digest pins the split manifest, which pins the training-identifier
+    digest, which pins the frozen configuration. That configuration is fingerprinted four ways:
+    the semantic identity of the learned parameters, the byte identity of the serialised file, the
+    source and runtime provenance of the code that runs around the model, and the digest of the
+    decision policy. All four are re-checked by 34 startup gates, which either serve or fail
+    closed.</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+            orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1050" height="900" fill="#ffffff"/>
+
+  <text x="48" y="44" font-size="15" font-weight="700" fill="#0f172a">
+    PROVENANCE CHAIN — what is pinned, and what each digest actually proves
+  </text>
+
+  <!-- === upstream chain -->
+  <rect x="60" y="76" width="320" height="54" rx="7" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="76" y="98" font-size="12.5" font-weight="600" fill="#0f172a">Raw dataset</text>
+  <text x="76" y="118" font-size="11" fill="#475569" font-family="ui-monospace, Consolas, monospace">
+    raw_sha256  88be4b93…
+  </text>
+
+  <path d="M220 130 V148" fill="none" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <rect x="60" y="152" width="320" height="54" rx="7" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="76" y="174" font-size="12.5" font-weight="600" fill="#0f172a">Split manifest</text>
+  <text x="76" y="194" font-size="11" fill="#475569">
+    split parameters + a digest per partition
+  </text>
+
+  <path d="M220 206 V224" fill="none" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <rect x="60" y="228" width="320" height="54" rx="7" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="76" y="250" font-size="12.5" font-weight="600" fill="#0f172a">Training identifiers</text>
+  <text x="76" y="270" font-size="11" fill="#475569" font-family="ui-monospace, Consolas, monospace">
+    training_ids_sha256  a553196d…
+  </text>
+
+  <path d="M220 282 V300" fill="none" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+  <rect x="60" y="304" width="320" height="66" rx="8" fill="#f1f5f9" stroke="#334155"
+        stroke-width="2.2"/>
+  <text x="76" y="328" font-size="13" font-weight="700" fill="#0f172a">FROZEN CONFIGURATION</text>
+  <text x="76" y="347" font-size="11" fill="#475569">
+    estimator · hyperparameters · calibration
+  </text>
+  <text x="76" y="362" font-size="11" fill="#475569">
+    NONE · threshold · feature contract
+  </text>
+
+  <text x="76" y="404" font-size="11" fill="#64748b">
+    Each link is verifiable on its own:
+  </text>
+  <text x="76" y="420" font-size="11" fill="#64748b">
+    the partition is regenerated from the
+  </text>
+  <text x="76" y="436" font-size="11" fill="#64748b">
+    raw file rather than stored, and the
+  </text>
+  <text x="76" y="452" font-size="11" fill="#64748b">
+    pipeline is rebuilt from the frozen
+  </text>
+  <text x="76" y="468" font-size="11" fill="#64748b">
+    split, builder and training pool.
+  </text>
+
+  <!-- === four fingerprints -->
+  <path d="M380 337 H406" fill="none" stroke="#475569" stroke-width="1.6"/>
+  <path d="M406 122 V490" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <path d="M406 122 H424" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M406 238 H424" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M406 362 H424" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M406 486 H424" fill="none" stroke="#475569" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="430" y="76" width="560" height="92" rx="8" fill="#f1f5f9" stroke="#334155"
+        stroke-width="2.2"/>
+  <text x="448" y="96" font-size="10.5" font-weight="700" fill="#334155" letter-spacing="0.6">
+    SEMANTIC IDENTITY — WHAT THE MODEL IS · AUTHORITATIVE
+  </text>
+  <text x="448" y="118" font-size="12" fill="#0f172a" font-family="ui-monospace, Consolas, monospace">
+    model_fingerprint_sha256  a57568e1…
+  </text>
+  <text x="448" y="140" font-size="11" fill="#475569">
+    Hashes the learned parameters under a canonical encoding that round-trips every
+  </text>
+  <text x="448" y="156" font-size="11" fill="#475569">
+    double exactly. Invariant to how the object happened to be serialised.
+  </text>
+
+  <rect x="430" y="192" width="560" height="92" rx="8" fill="#ffffff" stroke="#64748b"
+        stroke-width="1.4"/>
+  <text x="448" y="212" font-size="10.5" font-weight="700" fill="#334155" letter-spacing="0.6">
+    BYTE IDENTITY — WHAT THE FILE IS
+  </text>
+  <text x="448" y="234" font-size="12" fill="#0f172a" font-family="ui-monospace, Consolas, monospace">
+    pipeline_sha256  574fde36…   8,218 bytes
+  </text>
+  <text x="448" y="256" font-size="11" fill="#475569">
+    Catches a corrupted or swapped artifact. It is a property of the file, not of the
+  </text>
+  <text x="448" y="272" font-size="11" fill="#475569">
+    model, and is not guaranteed to survive a change of environment.
+  </text>
+
+  <rect x="430" y="308" width="560" height="108" rx="8" fill="#f8fafc" stroke="#64748b"
+        stroke-width="1.6" stroke-dasharray="7 4"/>
+  <text x="448" y="328" font-size="10.5" font-weight="700" fill="#334155" letter-spacing="0.6">
+    SOURCE AND RUNTIME PROVENANCE — WHAT RUNS AROUND THE MODEL
+  </text>
+  <text x="448" y="350" font-size="12" fill="#0f172a" font-family="ui-monospace, Consolas, monospace">
+    8 source files + 3 configuration files, whole-file SHA-256
+  </text>
+  <text x="448" y="372" font-size="11" fill="#475569">
+    Plus the exact pinned versions of scikit-learn, numpy, pandas and joblib.
+  </text>
+  <text x="448" y="392" font-size="11" fill="#475569">
+    Whole-file and fail-closed: an unrelated edit invalidates the freeze on purpose,
+  </text>
+  <text x="448" y="408" font-size="11" fill="#475569">
+    because hashing only the parts believed to matter would miss the parts that do.
+  </text>
+
+  <rect x="430" y="440" width="560" height="92" rx="8" fill="#ffffff" stroke="#64748b"
+        stroke-width="1.4"/>
+  <rect x="430" y="440" width="5" height="92" rx="2" fill="#334155"/>
+  <text x="448" y="460" font-size="10.5" font-weight="700" fill="#334155" letter-spacing="0.6">
+    FROZEN RULE — WHAT IS DONE WITH THE SCORE
+  </text>
+  <text x="448" y="482" font-size="12" fill="#0f172a" font-family="ui-monospace, Consolas, monospace">
+    decision_policy_sha256  bd7aa800…
+  </text>
+  <text x="448" y="504" font-size="11" fill="#475569">
+    The threshold, the comparison and the positive class come from this document and
+  </text>
+  <text x="448" y="520" font-size="11" fill="#475569">
+    from nowhere else. No environment variable may redefine any of them.
+  </text>
+
+  <!-- === startup gates -->
+  <path d="M406 490 V556 H525 V576" fill="none" stroke="#475569" stroke-width="1.8"
+        marker-end="url(#arrow)"/>
+
+  <rect x="60" y="580" width="930" height="66" rx="8" fill="#f1f5f9" stroke="#334155"
+        stroke-width="2.2"/>
+  <text x="80" y="604" font-size="13.5" font-weight="700" fill="#0f172a">
+    34 startup integrity gates
+  </text>
+  <text x="80" y="624" font-size="11" fill="#475569">
+    Every digest above is re-checked when the process boots, before a single request is accepted.
+  </text>
+  <text x="80" y="638" font-size="10.5" fill="#64748b">
+    The pipeline is also regenerable: rebuilding it must reproduce both fingerprints.
+  </text>
+
+  <path d="M525 646 V668" fill="none" stroke="#475569" stroke-width="1.8"/>
+  <path d="M525 668 H280 V692" fill="none" stroke="#475569" stroke-width="1.8"
+        marker-end="url(#arrow)"/>
+  <path d="M525 668 H770 V692" fill="none" stroke="#475569" stroke-width="1.8"
+        marker-end="url(#arrow)"/>
+
+  <rect x="60" y="696" width="440" height="66" rx="8" fill="#ffffff" stroke="#334155"
+        stroke-width="1.6"/>
+  <text x="80" y="720" font-size="13" font-weight="700" fill="#0f172a">SERVE</text>
+  <text x="80" y="740" font-size="11" fill="#475569">
+    /health/ready answers 200 and reports
+  </text>
+  <text x="80" y="754" font-size="11" fill="#475569" font-family="ui-monospace, Consolas, monospace">
+    "startup_gates_passed": 34
+  </text>
+
+  <rect x="550" y="696" width="440" height="66" rx="8" fill="#ffffff" stroke="#334155"
+        stroke-width="1.6" stroke-dasharray="7 4"/>
+  <text x="570" y="720" font-size="13" font-weight="700" fill="#0f172a">FAIL CLOSED</text>
+  <text x="570" y="740" font-size="11" fill="#475569">
+    On any mismatch the service refuses to serve.
+  </text>
+  <text x="570" y="756" font-size="11" fill="#475569">
+    No prediction is better than an unverified one.
+  </text>
+
+  <!-- === why source provenance exists -->
+  <rect x="60" y="792" width="930" height="80" rx="8" fill="#f8fafc" stroke="#334155"
+        stroke-width="1.2"/>
+  <rect x="60" y="792" width="6" height="80" rx="3" fill="#334155"/>
+  <text x="84" y="816" font-size="12.5" font-weight="700" fill="#0f172a">
+    Why source provenance has to exist as a separate link
+  </text>
+  <text x="84" y="838" font-size="11.5" fill="#475569">
+    prepare_features() runs BEFORE the persisted pipeline, so it is outside everything the model's
+    own fingerprints can see. Editing it would change
+  </text>
+  <text x="84" y="856" font-size="11.5" fill="#475569">
+    the values handed to the model while the semantic fingerprint, the file bytes, the feature
+    names, the threshold and the hyperparameters all stayed identical.
+  </text>
+</svg>
