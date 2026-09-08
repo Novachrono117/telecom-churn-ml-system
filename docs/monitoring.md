@@ -60,9 +60,26 @@ nothing in that file can reach the model.
 
 The console screenshot ([`screenshots/monitoring-status.png`](screenshots/monitoring-status.png))
 shows `WARNING`: 101 records, data drift `WARNING`, prediction drift `WARNING`, structural
-consistency `OK`. That window is the first 101 scored observations of the frozen training
-pool, taken deterministically in frozen order — **the reference population itself** — and it
-crosses the heuristic cutoffs anyway, at PSI 0.155 on `tenure` and 0.152 on the model score.
+consistency `OK`. Every observation in that window comes from the frozen training pool —
+**the reference population itself** — and it crosses the heuristic cutoffs anyway, at PSI
+0.155 on `tenure` and 0.152 on the model score.
+
+**The canonical window.** It is deterministic, and rebuildable from the versioned repository
+alone. Start a fresh process with `CHURN_SERVING_MONITORING=1` and
+`CHURN_SERVING_PORTFOLIO_UI=1` — the second flag is what publishes `/api/v1/explain` — so the
+collector begins empty, then:
+
+1. `POST /api/v1/predict/batch` with the **first 100 records of the frozen training pool, in
+   frozen order** — the order `load_training_pool()` rebuilds from the raw digest and the
+   split manifest;
+2. `POST /api/v1/explain` with the visualization example the README uses for the decision
+   boundary: the first record in that same frozen order whose score is at or above the frozen
+   threshold and below 0.500;
+3. `GET /api/v1/monitoring`.
+
+The 101st observation is therefore that example, **not** the 101st distinct row of the pool.
+No fixture and no extra script are needed: the frozen split, the frozen pipeline and the two
+endpoints fully determine the numbers.
 
 What that demonstrates is a property of the cutoff, not a property of the data: an
 operational threshold fixed before any traffic existed can fire on a small window drawn from

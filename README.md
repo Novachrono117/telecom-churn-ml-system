@@ -29,7 +29,9 @@ next to the held-out metrics.](docs/screenshots/churn-risk-console.png)
 ## Results
 
 One frozen configuration, evaluated **once** on a holdout of **1,409 customers**
-(374 churners, prevalence 0.2654) that took no part in any decision.
+(374 churners, prevalence 0.2654). After the formal split, no part of that holdout was used
+for fitting, feature selection, model selection, tuning, the calibration decision or the
+threshold decision.
 
 | Metric | Value | 95% CI (percentile bootstrap, 2,000 replications) |
 | --- | --- | --- |
@@ -224,16 +226,21 @@ exposed. PSI and TVD are descriptive distances, not tests — crossing a cutoff 
 window size of 100, data drift WARNING, prediction drift WARNING, structural consistency
 OK.](docs/screenshots/monitoring-status.png)
 
-**Demonstration window.** The first 101 scored observations of the frozen training pool, taken
-deterministically in frozen order — the reference population itself. It reports `WARNING`: PSI
-0.155 on `tenure` and 0.152 on the model score against a heuristic 0.10 cutoff, while the mean of
-`tenure` moved −0.10 reference standard deviations and the predicted-positive rate moved −0.015 and
-stayed `OK`. What this demonstrates is that the operational cutoff can fire on a small window drawn
-from the reference population. It is **not** evidence of production drift, and **not** evidence of
-performance degradation — which nothing here can measure, because there are no labels. The window
-is published as captured rather than replaced with a greener one: the cutoffs are heuristics fixed
-before any traffic existed, and this is exactly the kind of window that says they need re-tuning
-once real ones exist.
+**Demonstration window.** 101 scored observations, every one of them drawn from the frozen
+training pool — the reference population itself. The window is deterministic and rebuildable on a
+fresh process with an empty collector: the **first 100 records of the frozen training pool, in
+frozen order**, sent to `POST /api/v1/predict/batch`, followed by the visualization example above
+scored through `POST /api/v1/explain`. The 101st observation is that example, not the 101st
+distinct row of the pool.
+
+It reports `WARNING`: PSI 0.155 on `tenure` and 0.152 on the model score against a heuristic 0.10
+cutoff, while the mean of `tenure` moved −0.10 reference standard deviations and the
+predicted-positive rate moved −0.015 and stayed `OK`. What this demonstrates is that the
+operational cutoff can fire on a small window drawn from the reference population. It is **not**
+evidence of production drift, and **not** evidence of performance degradation — which nothing here
+can measure, because there are no labels. The window is published as captured rather than replaced
+with a greener one: the cutoffs are heuristics fixed before any traffic existed, and this is
+exactly the kind of window that says they need re-tuning once real ones exist.
 
 Deep dive: [monitoring](reports/monitoring_report.md) ·
 [policy and cutoffs](configs/monitoring.toml)
@@ -366,7 +373,7 @@ scripts/        one entry point per stage; 11 of them support --verify
 tests/          contract, transformation, modeling, serving and monitoring tests
 reports/        generated reports, figures and machine-readable experiment records
 notebooks/      exploratory analysis and the independent reproduction notebook
-data/raw/       the untouched source CSV, versioned and fingerprinted
+data/raw/       the unmodified source CSV, versioned and fingerprinted
 artifacts/      the frozen inference pipeline (8 KB, regenerable, fingerprinted)
 academic/       historical / extended reproducibility material (Portuguese)
 ```

@@ -64,6 +64,15 @@ digests and the exact pinned versions of scikit-learn, numpy, pandas and joblib.
 mismatch the process refuses to serve; no failure path rebuilds anything.
 `GET /health/ready` reports `"startup_gates_passed": 34`, or `503`.
 
+> **The freeze records describe the repository as it was at freeze time.**
+> [`decision_policy.json`](../reports/decision_policy.json) records
+> `artifacts.versioned_in_git = false`, and
+> [`model_freeze_report.md`](../reports/model_freeze_report.md) says the same, because the
+> pipeline binary had not been committed yet when the model was frozen. It was committed
+> later, without changing its bytes, its semantic fingerprint or the decision policy — the
+> three digests above still verify. Those records are deliberately not rewritten: a frozen
+> record edited to match a newer repository state stops being evidence of what was frozen.
+
 ## Why `serving/` is its own uv project
 
 `pyproject.toml` and `uv.lock` are part of the freeze: their digests are recorded in
@@ -91,8 +100,12 @@ freeze, so it needs a deliberate re-freeze. See
 
 The directory layout is in the README's
 [project structure](../README.md#project-structure). Two entries matter architecturally:
-`artifacts/` holds the frozen pipeline (8,218 bytes) and is **not** versioned — it is
-regenerable and fingerprinted, which is a stronger guarantee than storing the binary; and
+`artifacts/` holds the frozen pipeline (8,218 bytes), and that binary **is** versioned:
+`.gitignore` excludes `*.joblib` and then re-includes `artifacts/model/*.joblib`, so a clone
+can serve without retraining. Shipping the bytes is a convenience, not the guarantee — the
+authoritative identity of the model is `model_fingerprint_sha256`, `pipeline_sha256` verifies
+the serialised bytes, and [`freeze_model.py`](../scripts/freeze_model.py) reconstructs and
+re-verifies the artefact from code, so the pipeline is regenerable as well as stored. And
 `scripts/` holds one entry point per stage, 11 of which support `--verify`.
 
 > **On the screenshots.** The images under [`screenshots/`](screenshots) are documentation
