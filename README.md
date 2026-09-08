@@ -152,7 +152,7 @@ real costs remains open work.
 ![Out-of-fold F1 across the whole range of decision thresholds, peaking at 0.6381 on the frozen
 threshold 0.3273 and falling away well before the 0.500 default, which is marked separately.](reports/figures/threshold/02_f1_vs_threshold.png)
 
-A real customer scored through the live API, on the band where the default and the policy disagree:
+A sample customer record scored through the running API, in the band where the default and the policy disagree:
 
 ![Result panel from the running console: a churn score of 34.0%, full precision
 0.34000536953235566, decision "churn", against the frozen threshold 0.3273 under the rule
