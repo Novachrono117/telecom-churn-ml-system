@@ -169,7 +169,7 @@ Reusable logic belongs under `src/`.
 15B. **COMPLETE** — Recruiter-facing README and technical story.
 15C. **COMPLETE** — Architecture, visual evidence and real demo screenshots.
 15D. **COMPLETE** — Developer experience and documentation navigation.
-15E. **CURRENT** — Final public portfolio audit — `READY_FOR_PUBLIC_PORTFOLIO`.
+15E. **COMPLETE** — Final public portfolio audit — `READY_FOR_PUBLIC_PORTFOLIO`.
 OPTIONAL. Public release / deployment. Not required to close Phase 15.
 Always identify the current phase before expanding scope.
 From Phase 15 on, `README.md`, `CLAUDE.md`, `LICENSE` and any new `docs/` layer are in scope; historical reports, experiment records and figures are not rewritten to match a newer narrative.
